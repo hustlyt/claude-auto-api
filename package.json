@@ -1,0 +1,43 @@
+{
+  "name": "@4xian/ccapi",
+  "version": "1.0.1",
+  "author": "4xian (https://github.com/4xian)",
+  "description": "Claude Code settings.json中key自动配置工具，方便API_KEY、AUTH_TOKEN配置切换",
+  "main": "dist/index.js",
+  "bin": {
+    "ccapi": "bin/ccapi"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude",
+    "api",
+    "cli",
+    "config",
+    "settings"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.9.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ]
+}
