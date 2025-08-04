@@ -1,0 +1,74 @@
+const { Command } = require('commander');
+const chalk = require('chalk');
+const packageJson = require('../package.json');
+
+// 导入命令处理模块
+const versionCommand = require('./commands/version');
+const setCommand = require('./commands/set');
+const listCommand = require('./commands/list');
+const useCommand = require('./commands/use');
+
+const program = new Command();
+
+// 设置基本信息
+program
+  .name('ccapi')
+  .description('Claude settings.json配置管理工具')
+  .version(packageJson.version);
+
+// 注册命令
+
+// 版本命令
+program
+  .option('-v, --version', '显示版本信息')
+  .action((options) => {
+    if (options.version) {
+      versionCommand();
+    }
+  });
+
+// 设置命令
+program
+  .command('set')
+  .description('设置配置文件路径')
+  .option('--settings <path>', 'Claude Code settings.json文件路径')
+  .option('--api <path>', '自定义API配置文件路径')
+  .action(setCommand);
+
+// 列举命令 (支持 ls 和 list 两个命令)
+program
+  .command('ls')
+  .alias('list')
+  .description('显示当前API配置列表')
+  .action(listCommand);
+
+// 使用命令
+program
+  .command('use <name>')
+  .description('切换到指定的API配置')
+  .action(useCommand);
+
+// 全局错误处理
+process.on('uncaughtException', (error) => {
+  console.error(chalk.red('程序错误:'), error.message);
+  if (process.env.NODE_ENV === 'development') {
+    console.error(error.stack);
+  }
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(chalk.red('未处理的Promise错误:'), reason);
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Promise:', promise);
+  }
+  process.exit(1);
+});
+
+// 解析命令行参数
+program.parse(process.argv);
+
+// 如果没有提供任何参数，显示帮助信息
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}

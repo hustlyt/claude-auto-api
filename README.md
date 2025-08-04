@@ -1,5 +1,7 @@
 # @4xian/ccapi
 
+[English](./README_EN.md) | 中文
+
 Claude Code settings.json中key自动配置工具，方便API_KEY、AUTH_TOKEN配置切换
 
 ## 功能特性
@@ -28,18 +30,19 @@ ccapi -v
 
 ### 2. 设置配置文件路径
 
-初次使用需要设置 Claude 的 settings.json 文件路径和 API 配置文件路径：
+初次使用需要设置 Claude Code 的 settings.json 文件路径和自定义API配置文件路径：
 
 ```bash
+例如:
 # 同时设置两个路径
-ccapi set --settings /path/to/claude/settings.json --api /path/to/api.json
+ccapi set --settings /Users/4xian/Desktop/settings.json --api /Users/4xian/Desktop/api.json
 
 # 或分别设置
-ccapi set --settings /path/to/claude/settings.json
-ccapi set --api /path/to/api.json
+ccapi set --settings /Users/4xian/Desktop/settings.json
+ccapi set --api /Users/4xian/Desktop/api.json
 ```
 
-### 3. API 配置文件格式
+### 3. 自定义API配置文件格式
 
 创建一个`api.json`文件，格式如下：
 
@@ -48,32 +51,40 @@ ccapi set --api /path/to/api.json
   "openrouter": {
     "url": "xxx",
     "token": "your-auth-token",
-    "model": "claude-sonnet-4-20250514"
+    "model": "claude-sonnet-4-20250514",
+    "fast": "claude-3-5-haiku-20241022",
+    "timeout": 120000,
+    "tokens": 20000
   },
   "anyrouter": {
     "url": "xxx",
-    "key": "sk-xxxxxxxxxxxx",
+    "key": "you-api-key",
     "model": "claude-sonnet-4-20250514"
   }
 }
 ```
 
 **字段说明：**
+【不同厂商提供的可能是key, 也可能是token, 若不能使用可将key和token互换一下】
+【本工具只支持Anthropic格式的配置, 当然只要Claude能用就都可以】
 
-- `url`: API 服务器地址（必需）
-- `key`: API 密钥（key 和 token 至少需要一个）
-- `token`: 认证令牌（key 和 token 至少需要一个）
-- `model`: 模型名称（必需）
+- `url`: API厂商服务器地址（必需）
+- `key`: API_KEY（key 和 token 至少需要一个）
+- `token`: AUTH_TOKEN（key 和 token 至少需要一个）
+- `model`: 模型名称（非必需，默认claude-sonnet-4-20250514）
+- `fast`: 快速模型名称（非必需，默认claude-3-5-haiku-20241022）
+- `timeout`: 请求超时时间（非必需，默认600000ms）
+- `tokens`: 最大输出令牌数（非必需，默认25000）
 
-### 4. 列举可用配置
+### 4. 列举api配置文件中的可用配置
 
 ```bash
-ccapi ls
+ccapi ls 或者 ccapi list
 ```
 
 > 带`*`号的配置表示当前正在使用
 
-### 5. 切换配置
+### 5. 自由切换配置(切换成功后记得重启Claude终端才会生效!!!)
 
 ```bash
 ccapi use openrouter
