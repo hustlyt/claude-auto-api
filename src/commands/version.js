@@ -6,7 +6,7 @@ const packageJson = require('../../package.json');
  */
 function versionCommand() {
   console.log(chalk.blue(`${packageJson.name} v${packageJson.version}`));
-  console.log(chalk.gray(packageJson.description));
+  console.log(packageJson.description);
 }
 
 module.exports = versionCommand;

@@ -5,50 +5,119 @@ const { validateApiConfig, validateSettingsConfig } = require('../utils/validato
 const { CLAUDE_ENV_KEYS, ERROR_MESSAGES } = require('../constants');
 
 /**
- * 获取当前使用的配置名称
+ * 获取当前使用的配置名称和模型索引信息
  */
-function getCurrentConfigName(settingsData, apiConfig) {
+function getCurrentConfigInfo(settingsData, apiConfig) {
   const currentUrl = settingsData.env?.[CLAUDE_ENV_KEYS.url];
+  const currentModel = settingsData.env?.[CLAUDE_ENV_KEYS.model];
+  const currentFast = settingsData.env?.[CLAUDE_ENV_KEYS.fast];
 
   if (!currentUrl) {
-    return null;
+    return { name: null, modelIndex: -1, fastIndex: -1 };
   }
 
   // 查找匹配的URL
   for (const [name, config] of Object.entries(apiConfig)) {
     if (config.url === currentUrl) {
-      return name;
+      let modelIndex = -1;
+      let fastIndex = -1;
+
+      // 查找当前使用的模型索引
+      if (currentModel) {
+        if (Array.isArray(config.model)) {
+          modelIndex = config.model.indexOf(currentModel);
+        } else if (config.model === currentModel) {
+          modelIndex = 0; // 字符串情况下默认为0
+        }
+      }
+
+      // 查找当前使用的快速模型索引
+      if (currentFast) {
+        if (Array.isArray(config.fast)) {
+          fastIndex = config.fast.indexOf(currentFast);
+        } else if (config.fast === currentFast) {
+          fastIndex = 0; // 字符串情况下默认为0
+        }
+      }
+
+      return { name, modelIndex, fastIndex };
     }
   }
 
-  return null;
+  return { name: null, modelIndex: -1, fastIndex: -1 };
+}
+
+/**
+ * 格式化模型/快速模型显示
+ */
+function formatModelDisplay(modelValue, currentIndex, label) {
+  if (Array.isArray(modelValue)) {
+    const lines = [`${label}:`];
+    modelValue.forEach((model, index) => {
+      const isCurrentModel = index === currentIndex;
+      const prefix = isCurrentModel ? '    * - ' : '      - ';
+      const modelDisplay = isCurrentModel ? chalk.green.bold(model) : chalk.cyan(model);
+      lines.push(`${prefix}${index + 1}: ${modelDisplay}`);
+    });
+    return lines;
+  } else {
+    // 字符串情况，保持原样
+    const modelDisplay = currentIndex === 0 ? chalk.green.bold(modelValue) : chalk.cyan(modelValue);
+    return [`${label}: ${modelDisplay}`];
+  }
 }
 
 /**
  * 格式化配置显示
  */
-function formatConfigDisplay(name, config, isCurrent = false) {
+function formatConfigDisplay(name, config, currentInfo) {
+  const isCurrent = name === currentInfo.name;
   const prefix = isCurrent ? chalk.green('* ') : '  ';
-  const nameDisplay = isCurrent ? chalk.green.bold(name) : chalk.cyan(name);
+  const nameDisplay = isCurrent ? chalk.green.bold(`【${name}】`) : chalk.cyan(`【${name}】`);
+  
+  // 设置默认值
   config.model = config.model || 'claude-sonnet-4-20250514';
   config.fast = config.fast || 'claude-3-5-haiku-20241022';
+  
   let details = [];
-  details.push(`URL: ${chalk.gray(config.url)}`);
-  details.push(`Model: ${chalk.gray(config.model)}`);
-  details.push(`Fast: ${chalk.gray(config.fast)}`);
+  details.push(`URL: ${chalk.cyan(config.url)}`);
+  
+  // 格式化模型显示
+  const modelLines = formatModelDisplay(
+    config.model, 
+    isCurrent ? currentInfo.modelIndex : -1, 
+    'Model'
+  );
+  details.push(...modelLines);
+  
+  // 格式化快速模型显示
+  const fastLines = formatModelDisplay(
+    config.fast, 
+    isCurrent ? currentInfo.fastIndex : -1, 
+    'Fast'
+  );
+  details.push(...fastLines);
 
   if (config.key) {
-    const maskedKey = config.key.length > 8
-      ? config.key.slice(0, 8) + '...'
+    const maskedKey = config.key.length > 15
+      ? config.key.slice(0, 15) + '...'
       : config.key;
-    details.push(`Key: ${chalk.gray(maskedKey)}`);
+    details.push(`Key: ${chalk.cyan(maskedKey)}`);
   }
 
   if (config.token) {
-    const maskedToken = config.token.length > 8
-      ? config.token.slice(0, 8) + '...'
+    const maskedToken = config.token.length > 15
+      ? config.token.slice(0, 15) + '...'
       : config.token;
-    details.push(`Token: ${chalk.gray(maskedToken)}`);
+    details.push(`Token: ${chalk.cyan(maskedToken)}`);
+  }
+
+  if (config.http) {
+    details.push(`HTTP: ${chalk.cyan(config.http)}`);
+  }
+
+  if (config.https) {
+    details.push(`HTTPS: ${chalk.cyan(config.https)}`);
   }
 
   console.log(`${prefix}${nameDisplay}`);
@@ -79,8 +148,8 @@ async function listCommand() {
       return;
     }
 
-    // 获取当前使用的配置
-    const currentConfigName = getCurrentConfigName(settingsData, apiConfig);
+    // 获取当前使用的配置信息
+    const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig);
 
     // 显示配置列表
     console.log(chalk.blue.bold('可用的API配置:'));
@@ -93,14 +162,13 @@ async function listCommand() {
 
     // 按名称排序显示
     configNames.sort().forEach(name => {
-      const isCurrent = name === currentConfigName;
-      formatConfigDisplay(name, apiConfig[name], isCurrent);
+      formatConfigDisplay(name, apiConfig[name], currentConfigInfo);
       console.log(); // 空行分隔
     });
 
     // 显示当前状态
-    if (currentConfigName) {
-      console.log(chalk.green(`当前使用: ${currentConfigName}`));
+    if (currentConfigInfo.name) {
+      console.log(chalk.green(`当前使用的配置: ${currentConfigInfo.name}`));
     } else {
       console.log(chalk.yellow('当前未进行任何配置'));
     }
@@ -108,7 +176,7 @@ async function listCommand() {
   } catch (error) {
     if (error.message.includes('未设置') || error.message.includes('不存在')) {
       console.error(chalk.red('配置错误:'), error.message);
-      console.log(chalk.gray('请先使用'), chalk.cyan('ccapi set'), chalk.gray('命令设置配置文件路径'));
+      console.log('请先使用', chalk.cyan('ccapi set'), '命令设置配置文件路径');
     } else {
       console.error(chalk.red('列举配置失败:'), error.message);
     }

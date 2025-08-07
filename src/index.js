@@ -46,7 +46,11 @@ program
 program
   .command('use <name>')
   .description('切换到指定的API配置')
-  .action(useCommand);
+  .option('-m, --model <index>', '指定要切换的模型索引（从1开始，仅对数组类型model有效）')
+  .option('-f, --fast <index>', '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）')
+  .action((name, options) => {
+    useCommand(name, options);
+  });
 
 // 全局错误处理
 process.on('uncaughtException', (error) => {

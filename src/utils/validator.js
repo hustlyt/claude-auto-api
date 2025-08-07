@@ -70,12 +70,12 @@ function validateSetCommand(options) {
   const { settings, api } = options;
 
   // 至少需要设置其中一个
-  if (!settings && !api) {
-    return {
-      valid: false,
-      error: '请指定要设置的路径参数 (--settings 或 --api)'
-    };
-  }
+  // if (!settings && !api) {
+  //   return {
+  //     valid: false,
+  //     error: '请指定要设置的路径参数 (--settings 或 --api)'
+  //   };
+  // }
 
   // 验证settings路径
   if (settings && !validatePath(settings)) {

@@ -12,7 +12,9 @@ const CLAUDE_ENV_KEYS = {
   model: 'ANTHROPIC_MODEL',
   fast: 'ANTHROPIC_SMALL_FAST_MODEL',
   timeout: 'API_TIMEOUT_MS',
-  tokens: 'CLAUDE_CODE_MAX_OUTPUT_TOKENS'
+  tokens: 'CLAUDE_CODE_MAX_OUTPUT_TOKENS',
+  http: 'HTTP_PROXY',
+  https: 'HTTPS_PROXY'
 };
 
 // 错误消息

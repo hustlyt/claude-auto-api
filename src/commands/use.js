@@ -59,13 +59,43 @@ function updateSettingsEnv(settingsData, targetConfig) {
       delete env[CLAUDE_ENV_KEYS.key];
     }
   }
+
+  if (targetConfig.http) {
+    // HTTP代理（可选）
+    env[CLAUDE_ENV_KEYS.http] = targetConfig.http;
+  } else {
+    delete env[CLAUDE_ENV_KEYS.http];
+  }
+  if (targetConfig.https) {
+    // HTTPS代理（可选）
+    env[CLAUDE_ENV_KEYS.https] = targetConfig.https;
+  } else {
+    delete env[CLAUDE_ENV_KEYS.https];
+  }
   return settingsData;
+}
+
+/**
+ * 解析和选择模型
+ */
+function selectModel(modelValue, selectedIndex, defaultModel) {
+  if (Array.isArray(modelValue)) {
+    // 数组情况：选择指定索引的模型，默认为第一个
+    const index = selectedIndex > 0 ? selectedIndex - 1 : 0;
+    if (index >= modelValue.length) {
+      throw new Error(`模型索引 ${selectedIndex} 超出范围，可用范围: 1-${modelValue.length}`);
+    }
+    return modelValue[index];
+  } else {
+    // 字符串情况：直接返回，忽略索引参数
+    return modelValue || defaultModel;
+  }
 }
 
 /**
  * 使用指定配置命令
  */
-async function useCommand(configName) {
+async function useCommand(configName, options = {}) {
   try {
     // 验证配置
     const config = await validateConfig();
@@ -79,8 +109,8 @@ async function useCommand(configName) {
 
     // 验证配置名称是否存在
     if (!validateConfigName(apiConfig, configName)) {
-      console.error(chalk.red('错误:'), `${ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND}: ${configName}`);
-      console.log(chalk.gray('可用配置:'), Object.keys(apiConfig).join(', '));
+      console.error(chalk.red('设置错误:'), `${ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND}: ${configName}`);
+      console.log(chalk.green('当前可用的配置:'), Object.keys(apiConfig).join(', '));
       return;
     }
 
@@ -91,11 +121,38 @@ async function useCommand(configName) {
       return;
     }
 
-    const targetConfig = apiConfig[configName];
+    const originalConfig = apiConfig[configName];
 
+    // 创建配置副本用于修改
+    const targetConfig = { ...originalConfig };
+
+    // 设置默认值
     targetConfig.model = targetConfig.model || 'claude-sonnet-4-20250514';
     targetConfig.fast = targetConfig.fast || 'claude-3-5-haiku-20241022';
     targetConfig.timeout = targetConfig.timeout || "600000";
+
+    try {
+      // 根据参数选择模型
+      const selectedModel = selectModel(
+        targetConfig.model,
+        options.model ? parseInt(options.model) : 0,
+        'claude-sonnet-4-20250514'
+      );
+
+      const selectedFast = selectModel(
+        targetConfig.fast,
+        options.fast ? parseInt(options.fast) : 0,
+        'claude-3-5-haiku-20241022'
+      );
+
+      // 更新目标配置为选中的具体模型
+      targetConfig.model = selectedModel;
+      targetConfig.fast = selectedFast;
+
+    } catch (error) {
+      console.error(chalk.red('参数错误:'), error.message);
+      return;
+    }
 
     // 检查是否已经是当前配置
     // if (isCurrentConfig(settingsData, targetConfig)) {
@@ -104,12 +161,12 @@ async function useCommand(configName) {
     // }
 
     // 备份settings.json
-    console.log(chalk.gray('正在备份settings.json...'));
+    console.log('正在备份settings.json...');
     const backupPath = await backupFile(config.settingsPath);
-    console.log(chalk.green(SUCCESS_MESSAGES.BACKUP_CREATED), chalk.gray(`(${backupPath})`));
+    console.log(chalk.green(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`);
 
     // 更新配置
-    console.log(chalk.gray(`正在切换配置: ${configName}...`));
+    console.log(`正在切换配置: ${configName}`);
     const updatedSettings = updateSettingsEnv(settingsData, targetConfig);
 
     // 保存更新后的settings.json
@@ -119,29 +176,38 @@ async function useCommand(configName) {
     console.log();
     console.log(chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED));
     console.log();
-    console.log(chalk.blue('配置详情:'));
+    console.log(chalk.blue('当前配置详情:'));
     console.log(`  名称: ${chalk.cyan(configName)}`);
-    console.log(`  URL: ${chalk.gray(targetConfig.url)}`);
-    console.log(`  Model: ${chalk.gray(targetConfig.model)}`);
-    console.log(`  Fast: ${chalk.gray(targetConfig.fast)}`);
-    console.log();
+    console.log(`  URL: ${chalk.cyan(targetConfig.url)}`);
+
+    // 显示选中的模型信息
+    console.log(`  Model: ${chalk.cyan(targetConfig.model)}`);
+
+    console.log(`  Fast: ${chalk.cyan(targetConfig.fast)}`);
+
     if (targetConfig.key) {
-      const maskedKey = targetConfig.key.length > 8
-        ? targetConfig.key.slice(0, 8) + '...'
+      const maskedKey = targetConfig.key.length > 15
+        ? targetConfig.key.slice(0, 15) + '...'
         : targetConfig.key;
-      console.log(`  Key: ${chalk.gray(maskedKey)}`);
+      console.log(`  Key: ${chalk.cyan(maskedKey)}`);
     }
     if (targetConfig.token) {
-      const maskedToken = targetConfig.token.length > 8
-        ? targetConfig.token.slice(0, 8) + '...'
+      const maskedToken = targetConfig.token.length > 15
+        ? targetConfig.token.slice(0, 15) + '...'
         : targetConfig.token;
-      console.log(`  Token: ${chalk.gray(maskedToken)}`);
+      console.log(`  Token: ${chalk.cyan(maskedToken)}`);
     }
-
+    if (targetConfig.http) {
+      console.log(`  HTTP Proxy: ${chalk.cyan(targetConfig.http)}`);
+    }
+    if (targetConfig.https) {
+      console.log(`  HTTPS Proxy: ${chalk.cyan(targetConfig.https)}`);
+    }
+    console.log();
   } catch (error) {
     if (error.message.includes('未设置') || error.message.includes('不存在')) {
       console.error(chalk.red('配置错误:'), error.message);
-      console.log(chalk.gray('请先使用'), chalk.cyan('ccapi set'), chalk.gray('命令设置配置文件路径'));
+      console.log('请先使用', chalk.cyan('ccapi set'), '命令设置配置文件路径');
     } else {
       console.error(chalk.red('切换配置失败:'), error.message);
     }
