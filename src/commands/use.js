@@ -32,10 +32,19 @@ function updateSettingsEnv(settingsData, targetConfig) {
   env[CLAUDE_ENV_KEYS.model] = targetConfig.model;
 
   // 轻量模型（可选）
-  env[CLAUDE_ENV_KEYS.fast] = targetConfig.fast;
+  if (targetConfig.fast) {
+    env[CLAUDE_ENV_KEYS.fast] = targetConfig.fast;
+  } else {
+    delete env[CLAUDE_ENV_KEYS.fast];
+  }
 
   // API请求超时时间（可选）
-  env[CLAUDE_ENV_KEYS.timeout] = targetConfig.timeout;
+  if (targetConfig.timeout) {
+    env[CLAUDE_ENV_KEYS.timeout] = targetConfig.timeout;
+  } else {
+    delete env[CLAUDE_ENV_KEYS.timeout];
+  }
+
 
   if (targetConfig.tokens) {
     env[CLAUDE_ENV_KEYS.tokens] = targetConfig.tokens;
@@ -128,8 +137,8 @@ async function useCommand(configName, options = {}) {
 
     // 设置默认值
     targetConfig.model = targetConfig.model || 'claude-sonnet-4-20250514';
-    targetConfig.fast = targetConfig.fast || 'claude-3-5-haiku-20241022';
-    targetConfig.timeout = targetConfig.timeout || "600000";
+    // targetConfig.fast = targetConfig.fast || 'claude-3-5-haiku-20241022';
+    // targetConfig.timeout = targetConfig.timeout || "600000";
 
     try {
       // 根据参数选择模型
@@ -142,7 +151,7 @@ async function useCommand(configName, options = {}) {
       const selectedFast = selectModel(
         targetConfig.fast,
         options.fast ? parseInt(options.fast) : 0,
-        'claude-3-5-haiku-20241022'
+        ''
       );
 
       // 更新目标配置为选中的具体模型
@@ -183,7 +192,9 @@ async function useCommand(configName, options = {}) {
     // 显示选中的模型信息
     console.log(`  Model: ${chalk.cyan(targetConfig.model)}`);
 
-    console.log(`  Fast: ${chalk.cyan(targetConfig.fast)}`);
+    if (targetConfig.fast) {
+      console.log(`  Fast: ${chalk.cyan(targetConfig.fast)}`);
+    }
 
     if (targetConfig.key) {
       const maskedKey = targetConfig.key.length > 15

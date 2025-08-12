@@ -74,29 +74,31 @@ function formatConfigDisplay(name, config, currentInfo) {
   const isCurrent = name === currentInfo.name;
   const prefix = isCurrent ? chalk.green('* ') : '  ';
   const nameDisplay = isCurrent ? chalk.green.bold(`【${name}】`) : chalk.cyan(`【${name}】`);
-  
+
   // 设置默认值
   config.model = config.model || 'claude-sonnet-4-20250514';
-  config.fast = config.fast || 'claude-3-5-haiku-20241022';
-  
+  // config.fast = config.fast || 'claude-3-5-haiku-20241022';
+
   let details = [];
   details.push(`URL: ${chalk.cyan(config.url)}`);
-  
+
   // 格式化模型显示
   const modelLines = formatModelDisplay(
-    config.model, 
-    isCurrent ? currentInfo.modelIndex : -1, 
+    config.model,
+    isCurrent ? currentInfo.modelIndex : -1,
     'Model'
   );
   details.push(...modelLines);
-  
+
   // 格式化快速模型显示
-  const fastLines = formatModelDisplay(
-    config.fast, 
-    isCurrent ? currentInfo.fastIndex : -1, 
-    'Fast'
-  );
-  details.push(...fastLines);
+  if (config.fast) {
+    const fastLines = formatModelDisplay(
+      config.fast,
+      isCurrent ? currentInfo.fastIndex : -1,
+      'Fast'
+    );
+    details.push(...fastLines);
+  }
 
   if (config.key) {
     const maskedKey = config.key.length > 15
