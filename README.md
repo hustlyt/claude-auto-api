@@ -11,6 +11,7 @@ Claude Code settings.json中key自动配置工具，方便API_KEY、AUTH_TOKEN�
 - 📝 **友好提示** - 详细的错误信息和操作指导
 - 🎯 **智能识别** - 自动识别当前使用的配置
 - 🛡️ **数据保护** - 敏感信息脱敏显示
+- 📄 **多格式支持** - 支持 JSON、JSON5、YAML 配置文件
 
 ## 安装
 
@@ -47,7 +48,11 @@ ccapi set
 
 ### 3. 自定义API配置文件格式
 
-创建一个`api.json`文件，格式如下：
+现在支持多种配置文件格式：**JSON、JSON5、YAML**。
+
+创建一个配置文件（如 `api.json`、`api.yaml`、`api.jsonc` 或 `api.json5`），格式如下：
+
+**JSON 格式示例：**
 
 ```json
 {
@@ -71,6 +76,45 @@ ccapi set
       "claude-3-5-haiku-20241022",
       "claude-3-haiku-20240307"
     ]
+  }
+}
+```
+
+**YAML 格式示例：**
+
+```yaml
+openrouter:
+  url: "https://api.openrouter.ai"
+  token: "your-auth-token"
+  model: "claude-sonnet-4-20250514"
+  fast: "claude-3-5-haiku-20241022"
+  timeout: 120000
+  tokens: 20000
+
+multimodel:
+  url: "https://api.example.com"
+  key: "your-api-key"
+  model:
+    - "claude-sonnet-4-20250514"
+    - "claude-3-5-haiku-20241022"
+    - "claude-3-opus-20240229"
+  fast:
+    - "claude-3-5-haiku-20241022"
+    - "claude-3-haiku-20240307"
+```
+
+**JSON5 格式示例（支持注释）：**
+
+```json5
+{
+  // OpenRouter 配置
+  "openrouter": {
+    "url": "https://api.openrouter.ai",
+    "token": "your-auth-token",
+    "model": "claude-sonnet-4-20250514",  // 默认模型
+    "fast": "claude-3-5-haiku-20241022",  // 快速模型
+    "timeout": 120000,  // 请求超时时间
+    "tokens": 20000  // 最大输出令牌数
   }
 }
 ```

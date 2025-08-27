@@ -1,40 +1,20 @@
 const fs = require('fs-extra');
 const path = require('path');
+const { readConfigFile: readFile, writeConfigFile: writeFile } = require('./config-reader');
 const { ERROR_MESSAGES } = require('../constants');
 
 /**
- * 安全读取JSON文件
+ * 读取配置文件
  */
-async function readJsonFile(filePath) {
-  try {
-    if (!await fs.pathExists(filePath)) {
-      throw new Error(`文件不存在: ${filePath}`);
-    }
-    
-    const content = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(content);
-  } catch (error) {
-    if (error.message.includes('JSON')) {
-      throw new Error(`${ERROR_MESSAGES.INVALID_JSON}: ${filePath}`);
-    }
-    throw error;
-  }
+async function readConfigFile(filePath) {
+  return await readFile(filePath);
 }
 
 /**
- * 安全写入JSON文件
+ * 写入配置文件
  */
-async function writeJsonFile(filePath, data) {
-  try {
-    // 确保目录存在
-    await fs.ensureDir(path.dirname(filePath));
-    
-    // 格式化JSON输出
-    const content = JSON.stringify(data, null, 2);
-    await fs.writeFile(filePath, content, 'utf8');
-  } catch (error) {
-    throw new Error(`写入文件失败: ${filePath} - ${error.message}`);
-  }
+async function writeConfigFile(filePath, data) {
+  return await writeFile(filePath, data);
 }
 
 /**
@@ -76,8 +56,8 @@ function validatePath(filePath) {
 }
 
 module.exports = {
-  readJsonFile,
-  writeJsonFile,
+  readConfigFile,
+  writeConfigFile,
   backupFile,
   fileExists,
   validatePath

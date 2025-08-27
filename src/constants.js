@@ -23,6 +23,7 @@ const ERROR_MESSAGES = {
   SETTINGS_NOT_FOUND: 'settings.json 文件不存在，请检查路径设置',
   API_CONFIG_NOT_FOUND: 'api.json 文件不存在，请检查路径设置',
   INVALID_JSON: 'JSON文件格式错误',
+  INVALID_YAML: 'YAML文件格式错误',
   CONFIG_NAME_NOT_FOUND: '指定的配置名称不存在',
   SAME_CONFIG: '当前已使用该配置',
   BACKUP_FAILED: 'settings.json 备份失败'
