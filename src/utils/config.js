@@ -1,4 +1,4 @@
-const { readJsonFile, writeJsonFile, fileExists } = require('./file');
+const { readConfigFile, writeConfigFile, fileExists } = require('./file');
 const { CONFIG_FILE, ERROR_MESSAGES } = require('../constants');
 
 /**
@@ -9,7 +9,7 @@ async function readConfig() {
     if (!await fileExists(CONFIG_FILE)) {
       return {};
     }
-    return await readJsonFile(CONFIG_FILE);
+    return await readConfigFile(CONFIG_FILE);
   } catch (error) {
     throw new Error(`读取配置失败: ${error.message}`);
   }
@@ -20,7 +20,7 @@ async function readConfig() {
  */
 async function writeConfig(config) {
   try {
-    await writeJsonFile(CONFIG_FILE, config);
+    await writeConfigFile(CONFIG_FILE, config);
   } catch (error) {
     throw new Error(`保存配置失败: ${error.message}`);
   }

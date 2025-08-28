@@ -11,6 +11,7 @@ Claude Code settings.json key auto-configuration tool for easy API_KEY and AUTH_
 - 📝 **User-friendly Prompts** - Detailed error messages and operation guidance
 - 🎯 **Smart Recognition** - Automatically identify the currently used configuration
 - 🛡️ **Data Protection** - Sensitive information is masked in display
+- 📄 **Multi-format Support** - Supports JSON, JSON5, YAML configuration files
 
 ## Installation
 
@@ -47,7 +48,11 @@ ccapi set
 
 ### 3. Custom API Configuration File Format
 
-Create an `api.json` file with the following format:
+Now supports multiple configuration file formats: **JSON, JSON5, YAML**.
+
+Create a configuration file (such as `api.json`, `api.yaml`, `api.jsonc`, or `api.json5`) with the following format:
+
+**JSON Format Example:**
 
 ```json
 {
@@ -71,6 +76,45 @@ Create an `api.json` file with the following format:
       "claude-3-5-haiku-20241022",
       "claude-3-haiku-20240307"
     ]
+  }
+}
+```
+
+**YAML Format Example:**
+
+```yaml
+openrouter:
+  url: "https://api.openrouter.ai"
+  token: "your-auth-token"
+  model: "claude-sonnet-4-20250514"
+  fast: "claude-3-5-haiku-20241022"
+  timeout: 120000
+  tokens: 20000
+
+multimodel:
+  url: "https://api.example.com"
+  key: "your-api-key"
+  model:
+    - "claude-sonnet-4-20250514"
+    - "claude-3-5-haiku-20241022"
+    - "claude-3-opus-20240229"
+  fast:
+    - "claude-3-5-haiku-20241022"
+    - "claude-3-haiku-20240307"
+```
+
+**JSON5 Format Example (supports comments):**
+
+```json5
+{
+  // OpenRouter configuration
+  "openrouter": {
+    "url": "https://api.openrouter.ai",
+    "token": "your-auth-token",
+    "model": "claude-sonnet-4-20250514",  // default model
+    "fast": "claude-3-5-haiku-20241022",  // fast model
+    "timeout": 120000,  // request timeout
+    "tokens": 20000  // max output tokens
   }
 }
 ```

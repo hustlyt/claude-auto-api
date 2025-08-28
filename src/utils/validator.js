@@ -1,4 +1,5 @@
 const { validatePath } = require('./file');
+const { validateApiConfigPath } = require('./config-reader');
 
 /**
  * 验证API配置数据结构
@@ -85,11 +86,11 @@ function validateSetCommand(options) {
     };
   }
 
-  // 验证api路径
-  if (api && !validatePath(api)) {
+  // 验证api路径 - 使用放宽的验证
+  if (api && !validateApiConfigPath(api)) {
     return {
       valid: false,
-      error: 'api路径格式错误，请提供绝对路径的api.json文件'
+      error: 'api路径格式错误，请提供绝对路径的配置文件（支持 .json、.json5、.jsonc、.yaml、.yml）'
     };
   }
 

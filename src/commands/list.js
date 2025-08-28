@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 const { validateConfig } = require('../utils/config');
-const { readJsonFile } = require('../utils/file');
+const { readConfigFile } = require('../utils/file');
 const { validateApiConfig, validateSettingsConfig } = require('../utils/validator');
 const { CLAUDE_ENV_KEYS, ERROR_MESSAGES } = require('../constants');
 
@@ -137,14 +137,14 @@ async function listCommand() {
     const config = await validateConfig();
 
     // 读取API配置文件
-    const apiConfig = await readJsonFile(config.apiConfigPath);
+    const apiConfig = await readConfigFile(config.apiConfigPath);
     if (!validateApiConfig(apiConfig)) {
       console.error(chalk.red('错误:'), 'api.json文件格式不正确');
       return;
     }
 
     // 读取settings.json文件
-    const settingsData = await readJsonFile(config.settingsPath);
+    const settingsData = await readConfigFile(config.settingsPath);
     if (!validateSettingsConfig(settingsData)) {
       console.error(chalk.red('错误:'), 'settings.json文件格式不正确');
       return;
