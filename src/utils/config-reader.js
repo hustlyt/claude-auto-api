@@ -1,7 +1,9 @@
 const fs = require('fs-extra');
 const path = require('path');
-const JSON5 = require('json5');
+const JSON5 = require('json5').default;
 const yaml = require('js-yaml');
+const { load: tomlLoad } = require('js-toml');
+const TOML = require('@iarna/toml');
 const { ERROR_MESSAGES } = require('../constants');
 
 /**
@@ -12,7 +14,8 @@ const SUPPORTED_FORMATS = {
   '.jsonc': 'json5',  // 支持 JSONC
   '.json5': 'json5',  // 支持 JSON5
   '.yaml': 'yaml',   // 支持 YAML
-  '.yml': 'yaml'     // 支持 YML
+  '.yml': 'yaml',     // 支持 YML
+  '.toml': 'toml'     // 支持 TOML
 };
 
 /**
@@ -24,7 +27,7 @@ function getConfigFormat(filePath) {
 }
 
 /**
- * 读取配置文件（支持 JSON、JSON5、JSONC、YAML 格式）
+ * 读取配置文件（支持 JSON、JSON5、JSONC、YAML、TOML 格式）
  */
 async function readConfigFile(filePath) {
   try {
@@ -50,6 +53,9 @@ async function readConfigFile(filePath) {
       case 'yaml':
         parsed = yaml.load(content);
         break;
+      case 'toml':
+        parsed = tomlLoad(content);
+        break;
       default:
         throw new Error(`未实现的配置文件格式: ${format}`);
     }
@@ -62,12 +68,15 @@ async function readConfigFile(filePath) {
     if (error.name === 'YAMLException') {
       throw new Error(`${ERROR_MESSAGES.INVALID_YAML}: ${filePath} - ${error.message}`);
     }
+    if (error.name === 'TomlError' || error.message.includes('TOML')) {
+      throw new Error(`${ERROR_MESSAGES.INVALID_TOML}: ${filePath} - ${error.message}`);
+    }
     throw error;
   }
 }
 
 /**
- * 写入配置文件（支持 JSON、JSON5、YAML 格式）
+ * 写入配置文件（支持 JSON、JSON5、YAML、TOML 格式）
  */
 async function writeConfigFile(filePath, data) {
   try {
@@ -90,6 +99,9 @@ async function writeConfigFile(filePath, data) {
           lineWidth: -1,
           noRefs: true
         });
+        break;
+      case 'toml':
+        content = TOML.stringify(data);
         break;
       default:
         throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`);

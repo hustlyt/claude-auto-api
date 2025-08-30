@@ -13,7 +13,7 @@ async function setCommand(options) {
     const { settings, api } = options;
     // 如果没有提供任何参数，显示当前配置路径
     if (!settings && !api) {
-      console.log(chalk.blue('当前配置路径:'));
+      console.log(chalk.green('当前配置路径:'));
 
       try {
         const currentSettingsPath = await getSettingsPath();

@@ -154,7 +154,7 @@ async function listCommand() {
     const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig);
 
     // 显示配置列表
-    console.log(chalk.blue.bold('可用的API配置:'));
+    console.log(chalk.green.bold('可用的API配置:'));
 
     const configNames = Object.keys(apiConfig);
     if (configNames.length === 0) {

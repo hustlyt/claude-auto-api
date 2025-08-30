@@ -11,7 +11,7 @@ Claude Code settings.json key auto-configuration tool for easy API_KEY and AUTH_
 - 📝 **User-friendly Prompts** - Detailed error messages and operation guidance
 - 🎯 **Smart Recognition** - Automatically identify the currently used configuration
 - 🛡️ **Data Protection** - Sensitive information is masked in display
-- 📄 **Multi-format Support** - Supports JSON, JSON5, YAML configuration files
+- 📄 **Multi-format Support** - Supports JSON, JSON5, YAML, TOML configuration files
 
 ## Installation
 
@@ -48,9 +48,9 @@ ccapi set
 
 ### 3. Custom API Configuration File Format
 
-Now supports multiple configuration file formats: **JSON, JSON5, YAML**.
+Now supports multiple configuration file formats: **JSON, JSON5, YAML, TOML**.
 
-Create a configuration file (such as `api.json`, `api.yaml`, `api.jsonc`, or `api.json5`) with the following format:
+Create a configuration file (such as `api.json`, `api.yaml`, `api.jsonc`, `api.json5`, or `api.toml`) with the following format:
 
 **JSON Format Example:**
 
@@ -117,6 +117,31 @@ multimodel:
     "tokens": 20000  // max output tokens
   }
 }
+```
+
+**TOML Format Example:**
+
+```toml
+[openrouter]
+url = "https://api.openrouter.ai"
+token = "your-auth-token"
+model = "claude-sonnet-4-20250514"
+fast = "claude-3-5-haiku-20241022"
+timeout = 120000
+tokens = 20000
+
+[multimodel]
+url = "https://api.example.com"
+key = "your-api-key"
+model = [
+  "claude-sonnet-4-20250514",
+  "claude-3-5-haiku-20241022",
+  "claude-3-opus-20240229"
+]
+fast = [
+  "claude-3-5-haiku-20241022",
+  "claude-3-haiku-20240307"
+]
 ```
 
 **Field Description:**

@@ -185,7 +185,7 @@ async function useCommand(configName, options = {}) {
     console.log();
     console.log(chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED));
     console.log();
-    console.log(chalk.blue('当前配置详情:'));
+    console.log(chalk.green.bold('当前配置详情:'));
     console.log(`  名称: ${chalk.cyan(configName)}`);
     console.log(`  URL: ${chalk.cyan(targetConfig.url)}`);
 

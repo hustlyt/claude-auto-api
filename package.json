@@ -1,6 +1,6 @@
 {
   "name": "@4xian/ccapi",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "4xian (https://github.com/4xian)",
   "description": "Claude Code settings.json中key自动配置工具，方便API_KEY、AUTH_TOKEN、多模型快速切换",
   "repository": "https://github.com/4xian/claude-auto-api.git",
@@ -19,16 +19,16 @@
     "claude code",
     "ccapi",
     "AI",
-    "api",
-    "cli",
     "config",
-    "settings"
+    "settings.json"
   ],
   "license": "MIT",
   "dependencies": {
+    "@iarna/toml": "^2.2.5",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
     "fs-extra": "^11.2.0",
+    "js-toml": "^1.0.2",
     "js-yaml": "^4.1.0",
     "json5": "^2.2.3"
   },
