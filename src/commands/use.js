@@ -85,19 +85,19 @@ function updateSettingsEnv(settingsData, targetConfig) {
 }
 
 /**
- * 解析和选择模型
+ * 解析和选择字段值（支持 URL、Key、Token、Model、Fast）
  */
-function selectModel(modelValue, selectedIndex, defaultModel) {
-  if (Array.isArray(modelValue)) {
-    // 数组情况：选择指定索引的模型，默认为第一个
+function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
+  if (Array.isArray(fieldValue)) {
+    // 数组情况：选择指定索引的值，默认为第一个
     const index = selectedIndex > 0 ? selectedIndex - 1 : 0;
-    if (index >= modelValue.length) {
-      throw new Error(`模型索引 ${selectedIndex} 超出范围，可用范围: 1-${modelValue.length}`);
+    if (index >= fieldValue.length) {
+      throw new Error(`索引 ${selectedIndex} 超出范围，可用范围: 1-${fieldValue.length}`);
     }
-    return modelValue[index];
+    return fieldValue[index];
   } else {
     // 字符串情况：直接返回，忽略索引参数
-    return modelValue || defaultModel;
+    return fieldValue || defaultValue;
   }
 }
 
@@ -141,20 +141,41 @@ async function useCommand(configName, options = {}) {
     // targetConfig.timeout = targetConfig.timeout || "600000";
 
     try {
-      // 根据参数选择模型
-      const selectedModel = selectModel(
+      // 根据参数选择各字段值
+      const selectedUrl = selectFieldValue(
+        targetConfig.url,
+        options.url ? parseInt(options.url) : 0,
+        targetConfig.url // URL 没有默认值，使用原值
+      );
+
+      const selectedKey = selectFieldValue(
+        targetConfig.key,
+        options.key ? parseInt(options.key) : 0,
+        targetConfig.key // Key 没有默认值，使用原值
+      );
+
+      const selectedToken = selectFieldValue(
+        targetConfig.token,
+        options.token ? parseInt(options.token) : 0,
+        targetConfig.token // Token 没有默认值，使用原值
+      );
+
+      const selectedModel = selectFieldValue(
         targetConfig.model,
         options.model ? parseInt(options.model) : 0,
         'claude-sonnet-4-20250514'
       );
 
-      const selectedFast = selectModel(
+      const selectedFast = selectFieldValue(
         targetConfig.fast,
         options.fast ? parseInt(options.fast) : 0,
         ''
       );
 
-      // 更新目标配置为选中的具体模型
+      // 更新目标配置为选中的具体值
+      targetConfig.url = selectedUrl;
+      targetConfig.key = selectedKey;
+      targetConfig.token = selectedToken;
       targetConfig.model = selectedModel;
       targetConfig.fast = selectedFast;
 

@@ -46,6 +46,9 @@ program
 program
   .command('use <name>')
   .description('切换到指定的API配置')
+  .option('-u, --url <index>', '指定要切换的URL索引（从1开始，仅对数组类型url有效）')
+  .option('-k, --key <index>', '指定要切换的Key索引（从1开始，仅对数组类型key有效）')
+  .option('-t, --token <index>', '指定要切换的Token索引（从1开始，仅对数组类型token有效）')
   .option('-m, --model <index>', '指定要切换的模型索引（从1开始，仅对数组类型model有效）')
   .option('-f, --fast <index>', '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）')
   .action((name, options) => {

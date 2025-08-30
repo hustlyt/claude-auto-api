@@ -5,7 +5,7 @@ const { validateApiConfigPath } = require('./config-reader');
  * 验证API配置数据结构
  */
 function validateApiConfig(apiConfig) {
-  if (!apiConfig || typeof apiConfig !== 'object') {
+  if (!apiConfig) {
     return false;
   }
 
@@ -18,22 +18,7 @@ function validateApiConfig(apiConfig) {
   // 验证每个配置的结构
   for (const name of configNames) {
     const config = apiConfig[name];
-    if (!config || typeof config !== 'object') {
-      return false;
-    }
-
-    // 检查必需字段
-    if (!config.url || typeof config.url !== 'string') {
-      return false;
-    }
-
-    // model字段必须存在
-    // if (!config.model || typeof config.model !== 'string') {
-    //   return false;
-    // }
-
-    // key和token至少其中一个要有值
-    if (!config.key && !config.token) {
+    if (!config || !config.url || (!config.key && !config.token)) {
       return false;
     }
   }

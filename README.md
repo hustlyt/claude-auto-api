@@ -57,16 +57,26 @@ ccapi set
 ```json
 {
   "openrouter": {
-    "url": "xxx",
+    "url": "https://api.openrouter.ai",
     "token": "your-auth-token",
     "model": "claude-sonnet-4-20250514",
     "fast": "claude-3-5-haiku-20241022",
     "timeout": 600000,
     "tokens": 65000
   },
-  "multimodel": {
-    "url": "https://api.example.com",
-    "key": "your-api-key",
+  "multiconfig": {
+    "url": [
+      "https://api.example1.com",
+      "https://api.example2.com"
+    ],
+    "key": [
+      "sk-key1-for-api1",
+      "sk-key2-for-api2"
+    ],
+    "token": [
+      "token1-for-auth",
+      "token2-for-auth"
+    ],
     "model": [
       "claude-sonnet-4-20250514",
       "claude-3-5-haiku-20241022",
@@ -91,9 +101,16 @@ openrouter:
   timeout: 600000
   tokens: 65000
 
-multimodel:
-  url: "https://api.example.com"
-  key: "your-api-key"
+multiconfig:
+  url:
+    - "https://api.example1.com"
+    - "https://api.example2.com"
+  key:
+    - "sk-key1-for-api1"
+    - "sk-key2-for-api2"
+  token:
+    - "token1-for-auth"
+    - "token2-for-auth"
   model:
     - "claude-sonnet-4-20250514"
     - "claude-3-5-haiku-20241022"
@@ -130,9 +147,19 @@ fast = "claude-3-5-haiku-20241022"
 timeout = 600000
 tokens = 65000
 
-[multimodel]
-url = "https://api.example.com"
-key = "your-api-key"
+[multiconfig]
+url = [
+  "https://api.example1.com",
+  "https://api.example2.com"
+]
+key = [
+  "sk-key1-for-api1",
+  "sk-key2-for-api2"
+]
+token = [
+  "token1-for-auth",
+  "token2-for-auth"
+]
 model = [
   "claude-sonnet-4-20250514",
   "claude-3-5-haiku-20241022",
@@ -149,8 +176,14 @@ fast = [
 【本工具只提供快速切换环境变量的功能，因此只支持Anthropic格式的配置, 当然只要Claude Code能用就都可以】
 
 - `url`: API厂商服务器地址（必需）
-- `key`: API_KEY（key 和 token 至少需要一个）
-- `token`: AUTH_TOKEN（key 和 token 至少需要一个）
+  - **字符串格式**: 直接指定一个URL
+  - **数组格式**: 可指定多个URL，支持通过索引切换
+- `key`: API_KEY（key 和 token 同时只需要一个）
+  - **字符串格式**: 直接指定一个API Key
+  - **数组格式**: 可指定多个API Key，支持通过索引切换
+- `token`: AUTH_TOKEN（key 和 token 同时只需要一个）
+  - **字符串格式**: 直接指定一个Auth Token
+  - **数组格式**: 可指定多个Auth Token，支持通过索引切换
 - `model`: 模型名称（非必需，默认claude-sonnet-4-20250514）
   - **字符串格式**: 直接指定一个模型
   - **数组格式**: 可指定多个模型，支持通过索引切换
@@ -177,10 +210,12 @@ ccapi ls 或者 ccapi list
     URL: https://api.openrouter.ai
     Model: claude-sonnet-4-20250514
     Fast: claude-3-5-haiku-20241022
-    Key: sk-or123...
+    Token: your-auth-token...
 
-* 【multimodel】
-    URL: https://api.example.com
+* 【multiconfig】
+    URL:
+    * - 1: https://api.example1.com
+      - 2: https://api.example2.com
     Model:
     * - 1: claude-sonnet-4-20250514
       - 2: claude-3-5-haiku-20241022
@@ -188,20 +223,27 @@ ccapi ls 或者 ccapi list
     Fast:
       - 1: claude-3-5-haiku-20241022
     * - 2: claude-3-haiku-20240307
-    Key: sk-abc123...
+    Key:
+    * - 1: sk-key1-for-api1...
+      - 2: sk-key2-for-api2...
+    Token:
+      - 1: token1-for-auth...
+    * - 2: token2-for-auth...
 ```
 
 **显示说明：**
 
 - 带`*`号的配置表示当前正在使用
-- 对于数组格式的 model/fast，会显示索引编号
+- 对于数组格式的 url/key/token/model/fast，会显示索引编号
+- 当前使用的项会用 `* - ` 标识并高亮显示
+- 敏感信息（key、token）会自动脱敏显示
 
 ### 5. 自由切换配置(切换成功后记得重启Claude终端才会生效!!!)
 
 #### 基本切换
 
 ```bash
-# 切换到指定配置（使用默认模型）
+# 切换到指定配置（使用默认模型，配置若为数组，则默认使用第一个）
 ccapi use openrouter
 
 # 对于字符串格式的 model/fast，直接切换
@@ -211,22 +253,30 @@ ccapi use anyrouter
 #### 高级切换（适用于数组格式）
 
 ```bash
-# 切换到 multimodel 配置的第2个模型和第1个快速模型
-ccapi use multimodel -m 2 -f 1
+# 切换到 multiconfig 配置，并使用第一个url,第一个token,第2个模型，第1个快速模型
+ccapi use multiconfig -u 1 -t 1 -m 2 -f 1
 
-# 只指定标准模型索引
-ccapi use multimodel -m 3
+# 只切换某些字段的索引
+ccapi use multiconfig -k 1      # 只切换到某个Key
+ccapi use multiconfig -t 2      # 只切换到某个Token
+ccapi use multiconfig -u 1      # 只切换到某个URL
+ccapi use multiconfig -m 3      # 只切换到某个Model
+ccapi use multiconfig -f 2      # 只切换到某个Fast Model索引
 
-# 只指定快速模型索引
-ccapi use multimodel -f 2
+# 组合使用示例
+ccapi use multiconfig -u 1 -k 1 -m 1 -f 2
 ```
 
 **参数说明：**
 
+- `-u <index>`: 指定要使用的URL索引（从1开始计数）
+- `-k <index>`: 指定要使用的Key索引（从1开始计数）
+- `-t <index>`: 指定要使用的Token索引（从1开始计数）
 - `-m <index>`: 指定要使用的模型索引（从1开始计数）
 - `-f <index>`: 指定要使用的快速模型索引（从1开始计数）
 - 对于字符串格式的配置，会自动忽略索引参数
 - 不指定索引时默认使用数组的第一个元素
+- 可以任意组合使用这些参数
 
 ## 系统要求
 
