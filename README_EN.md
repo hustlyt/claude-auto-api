@@ -2,16 +2,20 @@
 
 English | [中文](./README.md)
 
-Claude Code settings.json key auto-configuration tool for easy API_KEY and AUTH_TOKEN and multimodel configuration switching
+Claude Code settings.json key auto-configuration tool for easy switching between multiple API_KEYs, AUTH_TOKENs and multiple Model configurations
 
 ## Features
 
 - 🚀 **One-click Switch** - Easily switch between different Claude API configurations
+- ⚡ **Parallel Testing** - Fast concurrent testing of all API configurations with intelligent latency sorting
+- 🎯 **Auto Optimization** - Automatically test and switch to the optimal configuration with lowest latency
 - 🔒 **Safe Backup** - Automatically backup settings.json file before modifications
 - 📝 **User-friendly Prompts** - Detailed error messages and operation guidance
-- 🎯 **Smart Recognition** - Automatically identify the currently used configuration
+- 🧠 **Smart Recognition** - Automatically identify currently used configuration and optimal routes
 - 🛡️ **Data Protection** - Sensitive information is masked in display
+- 📊 **Latency Testing** - Supports both parallel and serial testing modes
 - 📄 **Multi-format Support** - Supports JSON, JSON5, YAML, TOML configuration files
+- 🔧 **Array Support** - Comprehensive support for array configurations of URL, Key, Token, Model fields
 
 ## Installation
 
@@ -36,13 +40,20 @@ First-time use requires setting the path to Claude Code's settings.json file and
 ```bash
 Examples:
 # Set both paths at once
-ccapi set --settings /Users/4xian/Desktop/settings.json --api /Users/4xian/Desktop/api.json
+ccapi set --settings ~/.claude/settings.json --api /Users/4xian/Desktop/api.json5
 
 # Or set them separately
-ccapi set --settings /Users/4xian/Desktop/settings.json
-ccapi set --api /Users/4xian/Desktop/api.json
+ccapi set --settings ~/.claude/settings.json
+ccapi set --api /Users/4xian/Desktop/api.json5
 
-# Or get current path
+# Directly modify paths in configuration file
+# In ~/.ccapi-config.json file (at same level as .claude), there are path storage variables, modify directly:
+  {
+    "settingsPath": "~/.claude/settings.json",
+    "apiConfigPath": "/Users/4xian/Desktop/api.json5",
+  }
+
+# Query current configuration file paths
 ccapi set
 ```
 
@@ -280,6 +291,126 @@ ccapi use multiconfig -u 1 -k 1 -t 2 -m 1 -f 2
 - For string format configurations, index parameters are automatically ignored
 - When no index is specified, defaults to the first element of the array
 - You can combine these parameters in any way
+
+### 6. Test API Latency
+
+#### Test All Configurations (Default Parallel Mode)
+
+```bash
+# Parallel testing (fast, recommended)
+ccapi test
+
+# Serial testing (sequential testing)
+ccapi test -s
+```
+
+#### Test Specific Configuration
+
+```bash
+# Parallel test specific configuration
+ccapi test openrouter
+
+# Serial test specific configuration
+ccapi test -s openrouter
+```
+
+**Test Mode Description:**
+
+- **Parallel Testing (Default)**: Test all URLs simultaneously, fast execution, results sorted by best latency
+- **Serial Testing (-s option)**: Test URLs one by one, grouped by configuration
+
+**Test Description:**
+
+- **Test timeout**: Defaults to 5 seconds, can be controlled by adding timeout variable in ~/.ccapi-config.json file: testTimeout: 10000
+- **Test result response**: Not displayed by default. Since different providers return different results, response errors don't mean it won't work in Claude Code - just focus on latency timing. Can enable response display by adding variable in ~/.ccapi-config.json file: testResponse: true
+
+  ```json5
+  {
+    "settingsPath": "~/.claude/settings.json",
+    "apiConfigPath": "/Users/4xian/Desktop/api.json5",
+    "testTimeout": 5000,
+    "testResponse": false
+  }
+  ```
+
+- For array format URLs, all URL addresses will be tested
+- Configurations sorted by best latency, lowest latency configurations appear first
+- Shows optimal route (fastest URL address) for each configuration
+
+**Parallel Testing Display Example:**
+
+```text
+Test Results (sorted by latency): 
+【xxx】(Optimal Route: xxx/claude)
+    1.[https://xxx/claude] ● 328ms 
+
+【multiconfig】(Optimal Route: api.example1.com)
+    1.[https://api.example1.com] ● 556ms 
+    2.[https://api.example2.com] ● 892ms 
+
+```
+
+### 7. Auto Select Best Configuration
+
+#### Basic Auto Selection
+
+```bash
+ccapi auto
+```
+
+#### Silent Mode (for Scripts)
+
+```bash
+# Common usage with combined commands
+ccapi auto -s && claude
+
+# Custom alias
+alias cc=ccapi auto -s && claude
+```
+
+**Feature Description:**
+
+- **Uses Parallel Testing**: Fast concurrent testing of all API configuration latencies
+- **Smart Selection**: Automatically select and switch to the globally lowest latency configuration
+- **Notes**:
+  - For array format configurations, automatically selects optimal URL
+  - If KEY/TOKEN are arrays, they will align with optimal URL index pairing, e.g.: if optimal URL is index 1, KEY/TOKEN will also select index 1; if optimal URL is 2, KEY/TOKEN will also select index 2. If you don't want automatic KEY/TOKEN switching, configure them as single values instead
+- **Interesting Combinations**:
+  - Due to automatic configuration alignment rules, you can configure multiple providers in one configuration, e.g.:
+
+    ```json5
+      {
+        "aaa": {
+          "url": [
+            "https://first-provider.com",
+            "https://second-provider.com",
+            "https://third-provider.com",
+          ],
+          "token": [
+            "first-provider-token",
+            "second-provider-token",
+            "third-provider-token",
+          ],
+          "model": ["xxx"]
+        },
+        "bbb": {
+          "url": [
+            "https://first-provider.com",
+            "https://second-provider.com",
+            "https://third-provider.com",
+          ],
+          "key": [
+            "first-provider-key",
+            "second-provider-key",
+            "third-provider-key",
+          ],
+          "model": ["xxx"]
+        },
+      }
+    ```
+
+    - This way, automatically selecting the first provider will also automatically select the first provider's token, selecting the second provider will automatically select the second provider's token...
+    - Note: group token-type providers together, and key-type providers together
 
 ## System Requirements
 

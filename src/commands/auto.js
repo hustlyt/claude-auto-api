@@ -1,0 +1,143 @@
+const chalk = require('chalk');
+const { testParallelCommand } = require('./test');
+const useCommand = require('./use');
+const { validateConfig } = require('../utils/config');
+const { readConfigFile } = require('../utils/file');
+
+/**
+ * 分析测试结果，从已排序的结果中选择最优配置
+ */
+function analyzeBestConfig(sortedResults) {
+  const allValidResults = [];
+
+  for (const configResult of sortedResults) {
+    const { configName, results } = configResult;
+
+    // 遍历该配置的所有结果
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      const isValidResult = (typeof result.latency === 'number') &&
+        (result.latency > 0 && result.latency !== Infinity && !isNaN(result.latency));
+
+      if (isValidResult) {
+        allValidResults.push({
+          configName: configName,
+          latency: result.latency,
+          url: result.url,
+          urlIndex: i,
+          keyIndex: i,
+          tokenIndex: i
+        });
+      }
+    }
+  }
+
+  // 如果没有有效结果，返回默认值
+  if (allValidResults.length === 0) {
+    return {
+      configName: null,
+      latency: Infinity,
+      url: null,
+      urlIndex: -1,
+      keyIndex: -1,
+      tokenIndex: -1
+    };
+  }
+
+  // 按延迟从小到大排序，选择延迟最低的配置
+  allValidResults.sort((a, b) => a.latency - b.latency);
+
+  return allValidResults[0];
+}
+
+/**
+ * 获取延迟显示颜色
+ */
+function getLatencyColor(latency) {
+  if (latency <= 300) {
+    return chalk.green.bold(`${latency}ms`);
+  } else if (latency <= 800) {
+    return chalk.yellow.bold(`${latency}ms`);
+  } else {
+    return chalk.red.bold(`${latency}ms`);
+  }
+}
+
+/**
+ * 构建use命令的选项对象
+ */
+async function buildUseOptions(configName, bestResult, apiConfig) {
+  const config = apiConfig[configName];
+  const options = {};
+
+  // 处理URL索引
+  if (Array.isArray(config.url) && bestResult.urlIndex >= 0) {
+    options.url = (bestResult.urlIndex + 1).toString(); // 转换为1开始的索引
+  }
+
+  // 处理Key索引
+  if (Array.isArray(config.key) && bestResult.keyIndex >= 0) {
+    const actualKeyIndex = Math.min(bestResult.keyIndex, config.key.length - 1);
+    options.key = (actualKeyIndex + 1).toString();
+  }
+
+  // 处理Token索引  
+  if (Array.isArray(config.token) && bestResult.tokenIndex >= 0) {
+    const actualTokenIndex = Math.min(bestResult.tokenIndex, config.token.length - 1);
+    options.token = (actualTokenIndex + 1).toString();
+  }
+
+  // Model和Fast默认使用第一个（如果是数组的话）
+  if (Array.isArray(config.model)) {
+    options.model = '1';
+  }
+
+  if (Array.isArray(config.fast)) {
+    options.fast = '1';
+  }
+
+  return options;
+}
+
+/**
+ * 自动选择最优配置命令
+ */
+async function autoCommand(configName = null, options = {}) {
+  try {
+    // const isSkipMode = options.skip;
+
+    // 执行并行测试所有配置，返回已排序的结果
+    const sortedResults = await testParallelCommand(configName);
+
+    if (!sortedResults || sortedResults.length === 0) {
+      console.error(chalk.red('错误:'), '暂无可用的配置进行测试');
+      process.exit(1);
+    }
+
+    // 从已排序的结果中选择最优配置
+    const bestResult = analyzeBestConfig(sortedResults);
+
+    if (!bestResult.configName) {
+      const tip = configName ? `${configName}: 配置测试异常!` : '所有配置测试异常!'
+      console.error(chalk.red.bold(tip));
+      process.exit(1);
+    }
+
+    console.log(chalk.green.bold('已找到最优配置,开始切换中...'));
+
+    // 读取配置文件以构建use命令参数
+    const config = await validateConfig();
+    const apiConfig = await readConfigFile(config.apiConfigPath);
+
+    // 构建use命令的选项
+    const useOptions = await buildUseOptions(bestResult.configName, bestResult, apiConfig);
+
+    // 执行切换
+    await useCommand(bestResult.configName, useOptions);
+  } catch (error) {
+    console.error(chalk.red('自动切换配置失败:'), error.message);
+    process.exit(1);
+  }
+}
+
+module.exports = autoCommand;

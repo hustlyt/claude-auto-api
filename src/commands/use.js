@@ -191,9 +191,8 @@ async function useCommand(configName, options = {}) {
     // }
 
     // 备份settings.json
-    console.log('正在备份settings.json...');
     const backupPath = await backupFile(config.settingsPath);
-    console.log(chalk.green(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`);
+    console.log(SUCCESS_MESSAGES.BACKUP_CREATED, `(${backupPath})`);
 
     // 更新配置
     console.log(`正在切换配置: ${configName}`);
@@ -204,7 +203,7 @@ async function useCommand(configName, options = {}) {
 
     // 显示成功信息
     console.log();
-    console.log(chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED));
+    console.log(chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED) + chalk.yellow.bold(SUCCESS_MESSAGES.RESTART_TERMINAL));
     console.log();
     console.log(chalk.green.bold('当前配置详情:'));
     console.log(`  名称: ${chalk.cyan(configName)}`);
@@ -218,14 +217,14 @@ async function useCommand(configName, options = {}) {
     }
 
     if (targetConfig.key) {
-      const maskedKey = targetConfig.key.length > 15
-        ? targetConfig.key.slice(0, 15) + '...'
+      const maskedKey = targetConfig.key.length > 25
+        ? targetConfig.key.slice(0, 25) + '...'
         : targetConfig.key;
       console.log(`  Key: ${chalk.cyan(maskedKey)}`);
     }
     if (targetConfig.token) {
-      const maskedToken = targetConfig.token.length > 15
-        ? targetConfig.token.slice(0, 15) + '...'
+      const maskedToken = targetConfig.token.length > 25
+        ? targetConfig.token.slice(0, 25) + '...'
         : targetConfig.token;
       console.log(`  Token: ${chalk.cyan(maskedToken)}`);
     }

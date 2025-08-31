@@ -7,6 +7,8 @@ const versionCommand = require('./commands/version');
 const setCommand = require('./commands/set');
 const listCommand = require('./commands/list');
 const useCommand = require('./commands/use');
+const { testParallelCommand, testCommand } = require('./commands/test');
+const autoCommand = require('./commands/auto');
 
 const program = new Command();
 
@@ -53,6 +55,27 @@ program
   .option('-f, --fast <index>', '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）')
   .action((name, options) => {
     useCommand(name, options);
+  });
+
+// 测试命令
+program
+  .command('test [name]')
+  .description('测试API配置的延迟')
+  .option('-s, --serial', '使用串行测试模式（单个测试），默认使用并行测试')
+  .action((name, options) => {
+    if (options.serial) {
+      testCommand(name);
+    } else {
+      testParallelCommand(name);
+    }
+  });
+
+// 自动选择命令
+program
+  .command('auto [name]')
+  .description('自动测试并切换到最优配置')
+  .action((name, options) => {
+    autoCommand(name, options);
   });
 
 // 全局错误处理
