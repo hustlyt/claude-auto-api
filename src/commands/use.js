@@ -3,6 +3,7 @@ const { validateConfig } = require('../utils/config');
 const { readConfigFile, writeConfigFile, backupFile } = require('../utils/file');
 const { validateApiConfig, validateSettingsConfig, validateConfigName } = require('../utils/validator');
 const { CLAUDE_ENV_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } = require('../constants');
+const { applyApiConfigToEnv } = require('../utils/env-vars');
 
 /**
  * 检查是否为当前配置
@@ -200,6 +201,27 @@ async function useCommand(configName, options = {}) {
 
     // 保存更新后的settings.json
     await writeConfigFile(config.settingsPath, updatedSettings);
+
+    // 设置环境变量
+    try {
+      console.log('正在设置Windows用户环境变量...');
+      const envResult = await applyApiConfigToEnv(apiConfig, configName);
+      
+      if (envResult.cleared.length > 0) {
+        console.log(chalk.blue('🧹'), `已清除旧环境变量: ${envResult.cleared.length} 个`);
+      }
+      
+      if (envResult.success.length > 0) {
+        console.log(chalk.green('✓'), `成功设置环境变量: ${envResult.success.join(', ')}`);
+      }
+      
+      if (envResult.failed.length > 0) {
+        console.warn(chalk.yellow('⚠'), `设置失败的环境变量: ${envResult.failed.join(', ')}`);
+      }
+    } catch (envError) {
+      console.warn(chalk.yellow('⚠'), `设置环境变量失败: ${envError.message}`);
+      console.log('Claude配置仍然生效，但环境变量未更新');
+    }
 
     // 显示成功信息
     console.log();
