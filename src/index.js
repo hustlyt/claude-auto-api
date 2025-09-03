@@ -9,7 +9,6 @@ const listCommand = require('./commands/list');
 const useCommand = require('./commands/use');
 const { testParallelCommand, testCommand } = require('./commands/test');
 const autoCommand = require('./commands/auto');
-const envCommand = require('./commands/env');
 
 const program = new Command();
 
@@ -77,14 +76,6 @@ program
   .description('自动测试并切换到最优配置')
   .action((name, options) => {
     autoCommand(name, options);
-  });
-
-// 环境变量管理命令
-program
-  .command('env <action> [name]')
-  .description('管理Windows用户环境变量')
-  .action((action, name, options) => {
-    envCommand(action, name, options);
   });
 
 // 全局错误处理
