@@ -7,7 +7,7 @@ const versionCommand = require('./commands/version');
 const setCommand = require('./commands/set');
 const listCommand = require('./commands/list');
 const useCommand = require('./commands/use');
-const { testParallelCommand, testCommand } = require('./commands/test');
+const { testParallelCommand, testSerialCommand } = require('./commands/test');
 const autoCommand = require('./commands/auto');
 
 const program = new Command();
@@ -61,10 +61,14 @@ program
 program
   .command('test [name]')
   .description('测试API配置的延迟')
-  .option('-s, --serial', '使用串行测试模式（单个测试），默认使用并行测试')
+  .option('-s, --serial', '最真实的测试配置在Claude Code中是否可用，提示：会在Claude Code中生成历史记录，介意勿用!')
+  .option('-t, --token <index>', '指定要使用的Token索引（从1开始，仅在测试单个配置且使用-s时有效）')
+  .option('-k, --key <index>', '指定要使用的Key索引（从1开始，仅在测试单个配置且使用-s时有效）')
   .action((name, options) => {
     if (options.serial) {
-      testCommand(name);
+      const keyIndex = options.key ? parseInt(options.key) - 1 : 0;
+      const tokenIndex = options.token ? parseInt(options.token) - 1 : 0;
+      testSerialCommand(name, keyIndex, tokenIndex);
     } else {
       testParallelCommand(name);
     }

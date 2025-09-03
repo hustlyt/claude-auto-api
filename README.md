@@ -10,9 +10,7 @@ Claude Code settings.json中key自动配置工具，方便多个API_KEY、AUTH_T
 - ⚡ **延迟测试** - 快速同时测试所有API配置，延迟智能排序显示
 - 🎯 **自动优选** - 自动测试并切换到延迟最低的最优配置
 - 🔒 **安全备份** - 修改前自动备份 settings.json 文件
-- 📝 **友好提示** - 详细的错误信息和操作指导
 - 🧠 **智能识别** - 自动识别当前使用的配置和最优路线
-- 🛡️ **数据保护** - 敏感信息脱敏显示
 - 📄 **多格式支持** - 支持 JSON、JSON5、YAML、TOML 配置文件
 - 🔧 **数组支持** - 支持多个URL、Key、Token、Model等字段的数组配置
 
@@ -21,7 +19,11 @@ Claude Code settings.json中key自动配置工具，方便多个API_KEY、AUTH_T
 ### 全局安装（推荐）
 
 ```bash
+# 安装
 npm install -g @4xian/ccapi
+
+# 卸载
+npm uninstall -g @4xian/ccapi
 ```
 
 ## 使用方法

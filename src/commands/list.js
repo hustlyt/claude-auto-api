@@ -149,7 +149,7 @@ function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
 function formatConfigDisplay(name, config, currentInfo) {
   const isCurrent = name === currentInfo.name;
   const prefix = isCurrent ? chalk.green('* ') : '  ';
-  const nameDisplay = isCurrent ? chalk.green.bold(`【${name}】`) : chalk.cyan(`【${name}】`);
+  const nameDisplay = isCurrent ? chalk.green.bold(`[${name}]`) : chalk.cyan(`[${name}]`);
 
   // 设置默认值
   config.model = config.model || 'claude-sonnet-4-20250514';
