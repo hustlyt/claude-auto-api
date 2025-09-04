@@ -1,20 +1,20 @@
-const fs = require('fs-extra');
-const path = require('path');
-const { readConfigFile: readFile, writeConfigFile: writeFile } = require('./config-reader');
-const { ERROR_MESSAGES } = require('../constants');
+const fs = require('fs-extra')
+const path = require('path')
+const { readConfigFile: readFile, writeConfigFile: writeFile } = require('./config-reader')
+const { ERROR_MESSAGES } = require('../constants')
 
 /**
  * 读取配置文件
  */
 async function readConfigFile(filePath) {
-  return await readFile(filePath);
+  return await readFile(filePath)
 }
 
 /**
  * 写入配置文件
  */
 async function writeConfigFile(filePath, data) {
-  return await writeFile(filePath, data);
+  return await writeFile(filePath, data)
 }
 
 /**
@@ -22,11 +22,11 @@ async function writeConfigFile(filePath, data) {
  */
 async function backupFile(filePath) {
   try {
-    const backupPath = `${filePath}.backup`;
-    await fs.copy(filePath, backupPath);
-    return backupPath;
+    const backupPath = `${filePath}.backup`
+    await fs.copy(filePath, backupPath)
+    return backupPath
   } catch (error) {
-    throw new Error(`${ERROR_MESSAGES.BACKUP_FAILED}: ${error.message}`);
+    throw new Error(`${ERROR_MESSAGES.BACKUP_FAILED}: ${error.message}`)
   }
 }
 
@@ -34,7 +34,7 @@ async function backupFile(filePath) {
  * 检查文件是否存在
  */
 async function fileExists(filePath) {
-  return await fs.pathExists(filePath);
+  return await fs.pathExists(filePath)
 }
 
 /**
@@ -42,17 +42,17 @@ async function fileExists(filePath) {
  */
 function validatePath(filePath) {
   if (!filePath || typeof filePath !== 'string') {
-    return false;
+    return false
   }
-  
+
   // 检查是否为绝对路径
   if (!path.isAbsolute(filePath)) {
-    return false;
+    return false
   }
-  
+
   // 检查文件扩展名
-  const ext = path.extname(filePath).toLowerCase();
-  return ext === '.json';
+  const ext = path.extname(filePath).toLowerCase()
+  return ext === '.json'
 }
 
 module.exports = {
@@ -61,4 +61,4 @@ module.exports = {
   backupFile,
   fileExists,
   validatePath
-};
+}

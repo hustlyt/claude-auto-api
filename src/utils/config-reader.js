@@ -1,29 +1,29 @@
-const fs = require('fs-extra');
-const path = require('path');
-const JSON5 = require('json5').default;
-const yaml = require('js-yaml');
-const { load: tomlLoad } = require('js-toml');
-const TOML = require('@iarna/toml');
-const { ERROR_MESSAGES } = require('../constants');
+const fs = require('fs-extra')
+const path = require('path')
+const JSON5 = require('json5').default
+const yaml = require('js-yaml')
+const { load: tomlLoad } = require('js-toml')
+const TOML = require('@iarna/toml')
+const { ERROR_MESSAGES } = require('../constants')
 
 /**
  * 支持的配置文件格式
  */
 const SUPPORTED_FORMATS = {
-  '.json': 'json',   // 支持 JSON
-  '.jsonc': 'json5',  // 支持 JSONC
-  '.json5': 'json5',  // 支持 JSON5
-  '.yaml': 'yaml',   // 支持 YAML
-  '.yml': 'yaml',     // 支持 YML
-  '.toml': 'toml'     // 支持 TOML
-};
+  '.json': 'json', // 支持 JSON
+  '.jsonc': 'json5', // 支持 JSONC
+  '.json5': 'json5', // 支持 JSON5
+  '.yaml': 'yaml', // 支持 YAML
+  '.yml': 'yaml', // 支持 YML
+  '.toml': 'toml' // 支持 TOML
+}
 
 /**
  * 根据文件扩展名获取格式类型
  */
 function getConfigFormat(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
-  return SUPPORTED_FORMATS[ext] || null;
+  const ext = path.extname(filePath).toLowerCase()
+  return SUPPORTED_FORMATS[ext] || null
 }
 
 /**
@@ -31,47 +31,47 @@ function getConfigFormat(filePath) {
  */
 async function readConfigFile(filePath) {
   try {
-    if (!await fs.pathExists(filePath)) {
-      throw new Error(`文件不存在: ${filePath}`);
+    if (!(await fs.pathExists(filePath))) {
+      throw new Error(`文件不存在: ${filePath}`)
     }
-    
-    const content = await fs.readFile(filePath, 'utf8');
-    const format = getConfigFormat(filePath);
-    
+
+    const content = await fs.readFile(filePath, 'utf8')
+    const format = getConfigFormat(filePath)
+
     if (!format) {
-      throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`);
+      throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`)
     }
-    
-    let parsed;
+
+    let parsed
     switch (format) {
       case 'json':
-        parsed = JSON.parse(content);
-        break;
+        parsed = JSON.parse(content)
+        break
       case 'json5':
-        parsed = JSON5.parse(content);
-        break;
+        parsed = JSON5.parse(content)
+        break
       case 'yaml':
-        parsed = yaml.load(content);
-        break;
+        parsed = yaml.load(content)
+        break
       case 'toml':
-        parsed = tomlLoad(content);
-        break;
+        parsed = tomlLoad(content)
+        break
       default:
-        throw new Error(`未实现的配置文件格式: ${format}`);
+        throw new Error(`未实现的配置文件格式: ${format}`)
     }
-    
-    return parsed;
+
+    return parsed
   } catch (error) {
     if (error.name === 'JSONError' || error.message.includes('JSON')) {
-      throw new Error(`${ERROR_MESSAGES.INVALID_JSON}: ${filePath} - ${error.message}`);
+      throw new Error(`${ERROR_MESSAGES.INVALID_JSON}: ${filePath} - ${error.message}`)
     }
     if (error.name === 'YAMLException') {
-      throw new Error(`${ERROR_MESSAGES.INVALID_YAML}: ${filePath} - ${error.message}`);
+      throw new Error(`${ERROR_MESSAGES.INVALID_YAML}: ${filePath} - ${error.message}`)
     }
     if (error.name === 'TomlError' || error.message.includes('TOML')) {
-      throw new Error(`${ERROR_MESSAGES.INVALID_TOML}: ${filePath} - ${error.message}`);
+      throw new Error(`${ERROR_MESSAGES.INVALID_TOML}: ${filePath} - ${error.message}`)
     }
-    throw error;
+    throw error
   }
 }
 
@@ -81,35 +81,35 @@ async function readConfigFile(filePath) {
 async function writeConfigFile(filePath, data) {
   try {
     // 确保目录存在
-    await fs.ensureDir(path.dirname(filePath));
-    
-    const format = getConfigFormat(filePath);
-    let content;
-    
+    await fs.ensureDir(path.dirname(filePath))
+
+    const format = getConfigFormat(filePath)
+    let content
+
     switch (format) {
       case 'json':
-        content = JSON.stringify(data, null, 2);
-        break;
+        content = JSON.stringify(data, null, 2)
+        break
       case 'json5':
-        content = JSON5.stringify(data, null, 2);
-        break;
+        content = JSON5.stringify(data, null, 2)
+        break
       case 'yaml':
         content = yaml.dump(data, {
           indent: 2,
           lineWidth: -1,
           noRefs: true
-        });
-        break;
+        })
+        break
       case 'toml':
-        content = TOML.stringify(data);
-        break;
+        content = TOML.stringify(data)
+        break
       default:
-        throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`);
+        throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`)
     }
-    
-    await fs.writeFile(filePath, content, 'utf8');
+
+    await fs.writeFile(filePath, content, 'utf8')
   } catch (error) {
-    throw new Error(`写入文件失败: ${filePath} - ${error.message}`);
+    throw new Error(`写入文件失败: ${filePath} - ${error.message}`)
   }
 }
 
@@ -118,17 +118,17 @@ async function writeConfigFile(filePath, data) {
  */
 function validateConfigPath(filePath) {
   if (!filePath || typeof filePath !== 'string') {
-    return false;
+    return false
   }
-  
+
   // 检查是否为绝对路径
   if (!path.isAbsolute(filePath)) {
-    return false;
+    return false
   }
-  
+
   // 检查文件扩展名
-  const ext = path.extname(filePath).toLowerCase();
-  return ext in SUPPORTED_FORMATS;
+  const ext = path.extname(filePath).toLowerCase()
+  return ext in SUPPORTED_FORMATS
 }
 
 /**
@@ -136,19 +136,19 @@ function validateConfigPath(filePath) {
  */
 function validateApiConfigPath(filePath) {
   if (!filePath || typeof filePath !== 'string') {
-    return false;
+    return false
   }
-  
+
   // 检查是否为绝对路径
   if (!path.isAbsolute(filePath)) {
-    return false;
+    return false
   }
-  
+
   // 检查文件扩展名 - 支持更多格式
-  const ext = path.extname(filePath).toLowerCase();
-  const allowedExtensions = Object.keys(SUPPORTED_FORMATS);
-  
-  return allowedExtensions.includes(ext);
+  const ext = path.extname(filePath).toLowerCase()
+  const allowedExtensions = Object.keys(SUPPORTED_FORMATS)
+
+  return allowedExtensions.includes(ext)
 }
 
 module.exports = {
@@ -158,4 +158,4 @@ module.exports = {
   validateApiConfigPath,
   getConfigFormat,
   SUPPORTED_FORMATS
-};
+}

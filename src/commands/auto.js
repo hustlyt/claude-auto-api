@@ -1,23 +1,41 @@
-const chalk = require('chalk');
-const { testParallelCommand } = require('./test');
-const useCommand = require('./use');
-const { validateConfig } = require('../utils/config');
-const { readConfigFile } = require('../utils/file');
+const chalk = require('chalk')
+const pingCommand = require('./ping')
+const testCommand = require('./test')
+const useCommand = require('./use')
+const { validateConfig } = require('../utils/config')
+const { readConfigFile } = require('../utils/file')
 
 /**
  * 分析测试结果，从已排序的结果中选择最优配置
+ * @param {Array} sortedResults - 排序后的测试结果
+ * @param {boolean} isTestMode - 是否为test模式（true=test, false=ping）
  */
-function analyzeBestConfig(sortedResults) {
-  const allValidResults = [];
+function analyzeBestConfig(sortedResults, isTestMode = false) {
+  const allValidResults = []
 
   for (const configResult of sortedResults) {
-    const { configName, results } = configResult;
+    const { configName, results } = configResult
 
     // 遍历该配置的所有结果
     for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      const isValidResult = (typeof result.latency === 'number') &&
-        (result.latency > 0 && result.latency !== Infinity && !isNaN(result.latency));
+      const result = results[i]
+
+      let isValidResult = false
+
+      if (isTestMode) {
+        isValidResult =
+          result.success === true &&
+          typeof result.latency === 'number' &&
+          result.latency > 0 &&
+          result.latency !== Infinity &&
+          !isNaN(result.latency)
+      } else {
+        isValidResult =
+          typeof result.latency === 'number' &&
+          result.latency > 0 &&
+          result.latency !== Infinity &&
+          !isNaN(result.latency)
+      }
 
       if (isValidResult) {
         allValidResults.push({
@@ -27,7 +45,7 @@ function analyzeBestConfig(sortedResults) {
           urlIndex: i,
           keyIndex: i,
           tokenIndex: i
-        });
+        })
       }
     }
   }
@@ -41,13 +59,13 @@ function analyzeBestConfig(sortedResults) {
       urlIndex: -1,
       keyIndex: -1,
       tokenIndex: -1
-    };
+    }
   }
 
   // 按延迟从小到大排序，选择延迟最低的配置
-  allValidResults.sort((a, b) => a.latency - b.latency);
+  allValidResults.sort((a, b) => a.latency - b.latency)
 
-  return allValidResults[0];
+  return allValidResults[0]
 }
 
 /**
@@ -55,11 +73,11 @@ function analyzeBestConfig(sortedResults) {
  */
 function getLatencyColor(latency) {
   if (latency <= 300) {
-    return chalk.green.bold(`${latency}ms`);
+    return chalk.green.bold(`${latency}ms`)
   } else if (latency <= 800) {
-    return chalk.yellow.bold(`${latency}ms`);
+    return chalk.yellow.bold(`${latency}ms`)
   } else {
-    return chalk.red.bold(`${latency}ms`);
+    return chalk.red.bold(`${latency}ms`)
   }
 }
 
@@ -67,36 +85,36 @@ function getLatencyColor(latency) {
  * 构建use命令的选项对象
  */
 async function buildUseOptions(configName, bestResult, apiConfig) {
-  const config = apiConfig[configName];
-  const options = {};
+  const config = apiConfig[configName]
+  const options = {}
 
   // 处理URL索引
   if (Array.isArray(config.url) && bestResult.urlIndex >= 0) {
-    options.url = (bestResult.urlIndex + 1).toString(); // 转换为1开始的索引
+    options.url = (bestResult.urlIndex + 1).toString() // 转换为1开始的索引
   }
 
   // 处理Key索引
   if (Array.isArray(config.key) && bestResult.keyIndex >= 0) {
-    const actualKeyIndex = Math.min(bestResult.keyIndex, config.key.length - 1);
-    options.key = (actualKeyIndex + 1).toString();
+    const actualKeyIndex = Math.min(bestResult.keyIndex, config.key.length - 1)
+    options.key = (actualKeyIndex + 1).toString()
   }
 
-  // 处理Token索引  
+  // 处理Token索引
   if (Array.isArray(config.token) && bestResult.tokenIndex >= 0) {
-    const actualTokenIndex = Math.min(bestResult.tokenIndex, config.token.length - 1);
-    options.token = (actualTokenIndex + 1).toString();
+    const actualTokenIndex = Math.min(bestResult.tokenIndex, config.token.length - 1)
+    options.token = (actualTokenIndex + 1).toString()
   }
 
   // Model和Fast默认使用第一个（如果是数组的话）
   if (Array.isArray(config.model)) {
-    options.model = '1';
+    options.model = '1'
   }
 
   if (Array.isArray(config.fast)) {
-    options.fast = '1';
+    options.fast = '1'
   }
 
-  return options;
+  return options
 }
 
 /**
@@ -104,40 +122,48 @@ async function buildUseOptions(configName, bestResult, apiConfig) {
  */
 async function autoCommand(configName = null, options = {}) {
   try {
-    // const isSkipMode = options.skip;
+    let sortedResults
+    let isTestMode = true
 
-    // 执行并行测试所有配置，返回已排序的结果
-    const sortedResults = await testParallelCommand(configName);
+    if (options.ping) {
+      // console.log(chalk.cyan('使用 ping 测试模式（快速网络延迟测试）...'))
+      sortedResults = await pingCommand(configName)
+      isTestMode = false
+    } else {
+      // console.log(chalk.cyan('使用 test 测试模式（真实API可用性测试）...'))
+      sortedResults = await testCommand(configName, 0, 0)
+      isTestMode = true
+    }
 
     if (!sortedResults || sortedResults.length === 0) {
-      console.error(chalk.red('错误:'), '暂无可用的配置进行测试');
-      process.exit(1);
+      console.error(chalk.red('错误:'), '暂无可用的配置进行测试')
+      process.exit(1)
     }
 
     // 从已排序的结果中选择最优配置
-    const bestResult = analyzeBestConfig(sortedResults);
+    const bestResult = analyzeBestConfig(sortedResults, isTestMode)
 
     if (!bestResult.configName) {
       const tip = configName ? `${configName}: 配置测试异常!` : '所有配置测试异常!'
-      console.error(chalk.red.bold(tip));
-      process.exit(1);
+      console.error(chalk.red.bold(tip))
+      process.exit(1)
     }
 
-    console.log(chalk.green.bold('已找到最优配置,开始切换中...'));
+    console.log(chalk.green.bold('已找到最优配置,开始切换中...'))
 
     // 读取配置文件以构建use命令参数
-    const config = await validateConfig();
-    const apiConfig = await readConfigFile(config.apiConfigPath);
+    const config = await validateConfig()
+    const apiConfig = await readConfigFile(config.apiConfigPath)
 
     // 构建use命令的选项
-    const useOptions = await buildUseOptions(bestResult.configName, bestResult, apiConfig);
+    const useOptions = await buildUseOptions(bestResult.configName, bestResult, apiConfig)
 
     // 执行切换
-    await useCommand(bestResult.configName, useOptions);
+    await useCommand(bestResult.configName, useOptions)
   } catch (error) {
-    console.error(chalk.red('自动切换配置失败:'), error.message);
-    process.exit(1);
+    console.error(chalk.red('自动切换配置失败:'), error.message)
+    process.exit(1)
   }
 }
 
-module.exports = autoCommand;
+module.exports = autoCommand

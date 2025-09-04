@@ -14,6 +14,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "format": "prettier --write \"src/**/*.js\"",
+    "prepare": "husky install",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -26,7 +28,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/claude-code": "^1.0.95",
+    "@anthropic-ai/claude-code": "^1.0.98",
     "@anthropic-ai/sdk": "^0.60.0",
     "@iarna/toml": "^2.2.5",
     "chalk": "^4.1.2",
@@ -41,14 +43,22 @@
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
     "rollup": "^4.9.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "dist",
     "bin",
     "README.md"
-  ]
+  ],
+  "lint-staged": {
+    "src/**/*.js": [
+      "prettier --write"
+    ]
+  }
 }

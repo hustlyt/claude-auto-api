@@ -1,17 +1,17 @@
-const { readConfigFile, writeConfigFile, fileExists } = require('./file');
-const { CONFIG_FILE, ERROR_MESSAGES } = require('../constants');
+const { readConfigFile, writeConfigFile, fileExists } = require('./file')
+const { CONFIG_FILE, ERROR_MESSAGES } = require('../constants')
 
 /**
  * 读取用户配置
  */
 async function readConfig() {
   try {
-    if (!await fileExists(CONFIG_FILE)) {
-      return {};
+    if (!(await fileExists(CONFIG_FILE))) {
+      return {}
     }
-    return await readConfigFile(CONFIG_FILE);
+    return await readConfigFile(CONFIG_FILE)
   } catch (error) {
-    throw new Error(`读取配置失败: ${error.message}`);
+    throw new Error(`读取配置失败: ${error.message}`)
   }
 }
 
@@ -20,9 +20,9 @@ async function readConfig() {
  */
 async function writeConfig(config) {
   try {
-    await writeConfigFile(CONFIG_FILE, config);
+    await writeConfigFile(CONFIG_FILE, config)
   } catch (error) {
-    throw new Error(`保存配置失败: ${error.message}`);
+    throw new Error(`保存配置失败: ${error.message}`)
   }
 }
 
@@ -30,59 +30,59 @@ async function writeConfig(config) {
  * 获取settings.json路径
  */
 async function getSettingsPath() {
-  const config = await readConfig();
-  return config.settingsPath || null;
+  const config = await readConfig()
+  return config.settingsPath || null
 }
 
 /**
  * 获取api.json路径
  */
 async function getApiConfigPath() {
-  const config = await readConfig();
-  return config.apiConfigPath || null;
+  const config = await readConfig()
+  return config.apiConfigPath || null
 }
 
 /**
  * 设置settings.json路径
  */
 async function setSettingsPath(path) {
-  const config = await readConfig();
-  config.settingsPath = path;
-  await writeConfig(config);
+  const config = await readConfig()
+  config.settingsPath = path
+  await writeConfig(config)
 }
 
 /**
  * 设置api.json路径
  */
 async function setApiConfigPath(path) {
-  const config = await readConfig();
-  config.apiConfigPath = path;
-  await writeConfig(config);
+  const config = await readConfig()
+  config.apiConfigPath = path
+  await writeConfig(config)
 }
 
 /**
  * 验证配置完整性
  */
 async function validateConfig() {
-  const config = await readConfig();
-  
+  const config = await readConfig()
+
   if (!config.settingsPath) {
-    throw new Error('未设置settings.json路径');
+    throw new Error('未设置settings.json文件路径')
   }
-  
+
   if (!config.apiConfigPath) {
-    throw new Error('未设置api.json路径');
+    throw new Error('未设置api配置文件路径')
   }
-  
-  if (!await fileExists(config.settingsPath)) {
-    throw new Error(ERROR_MESSAGES.SETTINGS_NOT_FOUND);
+
+  if (!(await fileExists(config.settingsPath))) {
+    throw new Error(ERROR_MESSAGES.SETTINGS_NOT_FOUND)
   }
-  
-  if (!await fileExists(config.apiConfigPath)) {
-    throw new Error(ERROR_MESSAGES.API_CONFIG_NOT_FOUND);
+
+  if (!(await fileExists(config.apiConfigPath))) {
+    throw new Error(ERROR_MESSAGES.API_CONFIG_NOT_FOUND)
   }
-  
-  return config;
+
+  return config
 }
 
 module.exports = {
@@ -93,4 +93,4 @@ module.exports = {
   setSettingsPath,
   setApiConfigPath,
   validateConfig
-};
+}
