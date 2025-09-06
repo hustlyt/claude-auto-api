@@ -4,7 +4,7 @@ const JSON5 = require('json5').default
 const yaml = require('js-yaml')
 const { load: tomlLoad } = require('js-toml')
 const TOML = require('@iarna/toml')
-const { ERROR_MESSAGES } = require('../constants')
+const { ERROR_MESSAGES } = require('../utils/constants')
 
 /**
  * 支持的配置文件格式

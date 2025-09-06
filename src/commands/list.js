@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig, validateSettingsConfig } = require('../utils/validator')
-const { CLAUDE_ENV_KEYS, ERROR_MESSAGES } = require('../constants')
+const { CLAUDE_ENV_KEYS, ERROR_MESSAGES } = require('../utils/constants')
 const maxText = 30
 /**
  * 获取当前使用的配置名称和各字段索引信息

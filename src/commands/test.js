@@ -2,8 +2,6 @@ const chalk = require('chalk')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig } = require('../utils/validator')
-// 注意：@anthropic-ai/claude-code是ESM模块，需要动态导入
-const Anthropic = require('@anthropic-ai/sdk')
 const { readConfig } = require('../utils/config')
 const { execSync } = require('child_process')
 const os = require('os')
@@ -11,38 +9,107 @@ const fs = require('fs')
 const path = require('path')
 
 let configData
-let testTempDir = null // 全局测试临时目录
+let testTempDirs = [] // 存储所有测试临时目录，用于清理
 const maxText = 50
 
 /**
- * 创建测试用的临时目录
+ * 创建测试用的临时目录和独立的Claude配置
  */
-function createTestTempDir() {
-  if (!testTempDir) {
-    const tmpDir = os.tmpdir()
-    const randomSuffix = Math.random().toString(36).substring(2, 15)
-    testTempDir = path.join(tmpDir, `ccapi-test-${randomSuffix}`)
+function createTestTempDir(url, key, token, model) {
+  const tmpDir = os.tmpdir()
+  const randomSuffix = Math.random().toString(36).substring(2, 15)
+  const tempDir = path.join(tmpDir, `ccapi-test-${randomSuffix}`)
 
-    // 创建目录
-    if (!fs.existsSync(testTempDir)) {
-      fs.mkdirSync(testTempDir, { recursive: true })
+  // 记录临时目录用于清理
+  testTempDirs.push(tempDir)
+
+  // 创建目录结构
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true })
+  }
+
+  // 创建 .claude 配置目录
+  const claudeConfigDir = path.join(tempDir, '.claude')
+  if (!fs.existsSync(claudeConfigDir)) {
+    fs.mkdirSync(claudeConfigDir, { recursive: true })
+  }
+
+  // 创建独立的配置文件，包含当前测试的API信息
+  const settingsPath = path.join(claudeConfigDir, 'settings.json')
+  const testSettings = {
+    cleanupPeriodDays: 180,
+    env: {
+      ANTHROPIC_BASE_URL: url,
+      ANTHROPIC_MODEL: model || 'claude-3-5-haiku-20241022',
+      ANTHROPIC_SMALL_FAST_MODEL: 'claude-3-5-haiku-20241022'
+    },
+    includeCoAuthoredBy: false,
+    permissions: {
+      allow: [
+        // 只允许测试必需的最基本工具
+        'Read'
+      ],
+      deny: []
+    },
+    hooks: {},
+    mcpServers: {} // 禁用所有MCP服务以加快测试
+  }
+
+  // 设置认证信息
+  if (key) {
+    testSettings.env.ANTHROPIC_API_KEY = key
+  }
+  if (token) {
+    testSettings.env.ANTHROPIC_AUTH_TOKEN = token
+  }
+
+  // 写入配置文件
+  fs.writeFileSync(settingsPath, JSON.stringify(testSettings, null, 2))
+
+  // 创建空的 .claude.json 项目配置
+  const projectConfigPath = path.join(tempDir, '.claude.json')
+  const projectConfig = {
+    projects: {
+      [tempDir]: {
+        allowedTools: [],
+        history: [],
+        mcpContextUris: [],
+        mcpServers: {},
+        enabledMcpjsonServers: [],
+        disabledMcpjsonServers: [],
+        hasTrustDialogAccepted: true,
+        projectOnboardingSeenCount: 0,
+        hasClaudeMdExternalIncludesApproved: false,
+        hasClaudeMdExternalIncludesWarningShown: false
+      }
     }
   }
-  return testTempDir
+  fs.writeFileSync(projectConfigPath, JSON.stringify(projectConfig, null, 2))
+
+  return tempDir
 }
 
 /**
- * 清理测试临时目录
+ * 清理测试临时目录（仅清理文件系统目录，不处理.claude.json）
  */
-function cleanupTestTempDir() {
-  if (testTempDir && fs.existsSync(testTempDir)) {
-    try {
-      fs.rmSync(testTempDir, { recursive: true, force: true })
-      testTempDir = null
-    } catch (error) {
-      // console.warn(chalk.yellow(`警告: 无法删除临时目录 ${testTempDir}: ${error.message}`))
+async function cleanupTestTempDir() {
+  if (testTempDirs.length === 0) return
+
+  // 稍微延迟，确保Claude Code SDK完成所有操作
+  await new Promise(resolve => setTimeout(resolve, 1000))
+
+  // 仅清理临时目录，不处理.claude.json（避免与异步清理重复）
+  testTempDirs.forEach((tempDir) => {
+    if (tempDir && fs.existsSync(tempDir)) {
+      try {
+        fs.rmSync(tempDir, { recursive: true, force: true })
+      } catch (error) {
+        // console.warn(chalk.yellow(`警告: 无法删除临时目录 ${tempDir}: ${error.message}`))
+      }
     }
-  }
+  })
+
+  testTempDirs = [] // 清空数组
 }
 
 /**
@@ -166,27 +233,12 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
       throw new Error('Claude 可执行文件未找到，请确保已安装 Claude Code')
     }
 
-    // 为测试创建临时工作目录，避免污染用户的Claude Code会话历史
-    const tempDir = createTestTempDir()
-
-    // 构建环境变量配置，与 claude-code SDK 保持一致
-    console.log(222, url, key, token)
-    
-    const env = {
-      ANTHROPIC_BASE_URL: url,
-      ANTHROPIC_MODEL: model
-    }
+    // 创建测试专用的临时工作目录，包含独立的Claude配置
+    const tempDir = createTestTempDir(url, key, token, model)
 
     // 动态导入ESM模块
     const { query } = await import('@anthropic-ai/claude-code')
 
-    // 设置认证信息
-    if (key) {
-      env.ANTHROPIC_API_KEY = key
-    }
-    if (token) {
-      env.ANTHROPIC_AUTH_TOKEN = token
-    }
     const abortController = new AbortController()
 
     // 设置超时
@@ -195,17 +247,12 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
       abortController.abort()
     }, timeout)
 
+    // 简化的queryOptions，完全依赖临时目录中的配置
     let queryOptions = {
-      env: {
-        ...env,
-        PATH: process.env.PATH
-      },
-      cwd: tempDir, // 使用临时目录作为工作目录，隔离会话历史
+      cwd: tempDir, // 使用包含独立配置的临时目录作为工作目录
       model: 'claude-3-5-haiku-20241022',
       fallbackModel: model,
       abortController,
-      allowedTools: [], // 禁用所有工具
-      mcpServers: [], // 禁用所有MCP服务
       pathToClaudeCodeExecutable: claudeExecutablePath,
       executable: 'node',
       maxTurns: 1, // 限制为单轮对话以加快测试
@@ -227,7 +274,7 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
       // console.log('msg', message)
       // 处理首个消息
       if (message.type === 'result') {
-        console.log('msg', message)
+        // console.log('msg', message)
         if (!hasResponse) {
           success = !message.is_error && message.subtype === 'success'
           hasResponse = true
@@ -533,15 +580,22 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     displaySimpleResults(sortedResults)
 
     // 显示测试完成
-    console.log(chalk.green.bold(`有效性测试完成, 此结果代表能否在Claude Code中真正使用!`))
+    console.log(chalk.green.bold(`有效性测试完成, 此结果代表能否在Claude Code中使用!`))
 
     // 清理测试临时目录
-    cleanupTestTempDir()
+    await cleanupTestTempDir()
+    
+    // 启动异步清理进程专门处理.claude.json中的所有临时项目记录
+    // （包括当前测试产生的记录和历史遗留的记录）
+    setTimeout(() => {
+      const { cleanupAllTempProjects } = require('../utils/cleanup')
+      cleanupAllTempProjects()
+    }, 2000)
 
     return allResults
   } catch (error) {
     // 确保即使出错也清理临时目录
-    cleanupTestTempDir()
+    await cleanupTestTempDir()
     console.error(chalk.red('有效性测试失败:'), error.message)
     process.exit(1)
   }

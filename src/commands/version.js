@@ -4,9 +4,8 @@ const packageJson = require('../../package.json')
 /**
  * 显示版本信息
  */
-function versionCommand() {
-  console.log(chalk.blue(`${packageJson.name} v${packageJson.version}`))
-  console.log(packageJson.description)
+async function versionCommand() {
+  console.log(chalk.green.bold(`${packageJson.name} v${packageJson.version}`))
 }
 
 module.exports = versionCommand

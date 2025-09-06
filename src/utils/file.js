@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const { readConfigFile: readFile, writeConfigFile: writeFile } = require('./config-reader')
-const { ERROR_MESSAGES } = require('../constants')
+const { ERROR_MESSAGES } = require('../utils/constants')
 
 /**
  * 读取配置文件

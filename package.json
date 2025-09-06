@@ -2,7 +2,7 @@
   "name": "@4xian/ccapi",
   "version": "1.0.6",
   "author": "4xian (https://github.com/4xian)",
-  "description": "Claude Code settings.json中key自动配置工具，方便API_KEY、AUTH_TOKEN、多模型快速切换",
+  "description": "一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、延迟测速、自动择优线路",
   "repository": {
     "url": "git+https://github.com/4xian/claude-auto-api.git"
   },
@@ -51,6 +51,11 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "updateLogs": [
+    "1. 新增版本检查与更新命令，一键更新到最新版本",
+    "2. 新增ping命令，测试厂商URL延迟",
+    "3. 调整test命令，最真实反映能否在Claude Code中使用"
+  ],
   "files": [
     "dist",
     "bin",

@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile, writeConfigFile, backupFile } = require('../utils/file')
 const { validateApiConfig, validateSettingsConfig, validateConfigName } = require('../utils/validator')
-const { CLAUDE_ENV_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } = require('../constants')
+const { CLAUDE_ENV_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } = require('../utils/constants')
 
 /**
  * 检查是否为当前配置
