@@ -26,7 +26,7 @@ async function backupFile(filePath) {
     await fs.copy(filePath, backupPath)
     return backupPath
   } catch (error) {
-    throw new Error(`${ERROR_MESSAGES.BACKUP_FAILED}: ${error.message}`)
+    throw new Error(`${await t(ERROR_MESSAGES.BACKUP_FAILED)}: ${error.message}`)
   }
 }
 

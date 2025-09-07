@@ -1,4 +1,5 @@
 const chalk = require('chalk')
+const { t } = require('../utils/i18n')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig, validateConfigName } = require('../utils/validator')
@@ -21,7 +22,7 @@ async function displayEnvStatus() {
     const currentConfig = getCurrentConfigName()
 
     if (currentConfig) {
-      console.log(chalk.green.bold(`当前系统环境变量: ${currentConfig}`))
+      console.log(chalk.green.bold(await t('envManagement.CURRENT_SYSTEM_ENV', currentConfig)))
       console.log()
     }
 
@@ -45,11 +46,11 @@ async function displayEnvStatus() {
         console.log(`  ${chalk.cyan(CONFIG_IDENTIFIER)}: ${chalk.green(status.envVars[CONFIG_IDENTIFIER])}`)
       }
     } else {
-      console.log(chalk.yellow('当前配置未检测出环境变量'))
-      console.log('使用', chalk.cyan('ccapi env <configName>'), '将配置设置到环境变量')
+      console.log(chalk.yellow(await t('envManagement.ENV_NOT_DETECTED')))
+      console.log(await t('envManagement.USE_CMD_TO_SET', chalk.cyan('ccapi env <configName>')))
     }
   } catch (error) {
-    console.error(chalk.red('获取当前配置环境变量失败:'), error.message)
+    console.error(chalk.red(await t('envManagement.GET_ENV_FAILED')), error.message)
   }
 }
 
@@ -64,14 +65,14 @@ async function setEnvFromConfig(configName, options = {}) {
     // 读取API配置文件
     const apiConfig = await readConfigFile(config.apiConfigPath)
     if (!validateApiConfig(apiConfig)) {
-      console.error(chalk.red('错误:'), 'API配置文件格式不正确')
+      console.error(chalk.red((await t('test.ERROR')) + ':'), await t('envManagement.CONFIG_FORMAT_ERROR'))
       return
     }
 
     // 验证配置名称是否存在
     if (!validateConfigName(apiConfig, configName)) {
-      console.error(chalk.red('配置错误:'), `${ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND}: ${configName}`)
-      console.log(chalk.green('当前可用的配置:'), Object.keys(apiConfig).join(', '))
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), `${await t(ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND)}: ${configName}`)
+      console.log(chalk.green(await t('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '))
       return
     }
 
@@ -88,7 +89,10 @@ async function setEnvFromConfig(configName, options = {}) {
         if (index >= 0 && index < processedConfig[field].length) {
           processedConfig[field] = processedConfig[field][index]
         } else {
-          console.error(chalk.red('索引错误:'), `${field} 索引超出范围，可用范围: 1-${processedConfig[field].length}`)
+          console.error(
+            chalk.red(await t('common.INDEX_ERROR')),
+            await t('envManagement.INDEX_OUT_OF_RANGE', field, processedConfig[field].length)
+          )
           return
         }
       }
@@ -97,11 +101,12 @@ async function setEnvFromConfig(configName, options = {}) {
     // 设置环境变量
     await setSystemEnvVars(processedConfig, configName)
   } catch (error) {
-    if (error.message.includes('未设置') || error.message.includes('不存在')) {
-      console.error(chalk.red('配置错误:'), error.message)
-      console.log('请先使用', chalk.cyan('ccapi set'), '命令设置配置文件路径')
+    const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set')
+    if (no) {
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), error.message)
+      console.log(await t('use.USE_SET_CMD', chalk.cyan('ccapi set')))
     } else {
-      console.error(chalk.red('设置环境变量失败:'), error.message)
+      console.error(chalk.red(await t('envManagement.ENV_CMD_FAILED')), error.message)
     }
     process.exit(1)
   }
@@ -115,12 +120,12 @@ async function clearEnvVars() {
     const status = await checkEnvStatus()
 
     if (!status.hasEnvVars && !status.currentConfig) {
-      console.log(chalk.yellow('当前没有设置任何相关环境变量'))
+      console.log(chalk.yellow(await t('envManagement.NO_ENV_VARS_SET')))
       return
     }
 
     if (status.currentConfig) {
-      console.log(chalk.yellow.bold(`将要清除当前配置${status.currentConfig}的环境变量: `))
+      console.log(chalk.yellow.bold(await t('envManagement.WILL_CLEAR_ENV_VARS', status.currentConfig)))
       console.log()
     }
 
@@ -142,15 +147,16 @@ async function clearEnvVars() {
       output: process.stdout
     })
 
-    const answer = await new Promise((resolve) => {
-      rl.question(chalk.red('输入y确认清除: '), (answer) => {
+    const answer = await new Promise(async (resolve) => {
+      const message = await t('clear.ENV_CONFIRM')
+      rl.question(chalk.red(message), (answer) => {
         rl.close()
         resolve(answer.toLowerCase())
       })
     })
 
     console.log(answer)
-    
+
     if (answer !== 'y') {
       return
     }
@@ -158,7 +164,7 @@ async function clearEnvVars() {
     // 执行清除
     await clearSystemEnvVars()
   } catch (error) {
-    console.error(chalk.red.bold('清除环境变量失败:'), error.message)
+    console.error(chalk.red.bold(await t('envManagement.CLEAR_ENV_FAILED')), error.message)
     process.exit(1)
   }
 }
@@ -183,7 +189,7 @@ async function envCommand(configName, options = {}) {
     // 设置指定配置到环境变量
     await setEnvFromConfig(configName, options)
   } catch (error) {
-    console.error(chalk.red.bold('环境变量命令执行失败:'), error.message)
+    console.error(chalk.red.bold(await t('envManagement.ENV_CMD_FAILED')), error.message)
     process.exit(1)
   }
 }

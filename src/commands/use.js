@@ -4,6 +4,7 @@ const { readConfigFile, writeConfigFile, backupFile } = require('../utils/file')
 const { validateApiConfig, validateSettingsConfig, validateConfigName } = require('../utils/validator')
 const { CLAUDE_ENV_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } = require('../utils/constants')
 const { setSystemEnvVars } = require('../utils/env')
+const { t } = require('../utils/i18n')
 
 /**
  * 检查是否为当前配置
@@ -86,12 +87,12 @@ function updateSettingsEnv(settingsData, targetConfig) {
 /**
  * 解析和选择字段值（支持 URL、Key、Token、Model、Fast）
  */
-function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
+async function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
   if (Array.isArray(fieldValue)) {
     // 数组情况：选择指定索引的值，默认为第一个
     const index = selectedIndex > 0 ? selectedIndex - 1 : 0
     if (index >= fieldValue.length) {
-      throw new Error(`索引 ${selectedIndex} 超出范围，可用范围: 1-${fieldValue.length}`)
+      throw new Error(await t('common.INDEX_OUT_OF_RANGE', selectedIndex, `1-${fieldValue.length}`))
     }
     return fieldValue[index]
   } else {
@@ -111,21 +112,21 @@ async function useCommand(configName, options = {}) {
     // 读取API配置文件
     const apiConfig = await readConfigFile(config.apiConfigPath)
     if (!validateApiConfig(apiConfig)) {
-      console.error(chalk.red('错误:'), 'api.json文件格式不正确')
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('use.API_FORMAT_ERROR'))
       return
     }
 
     // 验证配置名称是否存在
     if (!validateConfigName(apiConfig, configName)) {
-      console.error(chalk.red('设置错误:'), `${ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND}: ${configName}`)
-      console.log(chalk.green('当前可用的配置:'), Object.keys(apiConfig).join(', '))
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), `${await t(ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND)}: ${configName}`)
+      console.log(chalk.green(await t('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '))
       return
     }
 
     // 读取settings.json文件
     const settingsData = await readConfigFile(config.settingsPath)
     if (!validateSettingsConfig(settingsData)) {
-      console.error(chalk.red('错误:'), 'settings.json文件格式不正确')
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('use.SETTINGS_FORMAT_ERROR'))
       return
     }
 
@@ -141,31 +142,31 @@ async function useCommand(configName, options = {}) {
 
     try {
       // 根据参数选择各字段值
-      const selectedUrl = selectFieldValue(
+      const selectedUrl = await selectFieldValue(
         targetConfig.url,
         options.url ? parseInt(options.url) : 0,
         targetConfig.url // URL 没有默认值，使用原值
       )
 
-      const selectedKey = selectFieldValue(
+      const selectedKey = await selectFieldValue(
         targetConfig.key,
         options.key ? parseInt(options.key) : 0,
         targetConfig.key // Key 没有默认值，使用原值
       )
 
-      const selectedToken = selectFieldValue(
+      const selectedToken = await selectFieldValue(
         targetConfig.token,
         options.token ? parseInt(options.token) : 0,
         targetConfig.token // Token 没有默认值，使用原值
       )
 
-      const selectedModel = selectFieldValue(
+      const selectedModel = await selectFieldValue(
         targetConfig.model,
         options.model ? parseInt(options.model) : 0,
         'claude-sonnet-4-20250514'
       )
 
-      const selectedFast = selectFieldValue(targetConfig.fast, options.fast ? parseInt(options.fast) : 0, '')
+      const selectedFast = await selectFieldValue(targetConfig.fast, options.fast ? parseInt(options.fast) : 0, '')
 
       // 更新目标配置为选中的具体值
       targetConfig.url = selectedUrl
@@ -174,7 +175,7 @@ async function useCommand(configName, options = {}) {
       targetConfig.model = selectedModel
       targetConfig.fast = selectedFast
     } catch (error) {
-      console.error(chalk.red('参数错误:'), error.message)
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), error.message)
       return
     }
 
@@ -186,10 +187,10 @@ async function useCommand(configName, options = {}) {
 
     // 备份settings.json
     const backupPath = await backupFile(config.settingsPath)
-    console.log(SUCCESS_MESSAGES.BACKUP_CREATED, `(${backupPath})`)
+    console.log(await t(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`)
 
     // 更新配置
-    console.log(`正在切换配置: ${configName}`)
+    console.log(await t('use.SWITCHING_CONFIG', configName))
     const updatedSettings = updateSettingsEnv(settingsData, targetConfig)
 
     // 保存更新后的settings.json
@@ -203,51 +204,52 @@ async function useCommand(configName, options = {}) {
       try {
         success = await setSystemEnvVars(targetConfig, configName, false)
       } catch (error) {
-        console.log(chalk.red('settings.json更新成功，环境变量更新失败'))
+        console.log(chalk.red(await t('use.SETTINGS_SUCCESS_ENV_FAILED')))
       }
     }
 
     // 显示成功信息
     console.log()
     console.log(
-      chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED) + chalk.yellow.bold(SUCCESS_MESSAGES.RESTART_TERMINAL)
+      chalk.green.bold(await t(SUCCESS_MESSAGES.CONFIG_SWITCHED)) + chalk.yellow.bold(await t(SUCCESS_MESSAGES.RESTART_TERMINAL))
     )
     if (success) {
-      console.log(chalk.cyan('配置已同步更新到settings.json和系统环境变量'))
+      console.log(chalk.cyan(await t('use.CONFIG_SYNCED')))
     }
     console.log()
-    console.log(chalk.green.bold('当前配置详情:'))
-    console.log(`  名称: ${chalk.cyan(configName)}`)
-    console.log(`  URL: ${chalk.cyan(targetConfig.url)}`)
+    console.log(chalk.green.bold(await t('use.CURRENT_CONFIG_DETAILS')))
+    console.log(await t('use.NAME_LABEL', chalk.cyan(configName)))
+    console.log(await t('use.URL_LABEL', chalk.cyan(targetConfig.url)))
 
     // 显示选中的模型信息
-    console.log(`  Model: ${chalk.cyan(targetConfig.model)}`)
+    console.log(await t('use.MODEL_LABEL', chalk.cyan(targetConfig.model)))
 
     if (targetConfig.fast) {
-      console.log(`  Fast: ${chalk.cyan(targetConfig.fast)}`)
+      console.log(await t('use.FAST_LABEL', chalk.cyan(targetConfig.fast)))
     }
 
     if (targetConfig.key) {
       const maskedKey = targetConfig.key.length > 25 ? targetConfig.key.slice(0, 25) + '...' : targetConfig.key
-      console.log(`  Key: ${chalk.cyan(maskedKey)}`)
+      console.log(await t('use.KEY_LABEL', chalk.cyan(maskedKey)))
     }
     if (targetConfig.token) {
       const maskedToken = targetConfig.token.length > 25 ? targetConfig.token.slice(0, 25) + '...' : targetConfig.token
-      console.log(`  Token: ${chalk.cyan(maskedToken)}`)
+      console.log(await t('use.TOKEN_LABEL', chalk.cyan(maskedToken)))
     }
     if (targetConfig.http) {
-      console.log(`  HTTP: ${chalk.cyan(targetConfig.http)}`)
+      console.log(await t('use.HTTP_LABEL', chalk.cyan(targetConfig.http)))
     }
     if (targetConfig.https) {
-      console.log(`  HTTPS: ${chalk.cyan(targetConfig.https)}`)
+      console.log(await t('use.HTTPS_LABEL', chalk.cyan(targetConfig.https)))
     }
     console.log()
   } catch (error) {
-    if (error.message.includes('未设置') || error.message.includes('不存在')) {
-      console.error(chalk.red('配置错误:'), error.message)
-      console.log('请先使用', chalk.cyan('ccapi set'), '命令设置配置文件路径')
+    const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set')
+    if (no) {
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), error.message)
+      console.log(await t('use.USE_SET_CMD', chalk.cyan('ccapi set')))
     } else {
-      console.error(chalk.red('切换配置失败:'), error.message)
+      console.error(chalk.red(await t('use.SWITCH_CONFIG_FAILED')), error.message)
     }
     process.exit(1)
   }

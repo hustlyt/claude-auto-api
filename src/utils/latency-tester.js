@@ -3,6 +3,7 @@ const https = require('https')
 const http = require('http')
 const { URL } = require('url')
 const os = require('os')
+const { t } = require('./i18n')
 
 /**
  * 跨平台延迟测试工具类
@@ -43,28 +44,36 @@ class LatencyTester {
    * @returns {Promise<number>} 延迟时间（毫秒）
    */
   static async testWithCurl(url, timeout = 5000) {
+    // 预先获取所有可能需要的错误信息
+    const errorMessages = {
+      timeout: await t('utils.CONNECTION_TIMEOUT'),
+      dns: await t('utils.DNS_RESOLUTION_FAILED'),
+      invalid: await t('utils.INVALID_LATENCY_DATA', '{0}'),
+      failed: await t('utils.TEST_FAILED', '{0}')
+    }
+    
     const nullDevice = os.platform() === 'win32' ? 'nul' : '/dev/null'
     const timeoutSeconds = Math.ceil(timeout / 1000)
     const curlCommand = `curl -o ${nullDevice} -s -w "%{time_total}" --connect-timeout ${timeoutSeconds} --max-time ${timeoutSeconds + 2} "${url}"`
 
     return new Promise((resolve, reject) => {
-      exec(curlCommand, { timeout: timeout + 2000 }, (error, stdout, stderr) => {
+      exec(curlCommand, { timeout: timeout + 2000 }, (error, stdout) => {
         if (error) {
           // 如果是超时或网络错误，返回适当的错误信息
           const errorMsg = error.message.toLowerCase()
           if (errorMsg.includes('timeout') || errorMsg.includes('timed out')) {
-            reject(new Error('连接超时'))
+            reject(new Error(errorMessages.timeout))
           } else if (errorMsg.includes('could not resolve host')) {
-            reject(new Error('域名解析失败'))
+            reject(new Error(errorMessages.dns))
           } else {
-            reject(new Error(`测试失败: ${error.message}`))
+            reject(new Error(errorMessages.failed.replace('{0}', error.message)))
           }
           return
         }
 
         const timeInSeconds = parseFloat(stdout.trim())
         if (isNaN(timeInSeconds) || timeInSeconds < 0) {
-          reject(new Error(`无效的延迟数据: ${stdout}`))
+          reject(new Error(errorMessages.invalid.replace('{0}', stdout)))
           return
         }
 
@@ -80,6 +89,17 @@ class LatencyTester {
    * @returns {Promise<number>} 延迟时间（毫秒）
    */
   static async testWithNodeHttp(url, timeout = 5000) {
+    // 预先获取所有可能需要的错误信息
+    const errorMessages = {
+      timeout: await t('utils.CONNECTION_TIMEOUT'),
+      dns: await t('utils.DNS_RESOLUTION_FAILED'),
+      refused: await t('utils.CONNECTION_REFUSED'),
+      reset: await t('utils.CONNECTION_RESET'),
+      httpFailed: await t('utils.HTTP_TEST_FAILED', '{0}'),
+      requestTimeout: await t('utils.REQUEST_TIMEOUT'),
+      urlParsing: await t('utils.URL_PARSING_ERROR', '{0}')
+    }
+    
     return new Promise((resolve, reject) => {
       const startTime = Date.now()
 
@@ -106,27 +126,27 @@ class LatencyTester {
         req.on('error', (error) => {
           const errorMsg = error.message.toLowerCase()
           if (errorMsg.includes('timeout') || error.code === 'ETIMEDOUT') {
-            reject(new Error('连接超时'))
+            reject(new Error(errorMessages.timeout))
           } else if (errorMsg.includes('getaddrinfo') || error.code === 'ENOTFOUND') {
-            reject(new Error('域名解析失败'))
+            reject(new Error(errorMessages.dns))
           } else if (error.code === 'ECONNREFUSED') {
-            reject(new Error('连接被拒绝'))
+            reject(new Error(errorMessages.refused))
           } else if (error.code === 'ECONNRESET') {
-            reject(new Error('连接重置'))
+            reject(new Error(errorMessages.reset))
           } else {
-            reject(new Error(`HTTP 测试失败: ${error.message}`))
+            reject(new Error(errorMessages.httpFailed.replace('{0}', error.message)))
           }
         })
 
         req.on('timeout', () => {
           req.destroy()
-          reject(new Error('请求超时'))
+          reject(new Error(errorMessages.requestTimeout))
         })
 
         // 设置额外的超时保护
         const timeoutId = setTimeout(() => {
           req.destroy()
-          reject(new Error('请求超时'))
+          reject(new Error(errorMessages.requestTimeout))
         }, timeout)
 
         req.on('response', () => {
@@ -137,7 +157,7 @@ class LatencyTester {
           clearTimeout(timeoutId)
         })
       } catch (error) {
-        reject(new Error(`URL解析错误: ${error.message}`))
+        reject(new Error(errorMessages.urlParsing.replace('{0}', error.message)))
       }
     })
   }

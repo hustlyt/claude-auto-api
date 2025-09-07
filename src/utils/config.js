@@ -7,11 +7,16 @@ const { CONFIG_FILE, ERROR_MESSAGES } = require('../utils/constants')
 async function readConfig() {
   try {
     if (!(await fileExists(CONFIG_FILE))) {
-      return {}
+      return { lang: 'zh' } // 默认中文
     }
-    return await readConfigFile(CONFIG_FILE)
+    const config = await readConfigFile(CONFIG_FILE)
+    // 确保lang字段存在，默认为中文
+    if (!config.lang) {
+      config.lang = 'zh'
+    }
+    return config
   } catch (error) {
-    throw new Error(`读取配置失败: ${error.message}`)
+    throw new Error('Failed to read configuration: ' + error.message)
   }
 }
 
@@ -22,7 +27,7 @@ async function writeConfig(config) {
   try {
     await writeConfigFile(CONFIG_FILE, config)
   } catch (error) {
-    throw new Error(`保存配置失败: ${error.message}`)
+    throw new Error('Failed to save configuration: ' + error.message)
   }
 }
 
@@ -67,19 +72,19 @@ async function validateConfig() {
   const config = await readConfig()
 
   if (!config.settingsPath) {
-    throw new Error('未设置settings.json文件路径')
+    throw new Error('settings.json file path not set')
   }
 
   if (!config.apiConfigPath) {
-    throw new Error('未设置api配置文件路径')
+    throw new Error('API configuration file path not set')
   }
 
   if (!(await fileExists(config.settingsPath))) {
-    throw new Error(ERROR_MESSAGES.SETTINGS_NOT_FOUND)
+    throw new Error(await t(ERROR_MESSAGES.SETTINGS_NOT_FOUND))
   }
 
   if (!(await fileExists(config.apiConfigPath))) {
-    throw new Error(ERROR_MESSAGES.API_CONFIG_NOT_FOUND)
+    throw new Error(await t(ERROR_MESSAGES.API_CONFIG_NOT_FOUND))
   }
 
   return config

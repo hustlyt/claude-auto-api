@@ -4,6 +4,7 @@ const testCommand = require('./test')
 const useCommand = require('./use')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
+const { t } = require('../utils/i18n')
 
 /**
  * 分析测试结果，从已排序的结果中选择最优配置
@@ -69,19 +70,6 @@ function analyzeBestConfig(sortedResults, isTestMode = false) {
 }
 
 /**
- * 获取延迟显示颜色
- */
-function getLatencyColor(latency) {
-  if (latency <= 300) {
-    return chalk.green.bold(`${latency}ms`)
-  } else if (latency <= 800) {
-    return chalk.yellow.bold(`${latency}ms`)
-  } else {
-    return chalk.red.bold(`${latency}ms`)
-  }
-}
-
-/**
  * 构建use命令的选项对象
  */
 async function buildUseOptions(configName, bestResult, apiConfig) {
@@ -136,7 +124,7 @@ async function autoCommand(configName = null, options = {}) {
     }
 
     if (!sortedResults || sortedResults.length === 0) {
-      console.error(chalk.red('错误:'), '暂无可用的配置进行测试')
+      console.error(chalk.red(await t('test.ERROR') + ':'), await t('auto.NO_CONFIGS_AVAILABLE'))
       process.exit(1)
     }
 
@@ -144,12 +132,12 @@ async function autoCommand(configName = null, options = {}) {
     const bestResult = analyzeBestConfig(sortedResults, isTestMode)
 
     if (!bestResult.configName) {
-      const tip = configName ? `${configName}: 配置测试异常!` : '所有配置测试异常!'
+      const tip = configName ? `${configName}: ${await t('test.ERROR')}!` : await t('test.NO_AVAILABLE_CONFIG') + '!'
       console.error(chalk.red.bold(tip))
       process.exit(1)
     }
 
-    console.log(chalk.green.bold('已找到最优配置,开始切换中...'))
+    console.log(chalk.green.bold(await t('auto.FOUND_OPTIMAL_CONFIG')))
 
     // 读取配置文件以构建use命令参数
     const config = await validateConfig()
@@ -161,7 +149,7 @@ async function autoCommand(configName = null, options = {}) {
     // 执行切换
     await useCommand(bestResult.configName, useOptions)
   } catch (error) {
-    console.error(chalk.red('自动切换配置失败:'), error.message)
+    console.error(chalk.red(await t('auto.AUTO_SWITCH_FAILED')), error.message)
     process.exit(1)
   }
 }

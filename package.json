@@ -2,7 +2,7 @@
   "name": "@4xian/ccapi",
   "version": "1.0.6",
   "author": "4xian (https://github.com/4xian)",
-  "description": "一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、延迟测速、自动择优线路",
+  "description": "A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support",
   "repository": {
     "url": "git+https://github.com/4xian/claude-auto-api.git"
   },
@@ -56,7 +56,8 @@
     "2. 新增ping命令，测试厂商URL延迟",
     "3. 调整test命令，最真实反映能否在Claude Code中使用",
     "4. 新增一键修改系统环境变量",
-    "5. 具体更新内容请查看README.md"
+    "5. 新增i18n国际化支持",
+    "6. 具体更新内容请查看README.md"
   ],
   "files": [
     "dist",

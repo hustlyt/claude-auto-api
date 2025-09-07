@@ -1,6 +1,7 @@
 const { spawn } = require('child_process')
 const chalk = require('chalk')
 const packageJson = require('../../package.json')
+const { t } = require('../utils/i18n')
 
 /**
  * 执行npm update命令
@@ -8,8 +9,8 @@ const packageJson = require('../../package.json')
  * @returns {Promise<boolean>} 更新是否成功
  */
 function executeNpmUpdate(packageName) {
-  return new Promise((resolve, reject) => {
-    console.log(chalk.blue.bold(`正在更新${packageName}...`))
+  return new Promise(async (resolve, reject) => {
+    console.log(chalk.blue.bold(await t('update.UPDATING_PACKAGE', packageName)))
     
     const npmProcess = spawn('npm', ['install', '-g', packageName], {
       stdio: ['inherit', 'pipe', 'pipe']
@@ -17,17 +18,17 @@ function executeNpmUpdate(packageName) {
     
     let stderr = ''
     
-    npmProcess.on('close', (code) => {
+    npmProcess.on('close', async (code) => {
       if (code === 0) {
         resolve(true)
       } else {
-        reject(new Error(`npm update失败: ${stderr}`))
+        reject(new Error(await t('update.NPM_UPDATE_FAILED', stderr)))
       }
     })
     
-    npmProcess.on('error', (error) => {
+    npmProcess.on('error', async (error) => {
       if (error.code === 'ENOENT') {
-        console.log(chalk.yellow('💡 提示: 未找到npm命令，请确保已安装Node.js和npm'))
+        console.log(chalk.yellow(await t('update.NPM_NOT_FOUND')))
       }
       
       reject(error)
@@ -43,16 +44,16 @@ async function updateCommand() {
     await executeNpmUpdate(packageJson.name)
     
     console.log()
-    console.log(chalk.green.bold('🎉 更新完成，建议重启终端以使用新版本'))
+    console.log(chalk.green.bold(await t('update.UPDATE_COMPLETE')))
     
     // 显示最新版本的更新日志
-    showLatestUpdateLogs()
+    await showLatestUpdateLogs()
     
   } catch (error) {
     console.log()
-    console.log(chalk.red.bold('❌ 更新失败'))
+    console.log(chalk.red.bold(await t('update.UPDATE_FAILED')))
     console.log()
-    console.log(chalk.cyan(`手动更新命令: npm install -g ${packageJson.name}`))
+    console.log(chalk.cyan(await t('update.MANUAL_UPDATE_CMD', packageJson.name)))
     
     process.exit(1)
   }
@@ -61,7 +62,7 @@ async function updateCommand() {
 /**
  * 显示最新版本的更新内容
  */
-function showLatestUpdateLogs() {
+async function showLatestUpdateLogs() {
   const updateLogs = packageJson.updateLogs || []
   
   if (updateLogs.length === 0) {
@@ -69,7 +70,7 @@ function showLatestUpdateLogs() {
   }
   
   console.log()
-  console.log(chalk.cyan.bold('📋 本次更新内容:'))
+  console.log(chalk.cyan.bold(await t('update.CHANGELOG_TITLE')))
   updateLogs.forEach(log => {
     console.log(`   ${log}`)
   })

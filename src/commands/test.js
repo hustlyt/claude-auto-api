@@ -7,6 +7,7 @@ const { execSync } = require('child_process')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
+const { t } = require('../utils/i18n')
 
 let configData
 let testTempDirs = [] // 存储所有测试临时目录，用于清理
@@ -163,7 +164,7 @@ function showSpinner() {
 /**
  * 动态获取 Claude 可执行文件路径
  */
-function getClaudeExecutablePath() {
+async function getClaudeExecutablePath() {
   try {
     let command
     const isWindows = process.platform === 'win32'
@@ -198,7 +199,7 @@ function getClaudeExecutablePath() {
           }
         }
       } catch (error) {
-        console.log('获取Claude可执行文件路径失败:', error.message)
+        console.log(await t('test.GET_CLAUDE_PATH_FAILED'), error.message)
       }
     }
 
@@ -212,7 +213,7 @@ function getClaudeExecutablePath() {
 
     return finalPath
   } catch (error) {
-    console.log('获取Claude可执行文件路径失败:', error.message)
+    console.log(await t('test.GET_CLAUDE_PATH_FAILED'), error.message)
     return null
   }
 }
@@ -226,11 +227,11 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
 
   try {
     // 动态获取 Claude 可执行文件路径
-    const claudeExecutablePath = getClaudeExecutablePath()
+    const claudeExecutablePath = await getClaudeExecutablePath()
     // console.log('claudeExecutablePath', claudeExecutablePath)
 
     if (!claudeExecutablePath) {
-      throw new Error('Claude 可执行文件未找到，请确保已安装 Claude Code')
+      throw new Error(await t('test.CLAUDE_NOT_FOUND'))
     }
 
     // 创建测试专用的临时工作目录，包含独立的Claude配置
@@ -305,16 +306,16 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
   } catch (error) {
     // console.log('1111, error', error)
     let success = false
-    let message = '请求失败'
+    let message = await t('test.REQUEST_FAILED')
 
     // 如果是AbortError且已经有延迟数据，说明是收到响应后手动中断，应该算成功
     if (error.name === 'AbortError' && latency && latency !== 'error' && typeof latency === 'number') {
-      message = 'Success'
+      message = await t('test.SUCCESS')
       success = true
     }
     // 如果是AbortError但没有延迟数据，说明是超时中断，算失败
     else if (error.name === 'AbortError' || error.message.includes('aborted')) {
-      message = 'Timeout'
+      message = await t('test.TIMEOUT')
       latency = 'error'
     }
     // 其他错误
@@ -362,7 +363,7 @@ async function testConfigurationSerial(configName, config, keyIndex = 0, tokenIn
           url: 'all',
           success: false,
           latency: 'error',
-          error: '缺少认证信息 (key 或 token)'
+          error: await t('test.MISSING_AUTH')
         }
       ]
     }
@@ -483,27 +484,33 @@ function getBestLatency(results) {
 /**
  * 简化显示测试结果 (用于-s参数)
  */
-function displaySimpleResults(sortedResults) {
+async function displaySimpleResults(sortedResults) {
   console.log()
-  console.log(chalk.yellow.bold('有效性测试结果(按响应延迟从低到高): '))
+  console.log(chalk.yellow.bold(await t('test.TEST_RESULTS_TITLE')))
   console.log()
 
-  sortedResults.forEach((configResult, configIndex) => {
+  // 预先加载翻译信息
+  const translations = {
+    valid: await t('test.VALID'),
+    invalid: await t('test.INVALID')
+  }
+
+  for (const [configIndex, configResult] of sortedResults.entries()) {
     // 获取并显示配置的最佳延迟和地址
     const bestInfo = getBestLatencyInfo(configResult.results)
 
     let bestText
     if (bestInfo.latency === Infinity) {
-      bestText = '无'
+      bestText = await t('common.NONE')
     } else {
       const shortUrl = formatUrl(bestInfo.url)
       bestText = `${shortUrl}`
     }
-    console.log(chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(最优路线: ${bestText})`))
+    console.log(chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(${await t('test.BEST_ROUTE')}: ${bestText})`))
 
     configResult.results.forEach((result, index) => {
       const status =
-        result.success && result.latency !== 'error' ? `✅ ${chalk.green.bold('有效')}` : `❌ ${chalk.red.bold('无效')}`
+        result.success && result.latency !== 'error' ? `✅ ${chalk.green.bold(translations.valid)}` : `❌ ${chalk.red.bold(translations.invalid)}`
       const { color } = getLatencyColor(result.latency)
       const latencyText = result.latency === 'error' ? 'error' : `${result.latency}ms`
       const responseText = result.response
@@ -519,7 +526,7 @@ function displaySimpleResults(sortedResults) {
     if (configIndex < sortedResults.length - 1) {
       console.log()
     }
-  })
+  }
 
   console.log()
 }
@@ -535,7 +542,7 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     // 读取API配置文件
     const apiConfig = await readConfigFile(config.apiConfigPath)
     if (!validateApiConfig(apiConfig)) {
-      console.error(chalk.red('错误:'), 'api配置文件格式不正确')
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('test.CONFIG_FORMAT_ERROR'))
       return
     }
 
@@ -544,8 +551,8 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     if (configName) {
       // 测试指定配置
       if (!apiConfig[configName]) {
-        console.error(chalk.red('错误:'), `配置 "${configName}" 不存在`)
-        console.log(chalk.green('可用配置:'), Object.keys(apiConfig).join(', '))
+        console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('test.CONFIG_NOT_EXIST', configName))
+        console.log(chalk.green(await t('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '))
         return
       }
       configsToTest[configName] = apiConfig[configName]
@@ -556,7 +563,7 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
 
     // 显示并行测试进度
     const totalConfigs = Object.keys(configsToTest).length
-    console.log(chalk.green.bold(`正在测试${totalConfigs}个配置在Claude Code中的有效性(时间可能稍长,请耐心等待)...`))
+    console.log(chalk.green.bold(await t('test.TESTING_CONFIGS', totalConfigs)))
 
     // 显示全局加载动画
     const globalSpinner = showSpinner()
@@ -577,10 +584,10 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     const sortedResults = sortTestResults(allResults)
 
     // 使用简化显示
-    displaySimpleResults(sortedResults)
+    await displaySimpleResults(sortedResults)
 
     // 显示测试完成
-    console.log(chalk.green.bold(`有效性测试完成, 此结果代表能否在Claude Code中使用!`))
+    console.log(chalk.green.bold(await t('test.TEST_COMPLETE')))
 
     // 清理测试临时目录
     await cleanupTestTempDir()
@@ -596,7 +603,7 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
   } catch (error) {
     // 确保即使出错也清理临时目录
     await cleanupTestTempDir()
-    console.error(chalk.red('有效性测试失败:'), error.message)
+    console.error(chalk.red(await t('test.TEST_FAILED')), error.message)
     process.exit(1)
   }
 }

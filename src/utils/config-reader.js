@@ -32,14 +32,14 @@ function getConfigFormat(filePath) {
 async function readConfigFile(filePath) {
   try {
     if (!(await fs.pathExists(filePath))) {
-      throw new Error(`文件不存在: ${filePath}`)
+      throw new Error('File does not exist: ' + filePath)
     }
 
     const content = await fs.readFile(filePath, 'utf8')
     const format = getConfigFormat(filePath)
 
     if (!format) {
-      throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`)
+      throw new Error('Unsupported configuration file format: ' + path.extname(filePath))
     }
 
     let parsed
@@ -57,19 +57,19 @@ async function readConfigFile(filePath) {
         parsed = tomlLoad(content)
         break
       default:
-        throw new Error(`未实现的配置文件格式: ${format}`)
+        throw new Error('Unimplemented configuration file format: ' + format)
     }
 
     return parsed
   } catch (error) {
     if (error.name === 'JSONError' || error.message.includes('JSON')) {
-      throw new Error(`${ERROR_MESSAGES.INVALID_JSON}: ${filePath} - ${error.message}`)
+      throw new Error(`${await t(ERROR_MESSAGES.INVALID_JSON)}: ${filePath} - ${error.message}`)
     }
     if (error.name === 'YAMLException') {
-      throw new Error(`${ERROR_MESSAGES.INVALID_YAML}: ${filePath} - ${error.message}`)
+      throw new Error(`${await t(ERROR_MESSAGES.INVALID_YAML)}: ${filePath} - ${error.message}`)
     }
     if (error.name === 'TomlError' || error.message.includes('TOML')) {
-      throw new Error(`${ERROR_MESSAGES.INVALID_TOML}: ${filePath} - ${error.message}`)
+      throw new Error(`${await t(ERROR_MESSAGES.INVALID_TOML)}: ${filePath} - ${error.message}`)
     }
     throw error
   }
@@ -104,12 +104,12 @@ async function writeConfigFile(filePath, data) {
         content = TOML.stringify(data)
         break
       default:
-        throw new Error(`不支持的配置文件格式: ${path.extname(filePath)}`)
+        throw new Error('Unsupported configuration file format: ' + path.extname(filePath))
     }
 
     await fs.writeFile(filePath, content, 'utf8')
   } catch (error) {
-    throw new Error(`写入文件失败: ${filePath} - ${error.message}`)
+    throw new Error('Failed to write file: ' + filePath + ' - ' + error.message)
   }
 }
 

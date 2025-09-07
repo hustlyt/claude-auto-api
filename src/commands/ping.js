@@ -4,6 +4,7 @@ const { readConfigFile } = require('../utils/file')
 const { validateApiConfig } = require('../utils/validator')
 const { readConfig } = require('../utils/config')
 const LatencyTester = require('../utils/latency-tester')
+const { t } = require('../utils/i18n')
 
 let configData
 const maxText = 50
@@ -164,25 +165,28 @@ function sortTestResults(allResults) {
 /**
  * 显示排序后的测试结果
  */
-function displayPingResults(sortedResults) {
+async function displayPingResults(sortedResults) {
   console.log()
-  console.log(chalk.yellow.bold('延迟测试结果(按厂商URL延迟从低到高):'))
+  console.log(chalk.yellow.bold(await t('ping.LATENCY_TEST_RESULTS')))
   console.log()
 
-  sortedResults.forEach((configResult, configIndex) => {
+  for (const configResult of sortedResults) {
+    const configIndex = sortedResults.indexOf(configResult)
     // 获取并显示配置的最佳延迟和地址
     const bestInfo = getBestLatencyInfo(configResult.results)
 
     let bestText
     if (bestInfo.latency === Infinity) {
-      bestText = '无'
+      bestText = await t('test.FAILED')
     } else {
       const shortUrl = formatUrl(bestInfo.url)
       bestText = `${shortUrl}`
     }
 
     // 显示配置名和最佳延迟信息
-    console.log(chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(最优路线: ${bestText})`))
+    console.log(
+      chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(${await t('ping.BEST_ROUTE', bestText)})`)
+    )
 
     configResult.results.forEach((result, index) => {
       const { color, text, status } = getLatencyColor(result.latency)
@@ -205,7 +209,7 @@ function displayPingResults(sortedResults) {
     if (configIndex < sortedResults.length - 1) {
       console.log()
     }
-  })
+  }
 
   console.log()
 }
@@ -221,7 +225,7 @@ async function pingCommand(configName = null) {
     // 读取API配置文件
     const apiConfig = await readConfigFile(config.apiConfigPath)
     if (!validateApiConfig(apiConfig)) {
-      console.error(chalk.red('错误:'), 'api配置文件格式不正确')
+      console.error(chalk.red((await t('test.ERROR')) + ':'), await t('ping.CONFIG_FORMAT_ERROR'))
       return
     }
 
@@ -230,8 +234,8 @@ async function pingCommand(configName = null) {
     if (configName) {
       // 测试指定配置
       if (!apiConfig[configName]) {
-        console.error(chalk.red('错误:'), `配置 "${configName}" 不存在`)
-        console.log(chalk.green('可用配置:'), Object.keys(apiConfig).join(', '))
+        console.error(chalk.red((await t('test.ERROR')) + ':'), await t('ping.CONFIG_NOT_EXIST', configName))
+        console.log(chalk.green(await t('ping.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '))
         return
       }
       configsToTest[configName] = apiConfig[configName]
@@ -242,7 +246,7 @@ async function pingCommand(configName = null) {
 
     // 显示测试进度信息
     const totalConfigs = Object.keys(configsToTest).length
-    console.log(chalk.green.bold(`正在测试${totalConfigs}个配置的URL延迟...`))
+    console.log(chalk.green.bold(await t('ping.TESTING_CONFIGS', totalConfigs)))
 
     // 显示测试方法信息
     // const methodInfo = await LatencyTester.getTestMethodInfo()
@@ -266,7 +270,7 @@ async function pingCommand(configName = null) {
     const sortedResults = sortTestResults(allResults)
 
     // 显示排序后的结果
-    displayPingResults(sortedResults)
+    await displayPingResults(sortedResults)
 
     // 显示测试完成信息
     const totalUrls = sortedResults.reduce((total, config) => total + config.results.length, 0)
@@ -275,11 +279,11 @@ async function pingCommand(configName = null) {
       0
     )
 
-    console.log(chalk.green.bold(`URL延迟测试完成! 成功: ${successUrls}/${totalUrls}`))
+    console.log(chalk.green.bold(await t('ping.LATENCY_TEST_COMPLETE', successUrls, totalUrls)))
 
     return sortedResults
   } catch (error) {
-    console.error(chalk.red('URL延迟测试失败:'), error.message)
+    console.error(chalk.red(await t('ping.LATENCY_TEST_FAILED')), error.message)
     process.exit(1)
   }
 }

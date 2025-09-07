@@ -2,7 +2,8 @@ const chalk = require('chalk')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig, validateSettingsConfig } = require('../utils/validator')
-const { CLAUDE_ENV_KEYS, ERROR_MESSAGES } = require('../utils/constants')
+const { CLAUDE_ENV_KEYS } = require('../utils/constants')
+const { t } = require('../utils/i18n')
 const maxText = 30
 /**
  * 获取当前使用的配置名称和各字段索引信息
@@ -127,12 +128,15 @@ function getCurrentConfigInfo(settingsData, apiConfig) {
 /**
  * 格式化字段显示（支持 URL、Key、Token、Model、Fast）
  */
-function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
+async function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
+  // 获取本地化标签
+  const localizedLabel = await t(`list.${label}`) || label
+  
   if (Array.isArray(fieldValue)) {
-    const lines = [`${label}:`]
+    const lines = [`${localizedLabel}:`]
     fieldValue.forEach((value, index) => {
       const isCurrentValue = index === currentIndex
-      const prefix = isCurrentValue ? '    * -' : '      - '
+      const prefix = isCurrentValue ? '    * - ' : '      - '
 
       // 处理敏感信息脱敏
       let displayValue = value
@@ -153,14 +157,14 @@ function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
     }
 
     const valueDisplay = currentIndex === 0 ? chalk.green.bold(displayValue) : chalk.cyan(displayValue)
-    return [`${label}: ${valueDisplay}`]
+    return [`${localizedLabel}: ${valueDisplay}`]
   }
 }
 
 /**
  * 格式化配置显示
  */
-function formatConfigDisplay(name, config, currentInfo) {
+async function formatConfigDisplay(name, config, currentInfo) {
   const isCurrent = name === currentInfo.name
   const prefix = isCurrent ? chalk.green.bold('*') : '  '
   const nameDisplay = isCurrent ? chalk.green.bold(`[${name}]`) : chalk.cyan(`[${name}]`)
@@ -172,22 +176,22 @@ function formatConfigDisplay(name, config, currentInfo) {
   let details = []
 
   // 格式化 URL 显示
-  const urlLines = formatFieldDisplay(config.url, isCurrent ? currentInfo.urlIndex : -1, 'URL')
+  const urlLines = await formatFieldDisplay(config.url, isCurrent ? currentInfo.urlIndex : -1, 'URL')
   details.push(...urlLines)
 
   // 格式化模型显示
-  const modelLines = formatFieldDisplay(config.model, isCurrent ? currentInfo.modelIndex : -1, 'Model')
+  const modelLines = await formatFieldDisplay(config.model, isCurrent ? currentInfo.modelIndex : -1, 'Model')
   details.push(...modelLines)
 
   // 格式化快速模型显示
   if (config.fast) {
-    const fastLines = formatFieldDisplay(config.fast, isCurrent ? currentInfo.fastIndex : -1, 'Fast')
+    const fastLines = await formatFieldDisplay(config.fast, isCurrent ? currentInfo.fastIndex : -1, 'Fast')
     details.push(...fastLines)
   }
 
   // 格式化 Key 显示
   if (config.key) {
-    const keyLines = formatFieldDisplay(
+    const keyLines = await formatFieldDisplay(
       config.key,
       isCurrent ? currentInfo.keyIndex : -1,
       'Key',
@@ -198,7 +202,7 @@ function formatConfigDisplay(name, config, currentInfo) {
 
   // 格式化 Token 显示
   if (config.token) {
-    const tokenLines = formatFieldDisplay(
+    const tokenLines = await formatFieldDisplay(
       config.token,
       isCurrent ? currentInfo.tokenIndex : -1,
       'Token',
@@ -232,14 +236,14 @@ async function listCommand() {
     // 读取API配置文件
     const apiConfig = await readConfigFile(config.apiConfigPath)
     if (!validateApiConfig(apiConfig)) {
-      console.error(chalk.red('错误:'), 'api配置文件格式不正确')
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('listDisplay.API_FORMAT_ERROR'))
       return
     }
 
     // 读取settings.json文件
     const settingsData = await readConfigFile(config.settingsPath)
     if (!validateSettingsConfig(settingsData)) {
-      console.error(chalk.red('错误:'), 'settings.json文件格式不正确')
+      console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('listDisplay.SETTINGS_FORMAT_ERROR'))
       return
     }
 
@@ -247,32 +251,33 @@ async function listCommand() {
     const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig)
 
     // 显示配置列表
-    console.log(chalk.green.bold('可用的API配置:'))
+    console.log(chalk.green.bold(await t('listDisplay.AVAILABLE_API_CONFIGS')))
 
     const configNames = Object.keys(apiConfig)
     if (configNames.length === 0) {
-      console.log(chalk.yellow('暂无可用配置'))
+      console.log(chalk.yellow(await t('listDisplay.NO_CONFIGS_AVAILABLE')))
       return
     }
 
     // 按名称排序显示
-    configNames.sort().forEach((name) => {
-      formatConfigDisplay(name, apiConfig[name], currentConfigInfo)
+    for (const name of configNames.sort()) {
+      await formatConfigDisplay(name, apiConfig[name], currentConfigInfo)
       console.log() // 空行分隔
-    })
+    }
 
     // 显示当前状态
     if (currentConfigInfo.name) {
-      console.log(chalk.green.bold(`当前使用的配置: ${currentConfigInfo.name}`))
+      console.log(chalk.green.bold(await t('listDisplay.CURRENT_CONFIG', currentConfigInfo.name)))
     } else {
-      console.log(chalk.yellow('当前未进行任何配置'))
+      console.log(chalk.yellow(await t('listDisplay.NO_CURRENT_CONFIG')))
     }
   } catch (error) {
-    if (error.message.includes('未设置') || error.message.includes('不存在')) {
-      console.error(chalk.red('配置错误:'), error.message)
-      console.log('请先使用', chalk.cyan('ccapi set'), '命令设置配置文件路径')
+    const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set')
+    if (no) {
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), error.message)
+      console.log(await t('listDisplay.USE_SET_CMD', chalk.cyan('ccapi set')))
     } else {
-      console.error(chalk.red('列举配置失败:'), error.message)
+      console.error(chalk.red(await t('listDisplay.LIST_FAILED')), error.message)
     }
     process.exit(1)
   }

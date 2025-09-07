@@ -3,6 +3,7 @@ const chalk = require('chalk')
 const packageJson = require('../package.json')
 const { checkUpdateQuietly } = require('./utils/version-checker')
 const { readConfig } = require('./utils/config')
+const { t } = require('./utils/i18n')
 
 // 导入命令处理模块
 const versionCommand = require('./commands/version')
@@ -15,6 +16,7 @@ const pingCommand = require('./commands/ping')
 const updateCommand = require('./commands/update')
 const envCommand = require('./commands/env')
 const clearCommand = require('./commands/clear')
+const langCommand = require('./commands/lang')
 
 const program = new Command()
 
@@ -28,143 +30,170 @@ async function checkVersionInBackground() {
     const versionInfo = await checkUpdateQuietly()
     if (versionInfo.needsUpdate) {
       console.log(
-        chalk.yellow(`【新版本v${versionInfo.latestVersion}可用，可执行 ${chalk.bold('`ccapi update`')} 进行更新】`)
+        chalk.yellow(await t('prompts.NEW_VERSION_AVAILABLE', versionInfo.latestVersion, chalk.bold('`ccapi update`')))
       )
     }
   } catch (error) {}
 }
 
-// 设置基本信息
-program.name('ccapi').description(packageJson.description).version(packageJson.version)
+// 异步初始化程序和命令
+async function initializeProgram() {
+  // 设置基本信息
+  program
+    .name('ccapi')
+    .description(await t('cli.description'))
+    .version(packageJson.version)
 
-// 注册命令
-
-// 版本命令
-program.option('-v, --version', '显示版本信息').action(async () => {
-  await versionCommand()
-  await checkVersionInBackground()
-})
-
-// 设置命令
-program
-  .command('set')
-  .description('设置配置文件路径')
-  .option('--settings <path>', 'Claude Code settings.json文件路径')
-  .option('--api <path>', '自定义API配置文件路径')
-  .action(async (options) => {
-    await setCommand(options)
+  // 版本命令
+  program.option('-v, --version', await t('cli.version')).action(async () => {
+    await versionCommand()
     await checkVersionInBackground()
   })
 
-// 列举命令 (支持 ls 和 list 两个命令)
-program
-  .command('ls')
-  .alias('list')
-  .description('显示当前API配置列表')
-  .action(async () => {
-    await listCommand()
-    await checkVersionInBackground()
-  })
+  // 设置命令
+  program
+    .command('set')
+    .description(await t('commands.set.description'))
+    .option('--settings <path>', await t('commands.set.settingsOption'))
+    .option('--api <path>', await t('commands.set.apiOption'))
+    .action(async (options) => {
+      await setCommand(options)
+      await checkVersionInBackground()
+    })
 
-// 使用命令
-program
-  .command('use <name>')
-  .description('切换到指定的API配置')
-  .option('-u, --url <index>', '指定要切换的URL索引（从1开始，仅对数组类型url有效）')
-  .option('-k, --key <index>', '指定要切换的Key索引（从1开始，仅对数组类型key有效）')
-  .option('-t, --token <index>', '指定要切换的Token索引（从1开始，仅对数组类型token有效）')
-  .option('-m, --model <index>', '指定要切换的模型索引（从1开始，仅对数组类型model有效）')
-  .option('-f, --fast <index>', '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）')
-  .action(async (name, options) => {
-    await useCommand(name, options)
-    await checkVersionInBackground()
-  })
+  // 列举命令 (支持 ls 和 list 两个命令)
+  program
+    .command('ls')
+    .alias('list')
+    .description(await t('commands.list.description'))
+    .action(async () => {
+      await listCommand()
+      await checkVersionInBackground()
+    })
 
-// ping 命令
-program
-  .command('ping [name]')
-  .description('测试API配置中所有URL的网络延迟')
-  .action(async (name) => {
-    await pingCommand(name)
-    await checkVersionInBackground()
-  })
+  // 使用命令
+  program
+    .command('use <name>')
+    .description(await t('commands.use.description'))
+    .option('-u, --url <index>', await t('commands.use.urlOption'))
+    .option('-k, --key <index>', await t('commands.use.keyOption'))
+    .option('-t, --token <index>', await t('commands.use.tokenOption'))
+    .option('-m, --model <index>', await t('commands.use.modelOption'))
+    .option('-f, --fast <index>', await t('commands.use.fastOption'))
+    .action(async (name, options) => {
+      await useCommand(name, options)
+      await checkVersionInBackground()
+    })
 
-// 测试命令
-program
-  .command('test [name]')
-  .description('测试API配置在Claude Code中是否可用')
-  .option('-t, --token <index>', '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）')
-  .option('-k, --key <index>', '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）')
-  .action(async (name, options) => {
-    const keyIndex = options.key ? parseInt(options.key) - 1 : 0
-    const tokenIndex = options.token ? parseInt(options.token) - 1 : 0
-    await testCommand(name, keyIndex, tokenIndex)
-    await checkVersionInBackground()
-  })
+  // ping 命令
+  program
+    .command('ping [name]')
+    .description(await t('commands.ping.description'))
+    .action(async (name) => {
+      await pingCommand(name)
+      await checkVersionInBackground()
+    })
 
-// 自动选择命令
-program
-  .command('auto [name]')
-  .description('自动测试API配置并切换到最优配置')
-  .option('-p, --ping', '使用ping测试延迟结果选择最优配置切换（快速且只验证网站URL延迟）')
-  .option('-t, --test', '使用test测试结果选择最优配置切换（稍慢但验证真实API可用性）')
-  .action(async (name, options) => {
-    await autoCommand(name, options)
-    await checkVersionInBackground()
-  })
+  // 测试命令
+  program
+    .command('test [name]')
+    .description(await t('commands.test.description'))
+    .option('-t, --token <index>', await t('commands.test.tokenOption'))
+    .option('-k, --key <index>', await t('commands.test.keyOption'))
+    .action(async (name, options) => {
+      const keyIndex = options.key ? parseInt(options.key) - 1 : 0
+      const tokenIndex = options.token ? parseInt(options.token) - 1 : 0
+      await testCommand(name, keyIndex, tokenIndex)
+      await checkVersionInBackground()
+    })
 
-// update 命令
-program
-  .command('update')
-  .description('更新ccapi到最新版本')
-  .action(() => {
-    updateCommand()
-  })
+  // 自动选择命令
+  program
+    .command('auto [name]')
+    .description(await t('commands.auto.description'))
+    .option('-p, --ping', await t('commands.auto.pingOption'))
+    .option('-t, --test', await t('commands.auto.testOption'))
+    .action(async (name, options) => {
+      await autoCommand(name, options)
+      await checkVersionInBackground()
+    })
 
-// env 命令
-program
-  .command('env [name]')
-  .description('环境变量管理：设置/查看/清除系统环境变量')
-  .option('-u, --url <index>', '指定要使用的URL索引（从1开始，仅对数组类型url有效）')
-  .option('-k, --key <index>', '指定要使用的Key索引（从1开始，仅对数组类型key有效）')
-  .option('-t, --token <index>', '指定要使用的Token索引（从1开始，仅对数组类型token有效）')
-  .option('-m, --model <index>', '指定要使用的模型索引（从1开始，仅对数组类型model有效）')
-  .option('-f, --fast <index>', '指定要使用的快速模型索引（从1开始，仅对数组类型fast有效）')
-  .action(async (name, options) => {
-    await envCommand(name, options)
-    await checkVersionInBackground()
-  })
+  // update 命令
+  program
+    .command('update')
+    .description(await t('commands.update.description'))
+    .action(() => {
+      updateCommand()
+    })
 
-// clear 命令
-program
-  .command('clear')
-  .description('完全清除配置：同时清除settings.json和系统环境变量相关API配置')
-  .action(async () => {
-    await clearCommand()
-    await checkVersionInBackground()
-  })
+  // env 命令
+  program
+    .command('env [name]')
+    .description(await t('commands.env.description'))
+    .option('-u, --url <index>', await t('commands.env.urlOption'))
+    .option('-k, --key <index>', await t('commands.env.keyOption'))
+    .option('-t, --token <index>', await t('commands.env.tokenOption'))
+    .option('-m, --model <index>', await t('commands.env.modelOption'))
+    .option('-f, --fast <index>', await t('commands.env.fastOption'))
+    .action(async (name, options) => {
+      await envCommand(name, options)
+      await checkVersionInBackground()
+    })
+
+  // clear 命令
+  program
+    .command('clear')
+    .description(await t('commands.clear.description'))
+    .action(async () => {
+      await clearCommand()
+      await checkVersionInBackground()
+    })
+
+  // lang 命令
+  program
+    .command('lang [language]')
+    .description(await t('commands.lang.description'))
+    .action(async (language) => {
+      await langCommand(language)
+    })
+
+  return program
+}
 
 // 全局错误处理
-process.on('uncaughtException', (error) => {
-  console.error(chalk.red('程序错误:'), error.message)
+process.on('uncaughtException', async (error) => {
+  console.error(chalk.red(await t('errors.PROGRAM_ERROR') + ':'), error.message)
   if (process.env.NODE_ENV === 'development') {
     console.error(error.stack)
   }
   process.exit(1)
 })
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error(chalk.red('未处理的Promise错误:'), reason)
+process.on('unhandledRejection', async (reason, promise) => {
+  console.error(chalk.red(await t('errors.UNHANDLED_PROMISE') + ':'), reason)
   if (process.env.NODE_ENV === 'development') {
     console.error('Promise:', promise)
   }
   process.exit(1)
 })
 
-// 解析命令行参数
-program.parse(process.argv)
-
-// 如果没有提供任何参数，显示帮助信息
-if (!process.argv.slice(2).length) {
-  program.outputHelp()
+// 主函数 - 异步初始化并运行程序
+async function main() {
+  try {
+    const program = await initializeProgram()
+    
+    // 解析命令行参数
+    program.parse(process.argv)
+    
+    // 如果没有提供任何参数，显示帮助信息
+    if (!process.argv.slice(2).length) {
+      program.outputHelp()
+    }
+  } catch (error) {
+    console.error(chalk.red('Program initialization failed:'), error.message)
+    process.exit(1)
+  }
 }
+
+// 运行主函数
+main()

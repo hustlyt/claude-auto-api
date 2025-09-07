@@ -3,12 +3,13 @@ const readline = require('readline')
 const { validateConfig } = require('../utils/config')
 const { readConfigFile, writeConfigFile, backupFile } = require('../utils/file')
 const { validateSettingsConfig } = require('../utils/validator')
-const { CLAUDE_ENV_KEYS, SUCCESS_MESSAGES } = require('../utils/constants')
+const { CLAUDE_ENV_KEYS } = require('../utils/constants')
 const { 
   clearSystemEnvVars, 
   checkEnvStatus, 
   getCurrentConfigName 
 } = require('../utils/env')
+const { t } = require('../utils/i18n')
 const maxText = 30
 
 /**
@@ -31,16 +32,17 @@ function clearSettingsConfig(settingsData) {
 /**
  * 获取用户确认
  */
-async function getUserConfirmation(message, confirmText = 'y') {
+async function getUserConfirmation() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   })
 
-  return new Promise((resolve) => {
-    rl.question(chalk.red(`${message} (输入${confirmText}确认): `), (answer) => {
+  return new Promise(async (resolve) => {
+    const message = await t('clear.CONFIRM')
+    rl.question(chalk.red(message), (answer) => {
       rl.close()
-      resolve(answer.toLowerCase() === confirmText.toLowerCase())
+      resolve(answer.toLowerCase() === 'y')
     })
   })
 }
@@ -53,7 +55,7 @@ async function showClearPreview() {
     const status = await checkEnvStatus()
     const currentConfig = getCurrentConfigName()
 
-    console.log(chalk.blue.bold('准备清除以下内容:'))
+    console.log(chalk.blue.bold(await t('clear.PREPARE_TO_CLEAR')))
     console.log()
 
     // 显示settings.json中的配置
@@ -62,7 +64,7 @@ async function showClearPreview() {
       const settingsData = await readConfigFile(config.settingsPath)
       
       if (settingsData.env && Object.keys(settingsData.env).length > 0) {
-        console.log(chalk.yellow.bold('settings.json 中的环境变量配置:'))
+        console.log(chalk.yellow.bold(await t('clear.SETTINGS_ENV_CONFIG')))
         for (const [key, value] of Object.entries(settingsData.env)) {
           if (Object.values(CLAUDE_ENV_KEYS).includes(key)) {
             let displayValue = value
@@ -74,17 +76,17 @@ async function showClearPreview() {
         }
         console.log()
       } else {
-        console.log(chalk.dim('settings.json 中未检测到相关配置'))
+        console.log(chalk.dim(await t('clear.NO_SETTINGS_CONFIG')))
         console.log()
       }
     } catch (error) {
-      console.log(chalk.yellow('警告: 无法读取 settings.json 文件'))
+      console.log(chalk.yellow(await t('clear.CANT_READ_SETTINGS')))
       console.log()
     }
 
     // 显示系统环境变量
     if (status.hasEnvVars || currentConfig) {
-      console.log(chalk.yellow.bold('系统环境变量:'))
+      console.log(chalk.yellow.bold(await t('clear.SYSTEM_ENV_VARS')))
       
       for (const [key, value] of Object.entries(status.envVars)) {
         if (key !== 'CCAPI_CURRENT_CONFIG') {
@@ -97,13 +99,13 @@ async function showClearPreview() {
       }
       console.log()
     } else {
-      console.log(chalk.dim('系统环境变量中未检测到相关配置'))
+      console.log(chalk.dim(await t('clear.NO_SYSTEM_ENV_VARS')))
       console.log()
     }
 
     return status.hasEnvVars || currentConfig || false
   } catch (error) {
-    console.error(chalk.red('获取清除预览失败:'), error.message)
+    console.error(chalk.red(await t('clear.CLEAR_PREVIEW_FAILED')), error.message)
     return false
   }
 }
@@ -130,18 +132,18 @@ async function clearCommand() {
       }
 
       if (!hasSettingsConfig) {
-        console.log(chalk.green('未检测到任何需要清除的配置'))
+        console.log(chalk.green(await t('clear.NO_CONFIG_TO_CLEAR')))
         return
       }
     }
 
-    console.log(chalk.red.bold('⚠️ 警告: 此操作将完全清除所有相关配置'))
-    console.log(chalk.red('  • 清除 settings.json 中的环境变量配置'))
-    console.log(chalk.red('  • 清除系统中的相关环境变量'))
+    console.log(chalk.red.bold(await t('clear.WARNING_CLEAR_ALL')))
+    console.log(chalk.red(await t('clear.WILL_CLEAR_SETTINGS')))
+    console.log(chalk.red(await t('clear.WILL_CLEAR_SYSTEM')))
     console.log()
 
     // 第一次确认
-    const firstConfirm = await getUserConfirmation('确认要执行完全清理操作吗？', 'y')
+    const firstConfirm = await getUserConfirmation()
     if (!firstConfirm) {
       return
     }
@@ -159,17 +161,17 @@ async function clearCommand() {
       if (validateSettingsConfig(settingsData)) {
         // 备份 settings.json
         const backupPath = await backupFile(config.settingsPath)
-        console.log(`settings.json 已备份到: ${backupPath}`)
+        console.log(await t('clear.SETTINGS_BACKED_UP', backupPath))
 
         // 清理配置
         const clearedSettings = clearSettingsConfig(settingsData)
         await writeConfigFile(config.settingsPath, clearedSettings)
         
-        console.log(chalk.green.bold('✓ settings.json 配置已清除'))
+        console.log(chalk.green.bold(await t('clear.SETTINGS_CONFIG_CLEARED')))
         settingsCleared = true
       }
     } catch (error) {
-      console.log(chalk.yellow('警告: settings.json 清理失败'), error.message)
+      console.log(chalk.yellow(await t('clear.SETTINGS_CLEAR_FAILED')), error.message)
     }
 
     // 清理系统环境变量
@@ -180,7 +182,7 @@ async function clearCommand() {
     }
 
   } catch (error) {
-    console.error(chalk.red('清理命令执行失败:'), error.message)
+    console.error(chalk.red(await t('clear.CLEAR_CMD_FAILED')), error.message)
     process.exit(1)
   }
 }

@@ -2,7 +2,7 @@
 
 [English](./README_EN.md) | 中文
 
-一个快速切换Claude Code配置的管理工具，多个中转站之间快速切换URL、API_KEY、AUTH_TOKEN、Model... 支持环境变量管理，延迟测速与自动择优线路切换。
+一个快速切换Claude Code配置的管理工具，多个中转站之间快速切换URL、API_KEY、AUTH_TOKEN、Model... 支持环境变量管理，延迟测速，自动择优线路切换与国际化支持。
 
 ## 功能特性
 
@@ -14,6 +14,7 @@
 - 🧠 **智能识别** - 自动识别当前使用的配置和最优路线
 - 📄 **多格式支持** - 支持 JSON、JSON5、YAML、TOML 配置文件
 - 🔧 **数组支持** - 支持多个URL、Key、Token、Model等字段的数组配置
+- 🌍 **国际化支持** - 支持中文和英文界面语言切换
 
 ## 安装
 
@@ -409,9 +410,29 @@ cc
 ccapi update
 ```
 
-### 11. 完整的ccapi-config.json配置
+### 11. 语言设置 (国际化)
 
-该文件是ccapi使用的配置文件，可在此进行选项配置
+程序支持中英文双语界面，可以根据需要切换显示语言，默认中文：
+
+```bash
+# 查看当前语言设置
+ccapi lang
+
+# 切换为中文
+ccapi lang zh
+
+# 切换为英文
+ccapi lang en
+
+# 也可直接在配置文件修改 ~/.ccapi-config.json
+{
+  "language": "zh"
+}
+```
+
+### 12. 完整的ccapi-config.json配置
+
+该文件是ccapi使用的配置文件，可在此进行选项配置，具体文件在 ~/.ccapi-config.json。
 
 ```bash
 { 
@@ -428,7 +449,9 @@ ccapi update
   # 是否需要更新提示
   "update": true,
   # 使用use命令时是否同步修改系统环境变量
-  "useNoEnv": true
+  "useNoEnv": true,
+  # 界面语言设置 (zh: 中文, en: 英文)
+  "language": "zh"
 }
 ```
 

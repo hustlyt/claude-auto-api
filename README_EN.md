@@ -2,7 +2,7 @@
 
 English | [中文](./README.md)
 
-A CLI tool for managing Claude Code configurations, allowing users to quickly switch between different API endpoints, keys, tokens, models, and test network latency to automatically select optimal configurations.
+A CLI tool for managing Claude Code configurations, allowing users to quickly switch between different API endpoints, keys, tokens, models, and test network latency to automatically select optimal configurations with internationalization support.
 
 ## Features
 
@@ -14,6 +14,7 @@ A CLI tool for managing Claude Code configurations, allowing users to quickly sw
 - 🧠 **Smart Recognition** - Automatically identify currently used configuration and optimal routes
 - 📄 **Multi-format Support** - Supports JSON, JSON5, YAML, TOML configuration files
 - 🔧 **Array Support** - Supports array configurations for multiple URLs, Keys, Tokens, Models and other fields
+- 🌍 **Internationalization** - Supports Chinese and English interface language switching
 
 ## Installation
 
@@ -409,9 +410,29 @@ The program has built-in version checking. If a new version is published on npm,
 ccapi update
 ```
 
-### 11. Complete ccapi-config.json Configuration
+### 11. Language Settings (Internationalization)
 
-This file is the configuration file used by ccapi, where you can configure options
+The program supports bilingual interface in Chinese and English, you can switch display language as needed:
+
+```bash
+# View current language settings
+ccapi lang
+
+# Switch to Chinese
+ccapi lang zh
+
+# Switch to English
+ccapi lang en
+
+# You can also modify directly in configuration file ~/.ccapi-config.json
+{
+  "language": "en"
+}
+```
+
+### 12. Complete ccapi-config.json Configuration
+
+This file is the configuration file used by ccapi, where you can configure options. The specific file is located at ~/.ccapi-config.json.
 
 ```bash
 { 
@@ -428,7 +449,9 @@ This file is the configuration file used by ccapi, where you can configure optio
   # whether update prompts are needed
   "update": true,
   # whether to synchronously modify system environment variables when using use command
-  "useNoEnv": true
+  "useNoEnv": true,
+  # interface language setting (zh: Chinese, en: English)
+  "language": "en"
 }
 ```
 
