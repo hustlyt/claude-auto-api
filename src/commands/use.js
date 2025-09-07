@@ -1,8 +1,9 @@
 const chalk = require('chalk')
-const { validateConfig } = require('../utils/config')
+const { validateConfig, readConfig } = require('../utils/config')
 const { readConfigFile, writeConfigFile, backupFile } = require('../utils/file')
 const { validateApiConfig, validateSettingsConfig, validateConfigName } = require('../utils/validator')
 const { CLAUDE_ENV_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } = require('../utils/constants')
+const { setSystemEnvVars } = require('../utils/env')
 
 /**
  * 检查是否为当前配置
@@ -194,11 +195,26 @@ async function useCommand(configName, options = {}) {
     // 保存更新后的settings.json
     await writeConfigFile(config.settingsPath, updatedSettings)
 
+    // 同步设置到系统环境变量
+    let success = false
+    const configData = await readConfig()
+    const updateEnv = configData.useNoEnv !== void 0 ? configData.useNoEnv : true
+    if (updateEnv) {
+      try {
+        success = await setSystemEnvVars(targetConfig, configName, false)
+      } catch (error) {
+        console.log(chalk.red('settings.json更新成功，环境变量更新失败'))
+      }
+    }
+
     // 显示成功信息
     console.log()
     console.log(
       chalk.green.bold(SUCCESS_MESSAGES.CONFIG_SWITCHED) + chalk.yellow.bold(SUCCESS_MESSAGES.RESTART_TERMINAL)
     )
+    if (success) {
+      console.log(chalk.cyan('配置已同步更新到settings.json和系统环境变量'))
+    }
     console.log()
     console.log(chalk.green.bold('当前配置详情:'))
     console.log(`  名称: ${chalk.cyan(configName)}`)
@@ -220,10 +236,10 @@ async function useCommand(configName, options = {}) {
       console.log(`  Token: ${chalk.cyan(maskedToken)}`)
     }
     if (targetConfig.http) {
-      console.log(`  HTTP Proxy: ${chalk.cyan(targetConfig.http)}`)
+      console.log(`  HTTP: ${chalk.cyan(targetConfig.http)}`)
     }
     if (targetConfig.https) {
-      console.log(`  HTTPS Proxy: ${chalk.cyan(targetConfig.https)}`)
+      console.log(`  HTTPS: ${chalk.cyan(targetConfig.https)}`)
     }
     console.log()
   } catch (error) {

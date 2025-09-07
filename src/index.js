@@ -2,6 +2,7 @@ const { Command } = require('commander')
 const chalk = require('chalk')
 const packageJson = require('../package.json')
 const { checkUpdateQuietly } = require('./utils/version-checker')
+const { readConfig } = require('./utils/config')
 
 // 导入命令处理模块
 const versionCommand = require('./commands/version')
@@ -12,15 +13,18 @@ const testCommand = require('./commands/test')
 const autoCommand = require('./commands/auto')
 const pingCommand = require('./commands/ping')
 const updateCommand = require('./commands/update')
+const envCommand = require('./commands/env')
+const clearCommand = require('./commands/clear')
 
 const program = new Command()
 
 async function checkVersionInBackground() {
-  if (process.argv.includes('update')) {
-    return
-  }
-
   try {
+    const configData = await readConfig()
+    const update = configData.update !== void 0 ? configData.update : true
+    if (process.argv.includes('update') || !update) {
+      return
+    }
     const versionInfo = await checkUpdateQuietly()
     if (versionInfo.needsUpdate) {
       console.log(
@@ -53,10 +57,14 @@ program
   })
 
 // 列举命令 (支持 ls 和 list 两个命令)
-program.command('ls').alias('list').description('显示当前API配置列表').action(async () => {
-  await listCommand()
-  await checkVersionInBackground()
-})
+program
+  .command('ls')
+  .alias('list')
+  .description('显示当前API配置列表')
+  .action(async () => {
+    await listCommand()
+    await checkVersionInBackground()
+  })
 
 // 使用命令
 program
@@ -72,10 +80,19 @@ program
     await checkVersionInBackground()
   })
 
+// ping 命令
+program
+  .command('ping [name]')
+  .description('测试API配置中所有URL的网络延迟')
+  .action(async (name) => {
+    await pingCommand(name)
+    await checkVersionInBackground()
+  })
+
 // 测试命令
 program
   .command('test [name]')
-  .description('测试API配置在Claude Code中是否可使用')
+  .description('测试API配置在Claude Code中是否可用')
   .option('-t, --token <index>', '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）')
   .option('-k, --key <index>', '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）')
   .action(async (name, options) => {
@@ -88,20 +105,11 @@ program
 // 自动选择命令
 program
   .command('auto [name]')
-  .description('自动测试并切换到最优API配置')
+  .description('自动测试API配置并切换到最优配置')
   .option('-p, --ping', '使用ping测试延迟结果选择最优配置切换（快速且只验证网站URL延迟）')
   .option('-t, --test', '使用test测试结果选择最优配置切换（稍慢但验证真实API可用性）')
   .action(async (name, options) => {
     await autoCommand(name, options)
-    await checkVersionInBackground()
-  })
-
-// ping 命令
-program
-  .command('ping [name]')
-  .description('测试配置中所有URL的网络延迟')
-  .action(async (name) => {
-    await pingCommand(name)
     await checkVersionInBackground()
   })
 
@@ -113,12 +121,26 @@ program
     updateCommand()
   })
 
-// version 命令
+// env 命令
 program
-  .command('version')
-  .description('查看当前版本')
+  .command('env [name]')
+  .description('环境变量管理：设置/查看/清除系统环境变量')
+  .option('-u, --url <index>', '指定要使用的URL索引（从1开始，仅对数组类型url有效）')
+  .option('-k, --key <index>', '指定要使用的Key索引（从1开始，仅对数组类型key有效）')
+  .option('-t, --token <index>', '指定要使用的Token索引（从1开始，仅对数组类型token有效）')
+  .option('-m, --model <index>', '指定要使用的模型索引（从1开始，仅对数组类型model有效）')
+  .option('-f, --fast <index>', '指定要使用的快速模型索引（从1开始，仅对数组类型fast有效）')
+  .action(async (name, options) => {
+    await envCommand(name, options)
+    await checkVersionInBackground()
+  })
+
+// clear 命令
+program
+  .command('clear')
+  .description('完全清除配置：同时清除settings.json和系统环境变量相关API配置')
   .action(async () => {
-    await versionCommand()
+    await clearCommand()
     await checkVersionInBackground()
   })
 
