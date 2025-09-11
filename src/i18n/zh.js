@@ -2,7 +2,8 @@
 module.exports = {
   // CLI 基础信息
   cli: {
-    description: '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
+    description:
+      '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
     version: '显示版本信息'
   },
 
@@ -216,6 +217,7 @@ module.exports = {
     API_FORMAT_ERROR: 'api.json文件格式不正确',
     SETTINGS_FORMAT_ERROR: 'settings.json文件格式不正确',
     SWITCHING_CONFIG: '正在切换配置: {0}',
+    SWITCHING_ENV: '正在设置系统环境变量...',
     SETTINGS_SUCCESS_ENV_FAILED: 'settings.json更新成功，环境变量更新失败',
     CONFIG_SYNCED: '配置已同步更新到settings.json和系统环境变量',
     CURRENT_CONFIG_DETAILS: '当前配置详情:',
@@ -251,7 +253,8 @@ module.exports = {
 
   // 清理相关
   clear: {
-    CONFIRM: '确认清除所有配置？这将清除 settings.json 和系统环境变量中的所有API配置 (y/N):',
+    CONFIRM: '确认清除所有配置？将清除 settings.json 和系统环境变量中的所有API配置 (y/n):',
+    ENV_CONFIRM: '将清除系统环境变量中的所有API配置 请输入 (y/n):',
     CANCELLED: '操作已取消',
     SUCCESS: '配置完全清除成功',
     SETTINGS_CLEARED: 'settings.json中的API配置已清除',

@@ -3,7 +3,9 @@ const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig } = require('../utils/validator')
 const { readConfig } = require('../utils/config')
-const { execSync } = require('child_process')
+const { exec, execSync } = require('child_process')
+const { promisify } = require('util')
+const execAsync = promisify(exec)
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
@@ -14,42 +16,26 @@ let testTempDirs = [] // 存储所有测试临时目录，用于清理
 const maxText = 50
 
 /**
- * 创建测试用的临时目录和独立的Claude配置
+ * 创建测试用的临时settings文件供claude cli使用
  */
-function createTestTempDir(url, key, token, model) {
+function createTestSettingsFile(url, key, token, model) {
   const tmpDir = os.tmpdir()
   const randomSuffix = Math.random().toString(36).substring(2, 15)
-  const tempDir = path.join(tmpDir, `ccapi-test-${randomSuffix}`)
+  const settingsPath = path.join(tmpDir, `ccapi-test-${randomSuffix}.json`)
 
-  // 记录临时目录用于清理
-  testTempDirs.push(tempDir)
+  // 记录临时文件用于清理
+  testTempDirs.push(settingsPath)
 
-  // 创建目录结构
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true })
-  }
-
-  // 创建 .claude 配置目录
-  const claudeConfigDir = path.join(tempDir, '.claude')
-  if (!fs.existsSync(claudeConfigDir)) {
-    fs.mkdirSync(claudeConfigDir, { recursive: true })
-  }
-
-  // 创建独立的配置文件，包含当前测试的API信息
-  const settingsPath = path.join(claudeConfigDir, 'settings.json')
+  // 创建适合claude cli使用的配置文件
   const testSettings = {
-    cleanupPeriodDays: 180,
+    cleanupPeriodDays: 1,
     env: {
       ANTHROPIC_BASE_URL: url,
-      ANTHROPIC_MODEL: model || 'claude-3-5-haiku-20241022',
-      ANTHROPIC_SMALL_FAST_MODEL: 'claude-3-5-haiku-20241022'
+      ANTHROPIC_MODEL: model
     },
     includeCoAuthoredBy: false,
     permissions: {
-      allow: [
-        // 只允许测试必需的最基本工具
-        'Read'
-      ],
+      allow: [],
       deny: []
     },
     hooks: {},
@@ -64,48 +50,38 @@ function createTestTempDir(url, key, token, model) {
     testSettings.env.ANTHROPIC_AUTH_TOKEN = token
   }
 
+  // console.log(testSettings)
+
+  // 创建空的MCP配置文件
+  const mcpConfigPath = path.join(path.dirname(settingsPath), `ccapi-mcp-${randomSuffix}.json`)
+  const emptyMcpConfig = {
+    mcpServers: {}
+  }
+  fs.writeFileSync(mcpConfigPath, JSON.stringify(emptyMcpConfig, null, 2))
+  testTempDirs.push(mcpConfigPath) // 记录用于清理
+
   // 写入配置文件
   fs.writeFileSync(settingsPath, JSON.stringify(testSettings, null, 2))
 
-  // 创建空的 .claude.json 项目配置
-  const projectConfigPath = path.join(tempDir, '.claude.json')
-  const projectConfig = {
-    projects: {
-      [tempDir]: {
-        allowedTools: [],
-        history: [],
-        mcpContextUris: [],
-        mcpServers: {},
-        enabledMcpjsonServers: [],
-        disabledMcpjsonServers: [],
-        hasTrustDialogAccepted: true,
-        projectOnboardingSeenCount: 0,
-        hasClaudeMdExternalIncludesApproved: false,
-        hasClaudeMdExternalIncludesWarningShown: false
-      }
-    }
-  }
-  fs.writeFileSync(projectConfigPath, JSON.stringify(projectConfig, null, 2))
-
-  return tempDir
+  return { settingsPath, mcpConfigPath }
 }
 
 /**
- * 清理测试临时目录（仅清理文件系统目录，不处理.claude.json）
+ * 清理测试临时settings文件
  */
-async function cleanupTestTempDir() {
+async function cleanupTestTempFiles() {
   if (testTempDirs.length === 0) return
 
-  // 稍微延迟，确保Claude Code SDK完成所有操作
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  // 稍微延迟，确保claude cli完成所有操作
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  // 仅清理临时目录，不处理.claude.json（避免与异步清理重复）
-  testTempDirs.forEach((tempDir) => {
-    if (tempDir && fs.existsSync(tempDir)) {
+  // 清理临时settings文件
+  testTempDirs.forEach((tempFile) => {
+    if (tempFile && fs.existsSync(tempFile)) {
       try {
-        fs.rmSync(tempDir, { recursive: true, force: true })
+        fs.unlinkSync(tempFile)
       } catch (error) {
-        // console.warn(chalk.yellow(`警告: 无法删除临时目录 ${tempDir}: ${error.message}`))
+        // console.warn(chalk.yellow(`警告: 无法删除临时文件 ${tempFile}: ${error.message}`))
       }
     }
   })
@@ -162,140 +138,55 @@ function showSpinner() {
 }
 
 /**
- * 动态获取 Claude 可执行文件路径
- */
-async function getClaudeExecutablePath() {
-  try {
-    let command
-    const isWindows = process.platform === 'win32'
-
-    if (isWindows) {
-      command = 'where claude'
-    } else {
-      command = 'which claude'
-    }
-    const claudePath = execSync(command, { encoding: 'utf8' }).trim()
-    let finalPath = claudePath
-
-    if (isWindows && claudePath.includes('\n')) {
-      finalPath = claudePath.split('\n')[0].trim()
-    }
-
-    // Windows特殊处理：如果找到的是shell脚本，尝试找到实际的CLI文件
-    if (isWindows && finalPath && fs.existsSync(finalPath)) {
-      try {
-        // 读取shell脚本内容，寻找实际的CLI路径
-        const scriptContent = fs.readFileSync(finalPath, 'utf8')
-        const match = scriptContent.match(/node_modules\/@anthropic-ai\/claude-code\/cli\.js/)
-
-        if (match) {
-          // 构建CLI文件的完整路径
-          const basedir = path.dirname(finalPath)
-          const cliPath = path.join(basedir, 'node_modules/@anthropic-ai/claude-code/cli.js')
-
-          if (fs.existsSync(cliPath)) {
-            // console.log(`找到Claude CLI文件: ${cliPath}`)
-            return cliPath
-          }
-        }
-      } catch (error) {
-        console.log(await t('test.GET_CLAUDE_PATH_FAILED'), error.message)
-      }
-    }
-
-    // 检查文件是否存在，并处理符号链接
-    if (fs.existsSync(finalPath)) {
-      const stats = fs.lstatSync(finalPath)
-      if (stats.isSymbolicLink()) {
-        finalPath = fs.realpathSync(finalPath) // 解析符号链接的真实路径
-      }
-    }
-
-    return finalPath
-  } catch (error) {
-    console.log(await t('test.GET_CLAUDE_PATH_FAILED'), error.message)
-    return null
-  }
-}
-
-/**
- * 使用@anthropic-ai/claude-code库测试单个API配置的有效性
+ * 使用claude cli测试单个API配置的有效性
  */
 async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-20241022') {
   let latency
-  const startTime = Date.now()
+  let startTime = Date.now()
 
   try {
-    // 动态获取 Claude 可执行文件路径
-    const claudeExecutablePath = await getClaudeExecutablePath()
-    // console.log('claudeExecutablePath', claudeExecutablePath)
+    // 创建测试专用的临时settings文件和MCP配置文件
+    // const m = model ? model.includes('claude') ? 'claude-3-5-haiku-20241022' : model : 'claude-3-5-haiku-20241022'
+    const { settingsPath: tempSettingsPath, mcpConfigPath } = createTestSettingsFile(url, key, token, model)
 
-    if (!claudeExecutablePath) {
-      throw new Error(await t('test.CLAUDE_NOT_FOUND'))
+    // 创建临时工作目录用于claude cli执行
+    const tmpDir = os.tmpdir()
+    const randomSuffix = Math.random().toString(36).substring(2, 15)
+    const tempWorkDir = path.join(tmpDir, `ccapi-test-${randomSuffix}`)
+
+    if (!fs.existsSync(tempWorkDir)) {
+      fs.mkdirSync(tempWorkDir, { recursive: true })
     }
+    testTempDirs.push(tempWorkDir) // 记录用于清理
 
-    // 创建测试专用的临时工作目录，包含独立的Claude配置
-    const tempDir = createTestTempDir(url, key, token, model)
+    const testPrompt =
+      'Please reply with only one word "Success", no thinking is allowed, and no use of any mcp services, tools or hooks is allowed.'
 
-    // 动态导入ESM模块
-    const { query } = await import('@anthropic-ai/claude-code')
+    // 构建claude cli命令
+    const claudeCommand = `echo "${testPrompt}" | claude -p --model ${model} --max-turns 2 --dangerously-skip-permissions --settings "${tempSettingsPath}" --mcp-config "${mcpConfigPath}"`
+    // console.log('Executing command:', claudeCommand)
 
-    const abortController = new AbortController()
-
-    // 设置超时
+    // 设置执行选项
     const timeout = configData.testTimeout || 60000
-    const timeoutId = setTimeout(() => {
-      abortController.abort()
-    }, timeout)
-
-    // 简化的queryOptions，完全依赖临时目录中的配置
-    let queryOptions = {
-      cwd: tempDir, // 使用包含独立配置的临时目录作为工作目录
-      model: 'claude-3-5-haiku-20241022',
-      fallbackModel: model,
-      abortController,
-      pathToClaudeCodeExecutable: claudeExecutablePath,
-      executable: 'node',
-      maxTurns: 1, // 限制为单轮对话以加快测试
-      permissionMode: 'bypassPermissions' // 绕过权限检查以加快测试
+    const execOptions = {
+      encoding: 'utf8',
+      timeout: timeout - 1000,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      cwd: tempWorkDir
     }
 
-    let responseText = ''
-    let hasResponse = false
-    let success = false
+    // 执行claude cli命令
+    startTime = Date.now()
+    const result = await execAsync(claudeCommand, execOptions)
+    // 命令执行完成
+    // console.log('result', result)
 
-    const queryIterator = query({
-      prompt: 'please respond one word: Success',
-      options: queryOptions
-    })
+    const endTime = Date.now()
+    latency = endTime - startTime
 
-    // console.log('开始请求', queryIterator);
-
-    for await (const message of queryIterator) {
-      // console.log('msg', message)
-      // 处理首个消息
-      if (message.type === 'result') {
-        // console.log('msg', message)
-        if (!hasResponse) {
-          success = !message.is_error && message.subtype === 'success'
-          hasResponse = true
-          const endTime = Date.now()
-          latency = endTime - startTime
-          responseText = message.result?.replace(/\n/g, '') || 'Error'
-          abortController.abort()
-          break
-        }
-      }
-    }
-
-    clearTimeout(timeoutId)
-
-    // 如果没有获得响应但也没有错误，可能是空响应
-    if (!hasResponse) {
-      latency = 'error'
-      responseText = 'Empty response'
-      abortController.abort()
-    }
+    // 解析响应
+    let responseText = result.stdout.toString().trim().replace(/\n/g, '')
+    const success = responseText && !responseText.toLowerCase().includes('error')
 
     return {
       success,
@@ -304,23 +195,29 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
       error: null
     }
   } catch (error) {
-    // console.log('1111, error', error)
+    // 处理错误
+    // console.log('error', error)
+
     let success = false
     let message = await t('test.REQUEST_FAILED')
 
-    // 如果是AbortError且已经有延迟数据，说明是收到响应后手动中断，应该算成功
-    if (error.name === 'AbortError' && latency && latency !== 'error' && typeof latency === 'number') {
-      message = await t('test.SUCCESS')
-      success = true
-    }
-    // 如果是AbortError但没有延迟数据，说明是超时中断，算失败
-    else if (error.name === 'AbortError' || error.message.includes('aborted')) {
+    // 处理超时错误
+    if (error.signal === 'SIGTERM' || error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
       message = await t('test.TIMEOUT')
       latency = 'error'
+    } else if (error.stdout) {
+      message = error.stdout.toString().trim()
+      latency = 'error'
     }
-    // 其他错误
-    else if (error.message) {
+    // 处理其他错误
+    else if (error.stderr) {
+      message = error.stderr.toString().trim()
+      latency = 'error'
+    } else if (error.message) {
       message = error.message
+      latency = 'error'
+    } else {
+      message = 'Failed'
       latency = 'error'
     }
 
@@ -347,7 +244,7 @@ function formatUrl(url, maxLength = maxText) {
 /**
  * 测试单个配置的所有URL
  */
-async function testConfigurationSerial(configName, config, keyIndex = 0, tokenIndex = 0) {
+async function testConfiguration(configName, config, keyIndex = 0, tokenIndex = 0) {
   const urls = Array.isArray(config.url) ? config.url : [config.url]
   const keys = Array.isArray(config.key) ? config.key : config.key ? [config.key] : []
   const tokens = Array.isArray(config.token) ? config.token : config.token ? [config.token] : []
@@ -373,24 +270,42 @@ async function testConfigurationSerial(configName, config, keyIndex = 0, tokenIn
   const selectedAuthIndex = keyIndex || tokenIndex || 0
   const selectedAuth = authItems[Math.min(selectedAuthIndex, authItems.length - 1)]
 
-  // 创建并行测试任务
-  const testPromises = urls.map((url, i) => {
-    const model = Array.isArray(config.model) ? config.model[0] : config.model || 'claude-3-5-haiku-20241022'
+  // 创建URL测试任务队列
+  const urlTasks = urls.map((url, i) => ({
+    url,
+    index: i,
+    model: Array.isArray(config.model) ? config.model[0] : config.model || 'claude-3-5-haiku-20241022',
+    selectedAuth
+  }))
 
-    return testApiLatency(url, keys.length > 0 ? selectedAuth : null, tokens.length > 0 ? selectedAuth : null, model)
-      .then((result) => ({ url, ...result, configName, index: i }))
-      .catch((error) => ({
-        url,
-        success: false,
-        latency: 'error',
-        error: error.message,
-        configName,
-        index: i
-      }))
-  })
+  // 分片执行URL测试，每次最多并发3个
+  const urlChunkSize = 3
+  const results = []
 
-  // 等待所有测试完成
-  const results = await Promise.all(testPromises)
+  for (let i = 0; i < urlTasks.length; i += urlChunkSize) {
+    const chunk = urlTasks.slice(i, i + urlChunkSize)
+
+    const chunkPromises = chunk.map((task) =>
+      testApiLatency(
+        task.url,
+        keys.length > 0 ? task.selectedAuth : null,
+        tokens.length > 0 ? task.selectedAuth : null,
+        task.model
+      )
+        .then((result) => ({ url: task.url, ...result, configName, index: task.index }))
+        .catch((error) => ({
+          url: task.url,
+          success: false,
+          latency: 'error',
+          error: error.message,
+          configName,
+          index: task.index
+        }))
+    )
+
+    const chunkResults = await Promise.all(chunkPromises)
+    results.push(...chunkResults)
+  }
   return { configName, results }
 }
 
@@ -506,11 +421,15 @@ async function displaySimpleResults(sortedResults) {
       const shortUrl = formatUrl(bestInfo.url)
       bestText = `${shortUrl}`
     }
-    console.log(chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(${await t('test.BEST_ROUTE')}: ${bestText})`))
+    console.log(
+      chalk.cyan.bold(`[${configResult.configName}]`) + chalk.cyan.bold(`(${await t('test.BEST_ROUTE')}: ${bestText})`)
+    )
 
     configResult.results.forEach((result, index) => {
       const status =
-        result.success && result.latency !== 'error' ? `✅ ${chalk.green.bold(translations.valid)}` : `❌ ${chalk.red.bold(translations.invalid)}`
+        result.success && result.latency !== 'error'
+          ? `✅ ${chalk.green.bold(translations.valid)}`
+          : `❌ ${chalk.red.bold(translations.invalid)}`
       const { color } = getLatencyColor(result.latency)
       const latencyText = result.latency === 'error' ? 'error' : `${result.latency}ms`
       const responseText = result.response
@@ -535,6 +454,7 @@ async function displaySimpleResults(sortedResults) {
  * 并行测试所有API配置的主函数
  */
 async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
+  const { cleanupAllTempProjects } = require('../utils/cleanup')
   try {
     // 验证配置
     const config = await validateConfig()
@@ -561,6 +481,13 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
       configsToTest = apiConfig
     }
 
+    // 测试开始前清理历史遗留的临时项目记录
+    // try {
+    //   await cleanupAllTempProjects()
+    // } catch (error) {
+
+    // }
+
     // 显示并行测试进度
     const totalConfigs = Object.keys(configsToTest).length
     console.log(chalk.green.bold(await t('test.TESTING_CONFIGS', totalConfigs)))
@@ -568,13 +495,39 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     // 显示全局加载动画
     const globalSpinner = showSpinner()
 
-    // 创建所有配置的并行测试任务
-    const testPromises = Object.entries(configsToTest).map(([name, configData]) =>
-      testConfigurationSerial(name, configData, keyIndex, tokenIndex)
-    )
+    // 创建所有配置的测试任务队列
+    const testTasks = Object.entries(configsToTest).map(([name, configData]) => ({
+      name,
+      configData,
+      keyIndex,
+      tokenIndex
+    }))
 
-    // 等待所有配置测试完成
-    const allResults = await Promise.all(testPromises)
+    // 分片执行测试，每次最多并发执行的数量（可配置）
+    const chunkSize = configData.testConcurrency || 3
+    const allResults = []
+
+    for (let i = 0; i < testTasks.length; i += chunkSize) {
+      const chunk = testTasks.slice(i, i + chunkSize)
+
+      // 执行当前分片的测试任务
+      const chunkPromises = chunk.map((task) =>
+        testConfiguration(task.name, task.configData, task.keyIndex, task.tokenIndex)
+      )
+
+      // 等待当前分片完成
+      const chunkResults = await Promise.all(chunkPromises)
+      allResults.push(...chunkResults)
+
+      // 显示进度 - 每完成一个分片更新一次
+      const completed = Math.min(i + chunkSize, testTasks.length)
+      if (completed < testTasks.length) {
+        // 清除spinner并显示进度
+        process.stdout.write(`\r\u001b[K✓ 已完成 ${completed}/${testTasks.length} 个测试，继续下一批测试中... `)
+        // 稍微停顿一下让用户看到进度
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+    }
 
     // 清除加载动画
     clearInterval(globalSpinner)
@@ -589,20 +542,20 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
     // 显示测试完成
     console.log(chalk.green.bold(await t('test.TEST_COMPLETE')))
 
-    // 清理测试临时目录
-    await cleanupTestTempDir()
-    
+    // 清理测试临时文件
+    await cleanupTestTempFiles()
+
     // 启动异步清理进程专门处理.claude.json中的所有临时项目记录
     // （包括当前测试产生的记录和历史遗留的记录）
     setTimeout(() => {
-      const { cleanupAllTempProjects } = require('../utils/cleanup')
       cleanupAllTempProjects()
     }, 2000)
 
     return allResults
   } catch (error) {
-    // 确保即使出错也清理临时目录
-    await cleanupTestTempDir()
+    // 确保即使出错也清理临时文件
+    await cleanupTestTempFiles()
+    cleanupAllTempProjects()
     console.error(chalk.red(await t('test.TEST_FAILED')), error.message)
     process.exit(1)
   }

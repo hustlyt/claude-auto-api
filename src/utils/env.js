@@ -209,7 +209,7 @@ async function setSystemEnvVars(config, configName, tip = true) {
   try {
     const platform = await getPlatformType() // 这里会抛出不支持平台的错误
 
-    // console.log(chalk.green.bold('正在设置系统环境变量...'))
+    // console.log(await t('use.SWITCHING_ENV'))
 
     // 构建所有要设置的环境变量
     const envVarsToSet = {}
@@ -230,7 +230,7 @@ async function setSystemEnvVars(config, configName, tip = true) {
         envVarsToSet[envKey] = value
       }
     }
-    
+
     // 根据平台设置环境变量
     let success = false
     if (platform === 'windows') {
@@ -240,23 +240,26 @@ async function setSystemEnvVars(config, configName, tip = true) {
     }
 
     if (!tip) return success
-    
+
     if (success) {
       // 显示已设置的环境变量
       console.log()
-      console.log(chalk.green.bold(await t('utils.ENV_SET_SUCCESS_MSG', configName)), chalk.yellow.bold(await t('success.RESTART_TERMINAL')))
+      console.log(
+        chalk.green.bold(await t('utils.ENV_SET_SUCCESS_MSG', configName)),
+        chalk.yellow.bold(await t('success.RESTART_TERMINAL'))
+      )
       console.log()
-      
+
       // 按照CLAUDE_ENV_KEYS的顺序显示环境变量
       for (const [configKey, envKey] of Object.entries(CLAUDE_ENV_KEYS)) {
         if (envVarsToSet[envKey]) {
           let displayValue = envVarsToSet[envKey]
-          
+
           // 对敏感信息进行脱敏处理
           if (configKey === 'key' || configKey === 'token') {
             displayValue = displayValue.length > maxText ? displayValue.slice(0, maxText) + '...' : displayValue
           }
-          
+
           console.log(`  ${chalk.cyan(envKey)}: ${chalk.green(displayValue)}`)
         }
       }
@@ -295,7 +298,10 @@ async function clearSystemEnvVars() {
       // Unix: 删除shell配置文件中的环境变量
       await removeUnixEnvVars()
     }
-    console.log(chalk.green.bold(await t('utils.ENV_CLEAR_SUCCESS')), chalk.yellow.bold(await t('success.RESTART_TERMINAL')))
+    console.log(
+      chalk.green.bold(await t('utils.ENV_CLEAR_SUCCESS')),
+      chalk.yellow.bold(await t('success.RESTART_TERMINAL'))
+    )
     return true
   } catch (error) {
     console.error(chalk.red.bold(await t('utils.ENV_CLEAR_FAILED')), error.message)
