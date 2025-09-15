@@ -32,7 +32,8 @@ module.exports = {
     test: {
       description: 'Test if API configuration is available in Claude Code',
       tokenOption: 'Specify Token index to use (starting from 1, only valid when testing single configuration)',
-      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)'
+      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)',
+      cliOption: 'Use Claude Code CLI method for testing instead of default API mock method'
     },
     auto: {
       description: 'Automatically test API configurations and switch to the optimal one',
@@ -149,11 +150,12 @@ module.exports = {
     CONFIG_FORMAT_ERROR: 'api configuration file format error',
     CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
     TESTING_CONFIGS:
-      'Testing {0} configurations for availability in Claude Code (may take a while, please be patient)...',
+      'Testing {0} configurations URL for availability in Claude Code (may take a while, please be patient)...',
     TEST_COMPLETE: 'Validity test completed, this result shows whether it can be used in Claude Code!',
     TEST_FAILED: 'Validity test failed:',
     VALID: 'Valid',
-    INVALID: 'Invalid'
+    INVALID: 'Invalid',
+    PROGRESS_COMPLETED: '✓ Completed {0}/{1} URL tests, continuing with next batch...'
   },
 
   // Environment variable related

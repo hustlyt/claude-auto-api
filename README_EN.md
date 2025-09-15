@@ -65,7 +65,7 @@ ccapi set
 Supports multiple configuration file formats: **JSON, JSON5, YAML, TOML**
 Create a configuration file (such as `api.json`, `api.yaml`, `api.json5` or `api.toml`) with the following format:
 
-**JSON Format Example:**
+**JSON5 Format Example:**
 
 ```json5
 {
@@ -287,17 +287,30 @@ ccapi ping openrouter
 Test whether gateway API configurations are available in Claude Code, which can truly reflect whether configurations are effective
 
 ```bash
-# Test all configurations
+# Test all configurations (default uses API mock method, fast)
 ccapi test
 
-# Test specific configuration
+# Test specific configuration (default uses API mock method)
 ccapi test openrouter
+
+# Use Claude Code CLI method for testing (more accurate but slower)
+ccapi test -c
+ccapi test -c openrouter
+
+# Test using specific Key or Token index
+ccapi test openrouter -k 1    # Use 1st Key
+ccapi test openrouter -t 2    # Use 2nd Token
 ```
 
-**Test Description:**
+**Test Method Description:**
+
+- **Default Method**: Uses API mock method, directly simulates Claude CLI request headers, fast (2-3 seconds), supports retry mechanism
+- **CLI Method** (`-c` option): Uses real Claude Code CLI environment, highest accuracy but slower (40-50 seconds)
+
+**Configuration Description:**
 
 - **ping test timeout**: Defaults to 5 seconds, can be controlled by adding timeout variable in ~/.ccapi-config.json file, e.g.: pingTimeout: 5000
-- **test timeout**: Defaults to 60 seconds, can be controlled by adding timeout variable in ~/.ccapi-config.json file, e.g.: testTimeout: 60000 (This test requires waiting for Claude Code response, may take longer, recommended to set timeout higher)
+- **test timeout**: Defaults to 30 seconds (API mock method) or 60 seconds (CLI method), can be controlled by adding timeout variable in ~/.ccapi-config.json file, e.g.: testTimeout: 30000
 - **Test result response**: Not displayed by default. Since different providers return different results, response results are for reference only. Can enable result display by adding variable in ~/.ccapi-config.json file, e.g.: testResponse: true
 
   ```json5
@@ -305,7 +318,7 @@ ccapi test openrouter
     "settingsPath": "~/.claude/settings.json",
     "apiConfigPath": "/Users/4xian/Desktop/api.json5",
     "pingTimeout": 5000,
-    "testTimeout": 60000,
+    "testTimeout": 30000,
     "testResponse": false
   }
   ```
@@ -442,8 +455,8 @@ This file is the configuration file used by ccapi, where you can configure optio
   "apiConfigPath": "/Users/4xian/Desktop/api.json5",
   # ping command timeout
   "pingTimeout": 5000,
-  # test command timeout
-  "testTimeout": 80000,
+  # test command timeout (default 30s for API mock method, 60s for CLI method)
+  "testTimeout": 30000,
   # ping, test command result display
   "testResponse": false,
   # whether update prompts are needed

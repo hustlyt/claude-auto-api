@@ -32,7 +32,8 @@ module.exports = {
     test: {
       description: '测试API配置在Claude Code中是否可用',
       tokenOption: '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）',
-      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）'
+      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）',
+      cliOption: '使用Claude Code CLI方式进行测试，而非默认的接口模拟方式'
     },
     auto: {
       description: '自动测试API配置并切换到最优配置',
@@ -144,11 +145,12 @@ module.exports = {
     BEST_ROUTE: '最优路线',
     CONFIG_FORMAT_ERROR: 'api配置文件格式不正确',
     CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    TESTING_CONFIGS: '正在测试{0}个配置在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
+    TESTING_CONFIGS: '正在测试{0}个配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
     TEST_COMPLETE: '有效性测试完成, 此结果代表能否在Claude Code中使用!',
     TEST_FAILED: '有效性测试失败:',
     VALID: '有效',
-    INVALID: '无效'
+    INVALID: '无效',
+    PROGRESS_COMPLETED: '✓ 已完成{0}/{1}个URL测试，下一批次测试中...'
   },
 
   // 环境变量相关

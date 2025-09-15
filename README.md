@@ -65,7 +65,7 @@ ccapi set
 支持多种配置文件格式：**JSON、JSON5、YAML、TOML**
 创建一个配置文件（如 `api.json`、`api.yaml`、`api.json5` 或 `api.toml`），格式如下：
 
-**JSON 格式示例：**
+**JSON5 格式示例：**
 
 ```json5
 {
@@ -284,7 +284,7 @@ ccapi ping openrouter
 
 ### 8. 测试API可用性
 
-测试中转站API配置在Cluade Code中是否可用，可以真实的反映出配置是否有效
+测试中转站API配置在Claude Code中是否可用，可以真实的反映出配置是否有效
 
 ```bash
 # 测试所有配置
@@ -292,12 +292,21 @@ ccapi test
 
 # 测试指定配置
 ccapi test openrouter
+
+# 使用 Claude Code CLI 方式测试（更准确，但速度较慢）
+ccapi test -c
+ccapi test -c openrouter
 ```
 
-**测试说明：**
+**测试方式说明：**
+
+- **默认方式**：使用接口模拟方式，直接模拟Claude CLI请求头，速度快
+- **CLI方式**（`-c` 选项）：使用真实的Claude Code CLI环境，准确度最高，但速度较慢（40-50秒）
+
+**配置说明：**
 
 - **ping测试超时时间**：默认为5秒，可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：pingTimeout: 5000
-- **test测试超时时间**：默认为60秒，可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：testTimeout: 60000 (该测试由于需要等待Claude Code响应，时间可能稍长，超时时间建议设置大点)
+- **test测试超时时间**：默认为30秒（接口模拟方式）或60秒（CLI方式），可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：testTimeout: 30000
 - **测试返回的结果**：默认不显示，由于厂商不同，返回结果仅供参考，可在 ~/.ccapi-config.json 文件中新增变量是否显示结果，如：testResponse: true
 
   ```json5
@@ -305,7 +314,7 @@ ccapi test openrouter
     "settingsPath": "~/.claude/settings.json",
     "apiConfigPath": "/Users/4xian/Desktop/api.json5",
     "pingTimeout": 5000,
-    "testTimeout": 60000,
+    "testTimeout": 30000,
     "testResponse": false
   }
   ```
@@ -443,7 +452,7 @@ ccapi lang en
   # ping命令超时时间
   "pingTimeout": 5000,
   # test命令超时时间
-  "testTimeout": 80000,
+  "testTimeout": 60000,
   # ping、test命令返回结果显示
   "testResponse": false,
   # 是否需要更新提示

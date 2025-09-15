@@ -100,10 +100,12 @@ async function initializeProgram() {
     .description(await t('commands.test.description'))
     .option('-t, --token <index>', await t('commands.test.tokenOption'))
     .option('-k, --key <index>', await t('commands.test.keyOption'))
+    .option('-c, --cli', await t('commands.test.cliOption'))
     .action(async (name, options) => {
       const keyIndex = options.key ? parseInt(options.key) - 1 : 0
       const tokenIndex = options.token ? parseInt(options.token) - 1 : 0
-      await testCommand(name, keyIndex, tokenIndex)
+      const useCli = options.cli || false
+      await testCommand(name, keyIndex, tokenIndex, useCli)
       await checkVersionInBackground()
     })
 

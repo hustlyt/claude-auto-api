@@ -3,17 +3,15 @@ const { validateConfig } = require('../utils/config')
 const { readConfigFile } = require('../utils/file')
 const { validateApiConfig } = require('../utils/validator')
 const { readConfig } = require('../utils/config')
-const { exec, execSync } = require('child_process')
-const { promisify } = require('util')
-const execAsync = promisify(exec)
+const spawn = require('cross-spawn')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
 const { t } = require('../utils/i18n')
 
 let configData
-let testTempDirs = [] // 存储所有测试临时目录，用于清理
-const maxText = 50
+let testTempDirs = []
+const maxText = 100
 
 /**
  * 创建测试用的临时settings文件供claude cli使用
@@ -23,10 +21,8 @@ function createTestSettingsFile(url, key, token, model) {
   const randomSuffix = Math.random().toString(36).substring(2, 15)
   const settingsPath = path.join(tmpDir, `ccapi-test-${randomSuffix}.json`)
 
-  // 记录临时文件用于清理
   testTempDirs.push(settingsPath)
 
-  // 创建适合claude cli使用的配置文件
   const testSettings = {
     cleanupPeriodDays: 1,
     env: {
@@ -39,10 +35,9 @@ function createTestSettingsFile(url, key, token, model) {
       deny: []
     },
     hooks: {},
-    mcpServers: {} // 禁用所有MCP服务以加快测试
+    mcpServers: {}
   }
 
-  // 设置认证信息
   if (key) {
     testSettings.env.ANTHROPIC_API_KEY = key
   }
@@ -50,17 +45,14 @@ function createTestSettingsFile(url, key, token, model) {
     testSettings.env.ANTHROPIC_AUTH_TOKEN = token
   }
 
-  // console.log(testSettings)
-
   // 创建空的MCP配置文件
   const mcpConfigPath = path.join(path.dirname(settingsPath), `ccapi-mcp-${randomSuffix}.json`)
   const emptyMcpConfig = {
     mcpServers: {}
   }
   fs.writeFileSync(mcpConfigPath, JSON.stringify(emptyMcpConfig, null, 2))
-  testTempDirs.push(mcpConfigPath) // 记录用于清理
+  testTempDirs.push(mcpConfigPath)
 
-  // 写入配置文件
   fs.writeFileSync(settingsPath, JSON.stringify(testSettings, null, 2))
 
   return { settingsPath, mcpConfigPath }
@@ -72,7 +64,6 @@ function createTestSettingsFile(url, key, token, model) {
 async function cleanupTestTempFiles() {
   if (testTempDirs.length === 0) return
 
-  // 稍微延迟，确保claude cli完成所有操作
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
   // 清理临时settings文件
@@ -86,7 +77,7 @@ async function cleanupTestTempFiles() {
     }
   })
 
-  testTempDirs = [] // 清空数组
+  testTempDirs = []
 }
 
 /**
@@ -138,6 +129,331 @@ function showSpinner() {
 }
 
 /**
+ * 使用cross-spawn执行进程并处理超时
+ */
+function spawnWithTimeout(command, args, options, timeout, input = null) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, options)
+    let stdout = ''
+    let stderr = ''
+    let timedOut = false
+
+    const timer = setTimeout(() => {
+      timedOut = true
+      child.kill('SIGTERM')
+      reject({ signal: 'SIGTERM', message: 'timeout', code: 'ETIMEDOUT' })
+    }, timeout)
+
+    if (input && child.stdin) {
+      child.stdin.write(input)
+      child.stdin.end()
+    } else if (child.stdin) {
+      child.stdin.end()
+    }
+
+    if (child.stdout) {
+      child.stdout.on('data', (data) => {
+        stdout += data.toString()
+      })
+    }
+
+    if (child.stderr) {
+      child.stderr.on('data', (data) => {
+        stderr += data.toString()
+      })
+    }
+
+    child.on('close', (code) => {
+      clearTimeout(timer)
+      if (timedOut) return
+      resolve({ stdout, stderr, code })
+    })
+
+    child.on('error', (error) => {
+      clearTimeout(timer)
+      if (!timedOut) {
+        reject(error)
+      }
+    })
+  })
+}
+
+/**
+ * 使用curl命令流式请求测试单个API配置的有效性
+ */
+async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku-20241022') {
+  let latency
+  let startTime = Date.now()
+
+  const testMessage =
+    'Please reply with only one word "Success", no thinking is allowed, and no use of any mcp services, tools or hooks is allowed.'
+
+  const timeout = configData.testTimeout || 30000
+
+  const isClaudeModel = model && model.toLowerCase().includes('claude')
+  const firstTestModel = isClaudeModel ? 'claude-3-5-haiku-20241022' : model
+  const shouldRetry = isClaudeModel && model !== 'claude-3-5-haiku-20241022'
+
+  // 执行单次测试的内部函数
+  async function performSingleTest(testModel, attempt = 1) {
+
+    try {
+      const requestBody = {
+        model: testModel,
+        max_tokens: 521,
+        messages: [{ role: 'user', content: testMessage }],
+        temperature: 0,
+        stream: true
+      }
+
+      const requestBodyString = JSON.stringify(requestBody)
+
+      const curlArgs = [
+        '-k',
+        '-i',
+        '--raw',
+        '-s',
+        '-X',
+        'POST',
+        '-H',
+        `host: ${new URL(url).host}`,
+        '-H',
+        'Accept: application/json',
+        '-H',
+        'X-Stainless-Retry-Count: 0',
+        '-H',
+        'X-Stainless-Lang: js',
+        '-H',
+        'X-Stainless-Package-Version: 0.60.0',
+        '-H',
+        'X-Stainless-Runtime: node',
+        '-H',
+        'X-Stainless-Runtime-Version: v22.17.0',
+        '-H',
+        'anthropic-dangerous-direct-browser-access: true',
+        '-H',
+        'anthropic-version: 2023-06-01',
+        '-H',
+        `x-api-key: ${key || token}`,
+        '-H',
+        `Authorization: Bearer ${token || key}`,
+        '-H',
+        'x-app: cli',
+        '-H',
+        'User-Agent: claude-cli/1.0.113 (external, cli)',
+        '-H',
+        'content-type: application/json',
+        '-H',
+        'anthropic-beta: claude-code-20250219,fine-grained-tool-streaming-2025-05-14',
+        '-H',
+        'x-stainless-helper-method: stream',
+        '-H',
+        'accept-language: *',
+        '-H',
+        'sec-fetch-mode: cors',
+        '-H',
+        `content-length: ${Buffer.byteLength(requestBodyString, 'utf8')}`,
+        '-d',
+        requestBodyString,
+        `${url}/v1/messages?beta=true`
+      ]
+
+      const testStartTime = Date.now()
+
+      const result = await spawnWithTimeout(
+        'curl',
+        curlArgs,
+        {
+          stdio: ['pipe', 'pipe', 'pipe']
+        },
+        timeout
+      )
+
+      const testLatency = Date.now() - testStartTime
+
+      // 处理curl原始响应（包含HTTP头部）
+      let responseText = ''
+      const fullResponse = result.stdout
+
+      // 分离HTTP头部和响应体
+      const headerBodySplit = fullResponse.split('\r\n\r\n')
+      let httpHeaders = ''
+      let responseBody = ''
+
+      // console.log('response', fullResponse);
+      
+      if (headerBodySplit.length < 2) {
+        const lineSplit = fullResponse.split('\n\n')
+        if (lineSplit.length < 2) {
+          throw new Error('Invalid HTTP response format')
+        }
+        httpHeaders = lineSplit[0]
+        responseBody = lineSplit.slice(1).join('\n\n')
+      } else {
+        httpHeaders = headerBodySplit[0]
+        responseBody = headerBodySplit.slice(1).join('\r\n\r\n')
+      }
+
+      // 检查HTTP状态码
+      const statusMatch = httpHeaders.match(/HTTP\/[12](?:\.\d)?\s+(\d{3})\s*(.*)/)
+      const statusCode = statusMatch ? parseInt(statusMatch[1]) : 0
+      const statusText = statusMatch ? statusMatch[2].trim() : 'Unknown'
+
+      // 如果状态码不是2xx，则认为是错误
+      if (statusCode < 200 || statusCode >= 300) {
+        let errorMessage = `HTTP ${statusCode} ${statusText}`
+
+        // 尝试从响应体中提取更详细的错误信息
+        try {
+          const errorJson = JSON.parse(responseBody.trim())
+          if (errorJson.error && errorJson.error.message) {
+            errorMessage = errorJson.error.message
+          }
+        } catch (e) {
+          // 如果不是JSON，检查是否包含中文错误信息
+          const cleanBody = responseBody.replace(/<[^>]*>/g, '').trim()
+          if (cleanBody && cleanBody.length < 200) {
+            errorMessage = cleanBody
+          }
+        }
+
+        throw new Error(errorMessage)
+      }
+
+      // 检查响应是否为text/event-stream
+      const isEventStream = httpHeaders.toLowerCase().includes('content-type: text/event-stream')
+
+      if (!isEventStream) {
+        // 非SSE响应，尝试解析为JSON
+        const jsonResponse = JSON.parse(responseBody.trim())
+
+        if (jsonResponse.error) {
+          throw new Error(jsonResponse.error.message || 'API Error')
+        }
+        // 如果是成功的JSON响应，提取内容
+        if (jsonResponse.content && Array.isArray(jsonResponse.content)) {
+          responseText = jsonResponse.content.map((c) => c.text).join('')
+        }
+      } else {
+        // SSE响应处理
+        const lines = responseBody.split('\n')
+
+        for (const line of lines) {
+          const trimmedLine = line.trim()
+          if (!trimmedLine) continue
+
+          // 跳过事件行，只处理数据行
+          if (trimmedLine.startsWith('event:')) continue
+
+          // 处理SSE数据行
+          if (trimmedLine.startsWith('data: ')) {
+            try {
+              const jsonData = trimmedLine.slice(6)
+              if (jsonData === '[DONE]') break
+
+              const eventData = JSON.parse(jsonData)
+
+              // 处理文本增量事件
+              if (eventData.type === 'content_block_delta' && eventData.delta?.type === 'text_delta') {
+                responseText += eventData.delta.text
+              }
+
+              // 处理错误事件
+              if (eventData.type === 'error') {
+                throw new Error(eventData.error?.message || 'API Error')
+              }
+            } catch (jsonError) {
+              if (jsonError.message.includes('API Error')) {
+                throw jsonError
+              }
+              // 忽略JSON解析错误，继续处理
+              continue
+            }
+          }
+        }
+      }
+
+      // 检查curl命令执行结果
+      if (result.code !== 0) {
+        throw new Error(`Failed with code ${result.code}: ${result.stderr}`)
+      }
+
+      // 返回结果
+      // if (!responseText.trim()) {
+      //   throw new Error('No valid response received')
+      // }
+
+      return {
+        success: true,
+        latency: testLatency,
+        response: responseText.length > maxText ? responseText.slice(0, maxText) + '...' : responseText.trim(),
+        error: null,
+        model: testModel,
+        attempt
+      }
+
+    } catch (error) {
+      console.log(`Attempt ${attempt} failed:`, error.message)
+
+      return {
+        success: false,
+        latency: 'error',
+        error: error.message,
+        response: null,
+        model: testModel,
+        attempt
+      }
+    }
+  }
+
+  try {
+    startTime = Date.now()
+
+    // 第一次测试
+    let result = await performSingleTest(firstTestModel, 1)
+
+    // 如果第一次成功，直接返回
+    if (result.success) {
+      return {
+        ...result
+      }
+    }
+
+    // 如果第一次失败且需要重试
+    if (shouldRetry) {
+      result = await performSingleTest(model, 2)
+      return {
+        ...result
+      }
+    }
+    return {
+      ...result
+    }
+
+  } catch (error) {
+    let message = await t('test.REQUEST_FAILED')
+
+    if (error.code === 'ETIMEDOUT' || error.signal === 'SIGTERM') {
+      message = await t('test.TIMEOUT')
+      latency = 'error'
+    } else if (error.message) {
+      message = error.message
+      latency = 'error'
+    } else {
+      message = 'Failed'
+      latency = 'error'
+    }
+
+    return {
+      success: false,
+      latency,
+      error: message,
+      response: null
+    }
+  }
+}
+
+/**
  * 使用claude cli测试单个API配置的有效性
  */
 async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-20241022') {
@@ -146,7 +462,6 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
 
   try {
     // 创建测试专用的临时settings文件和MCP配置文件
-    // const m = model ? model.includes('claude') ? 'claude-3-5-haiku-20241022' : model : 'claude-3-5-haiku-20241022'
     const { settingsPath: tempSettingsPath, mcpConfigPath } = createTestSettingsFile(url, key, token, model)
 
     // 创建临时工作目录用于claude cli执行
@@ -157,35 +472,40 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
     if (!fs.existsSync(tempWorkDir)) {
       fs.mkdirSync(tempWorkDir, { recursive: true })
     }
-    testTempDirs.push(tempWorkDir) // 记录用于清理
+    testTempDirs.push(tempWorkDir)
 
     const testPrompt =
       'Please reply with only one word "Success", no thinking is allowed, and no use of any mcp services, tools or hooks is allowed.'
 
-    // 构建claude cli命令
-    const claudeCommand = `echo "${testPrompt}" | claude -p --model ${model} --max-turns 2 --dangerously-skip-permissions --settings "${tempSettingsPath}" --mcp-config "${mcpConfigPath}"`
-    // console.log('Executing command:', claudeCommand)
+    const claudeArgs = [
+      '-p',
+      '--model',
+      model,
+      '--max-turns',
+      '2',
+      '--dangerously-skip-permissions',
+      '--settings',
+      tempSettingsPath,
+      '--mcp-config',
+      mcpConfigPath
+    ]
 
-    // 设置执行选项
     const timeout = configData.testTimeout || 60000
-    const execOptions = {
-      encoding: 'utf8',
-      timeout: timeout - 1000,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      cwd: tempWorkDir
+    const spawnOptions = {
+      cwd: tempWorkDir,
+      stdio: ['pipe', 'pipe', 'pipe']
     }
 
-    // 执行claude cli命令
     startTime = Date.now()
-    const result = await execAsync(claudeCommand, execOptions)
-    // 命令执行完成
+    const result = await spawnWithTimeout('claude', claudeArgs, spawnOptions, timeout - 1000, testPrompt)
     // console.log('result', result)
 
     const endTime = Date.now()
     latency = endTime - startTime
+    // console.log('latency', latency)
 
     // 解析响应
-    let responseText = result.stdout.toString().trim().replace(/\n/g, '')
+    let responseText = result.stdout.trim().replace(/\n/g, '')
     const success = responseText && !responseText.toLowerCase().includes('error')
 
     return {
@@ -202,16 +522,15 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
     let message = await t('test.REQUEST_FAILED')
 
     // 处理超时错误
-    if (error.signal === 'SIGTERM' || error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
+    if (
+      error.signal === 'SIGTERM' ||
+      error.code === 'ETIMEDOUT' ||
+      (error.message && error.message.includes('timeout'))
+    ) {
       message = await t('test.TIMEOUT')
       latency = 'error'
-    } else if (error.stdout) {
-      message = error.stdout.toString().trim()
-      latency = 'error'
-    }
-    // 处理其他错误
-    else if (error.stderr) {
-      message = error.stderr.toString().trim()
+    } else if (error.stdout || error.stderr) {
+      message = error.stdout?.trim() || error.stderr?.trim()
       latency = 'error'
     } else if (error.message) {
       message = error.message
@@ -242,10 +561,9 @@ function formatUrl(url, maxLength = maxText) {
 }
 
 /**
- * 测试单个配置的所有URL
+ * 测试单个URL
  */
-async function testConfiguration(configName, config, keyIndex = 0, tokenIndex = 0) {
-  const urls = Array.isArray(config.url) ? config.url : [config.url]
+async function testSingleUrl(configName, url, config, keyIndex = 0, tokenIndex = 0, urlIndex = 0, useCli = false) {
   const keys = Array.isArray(config.key) ? config.key : config.key ? [config.key] : []
   const tokens = Array.isArray(config.token) ? config.token : config.token ? [config.token] : []
 
@@ -254,59 +572,50 @@ async function testConfiguration(configName, config, keyIndex = 0, tokenIndex = 
 
   if (authItems.length === 0) {
     return {
+      url,
+      success: false,
+      latency: 'error',
+      error: await t('test.MISSING_AUTH'),
       configName,
-      results: [
-        {
-          url: 'all',
-          success: false,
-          latency: 'error',
-          error: await t('test.MISSING_AUTH')
-        }
-      ]
+      index: urlIndex
     }
   }
 
   // 选择指定的key或token
   const selectedAuthIndex = keyIndex || tokenIndex || 0
   const selectedAuth = authItems[Math.min(selectedAuthIndex, authItems.length - 1)]
+  const model = Array.isArray(config.model) ? config.model[0] : config.model || 'claude-3-5-haiku-20241022'
 
-  // 创建URL测试任务队列
-  const urlTasks = urls.map((url, i) => ({
-    url,
-    index: i,
-    model: Array.isArray(config.model) ? config.model[0] : config.model || 'claude-3-5-haiku-20241022',
-    selectedAuth
-  }))
-
-  // 分片执行URL测试，每次最多并发3个
-  const urlChunkSize = 3
-  const results = []
-
-  for (let i = 0; i < urlTasks.length; i += urlChunkSize) {
-    const chunk = urlTasks.slice(i, i + urlChunkSize)
-
-    const chunkPromises = chunk.map((task) =>
-      testApiLatency(
-        task.url,
-        keys.length > 0 ? task.selectedAuth : null,
-        tokens.length > 0 ? task.selectedAuth : null,
-        task.model
+  try {
+    let result
+    if (useCli) {
+      // 使用CLI方式测试
+      result = await testApiLatency(
+        url,
+        keys.length > 0 ? selectedAuth : null,
+        tokens.length > 0 ? selectedAuth : null,
+        model
       )
-        .then((result) => ({ url: task.url, ...result, configName, index: task.index }))
-        .catch((error) => ({
-          url: task.url,
-          success: false,
-          latency: 'error',
-          error: error.message,
-          configName,
-          index: task.index
-        }))
-    )
-
-    const chunkResults = await Promise.all(chunkPromises)
-    results.push(...chunkResults)
+    } else {
+      // 使用API方式测试（默认）
+      result = await testApiLatencyWithCurl(
+        url,
+        keys.length > 0 ? selectedAuth : null,
+        tokens.length > 0 ? selectedAuth : null,
+        model
+      )
+    }
+    return { url, ...result, configName, index: urlIndex }
+  } catch (error) {
+    return {
+      url,
+      success: false,
+      latency: 'error',
+      error: error.message,
+      configName,
+      index: urlIndex
+    }
   }
-  return { configName, results }
 }
 
 /**
@@ -348,7 +657,6 @@ function sortTestResults(allResults) {
     if (bestLatencyA !== Infinity && bestLatencyB === Infinity) return -1
     if (bestLatencyA === Infinity && bestLatencyB !== Infinity) return 1
 
-    // 都没有成功结果，按配置名排序
     return a.configName.localeCompare(b.configName)
   })
 
@@ -389,7 +697,7 @@ function getBestLatencyInfo(results) {
 }
 
 /**
- * 获取配置结果中的最佳延迟（向后兼容）
+ * 获取配置结果中的最佳延迟
  */
 function getBestLatency(results) {
   const info = getBestLatencyInfo(results)
@@ -397,14 +705,13 @@ function getBestLatency(results) {
 }
 
 /**
- * 简化显示测试结果 (用于-s参数)
+ * 简化显示测试结果
  */
 async function displaySimpleResults(sortedResults) {
   console.log()
   console.log(chalk.yellow.bold(await t('test.TEST_RESULTS_TITLE')))
   console.log()
 
-  // 预先加载翻译信息
   const translations = {
     valid: await t('test.VALID'),
     invalid: await t('test.INVALID')
@@ -441,22 +748,17 @@ async function displaySimpleResults(sortedResults) {
       const responseDisplay = configData.testResponse ? ` [Response: ${responseText}]` : ''
 
       console.log(`    ${index + 1}.[${result.url}] ${status}(${color.bold(latencyText)})${responseDisplay}`)
-    })
-    if (configIndex < sortedResults.length - 1) {
       console.log()
-    }
+    })
   }
-
-  console.log()
 }
 
 /**
- * 并行测试所有API配置的主函数
+ * 并行测试所有API配置的主函数 - 按URL维度并发控制
  */
-async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
+async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0, useCli = false) {
   const { cleanupAllTempProjects } = require('../utils/cleanup')
   try {
-    // 验证配置
     const config = await validateConfig()
 
     // 读取API配置文件
@@ -477,83 +779,104 @@ async function testCommand(configName = null, keyIndex = 0, tokenIndex = 0) {
       }
       configsToTest[configName] = apiConfig[configName]
     } else {
-      // 测试所有配置
       configsToTest = apiConfig
     }
 
-    // 测试开始前清理历史遗留的临时项目记录
-    // try {
-    //   await cleanupAllTempProjects()
-    // } catch (error) {
+    const urlTasks = []
+    let urlIndex = 0
 
-    // }
+    Object.entries(configsToTest).forEach(([name, configData]) => {
+      const urls = Array.isArray(configData.url) ? configData.url : [configData.url]
+      urls.forEach((url) => {
+        urlTasks.push({
+          configName: name,
+          url,
+          config: configData,
+          keyIndex,
+          tokenIndex,
+          urlIndex: urlIndex++,
+          useCli
+        })
+      })
+    })
 
-    // 显示并行测试进度
-    const totalConfigs = Object.keys(configsToTest).length
-    console.log(chalk.green.bold(await t('test.TESTING_CONFIGS', totalConfigs)))
+    console.log(chalk.green.bold(await t('test.TESTING_CONFIGS', urlTasks.length)))
 
-    // 显示全局加载动画
     const globalSpinner = showSpinner()
 
-    // 创建所有配置的测试任务队列
-    const testTasks = Object.entries(configsToTest).map(([name, configData]) => ({
-      name,
-      configData,
-      keyIndex,
-      tokenIndex
-    }))
-
-    // 分片执行测试，每次最多并发执行的数量（可配置）
-    const chunkSize = configData.testConcurrency || 3
+    // 优化并发控制：确保达到最大并发限制
+    const chunkSize = Math.max(1, configData.testConcurrency || 3) // 确保至少为1
     const allResults = []
 
-    for (let i = 0; i < testTasks.length; i += chunkSize) {
-      const chunk = testTasks.slice(i, i + chunkSize)
-
-      // 执行当前分片的测试任务
-      const chunkPromises = chunk.map((task) =>
-        testConfiguration(task.name, task.configData, task.keyIndex, task.tokenIndex)
+    // 如果任务数量少于并发数，直接并发执行所有任务
+    if (!useCli) {
+      // 使用curl方式，支持并发
+      const allPromises = urlTasks.map((task) =>
+        testSingleUrl(
+          task.configName,
+          task.url,
+          task.config,
+          task.keyIndex,
+          task.tokenIndex,
+          task.urlIndex,
+          task.useCli
+        )
       )
+      const results = await Promise.all(allPromises)
+      allResults.push(...results)
+    } else {
+      // 使用CLI方式，分片处理大量任务
+      for (let i = 0; i < urlTasks.length; i += chunkSize) {
+        const chunk = urlTasks.slice(i, i + chunkSize)
+        const chunkPromises = chunk.map((task) =>
+          testSingleUrl(
+            task.configName,
+            task.url,
+            task.config,
+            task.keyIndex,
+            task.tokenIndex,
+            task.urlIndex,
+            task.useCli
+          )
+        )
 
-      // 等待当前分片完成
-      const chunkResults = await Promise.all(chunkPromises)
-      allResults.push(...chunkResults)
+        const chunkResults = await Promise.all(chunkPromises)
+        allResults.push(...chunkResults)
 
-      // 显示进度 - 每完成一个分片更新一次
-      const completed = Math.min(i + chunkSize, testTasks.length)
-      if (completed < testTasks.length) {
-        // 清除spinner并显示进度
-        process.stdout.write(`\r\u001b[K✓ 已完成 ${completed}/${testTasks.length} 个测试，继续下一批测试中... `)
-        // 稍微停顿一下让用户看到进度
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const completed = Math.min(i + chunkSize, urlTasks.length)
+        if (completed < urlTasks.length) {
+          process.stdout.write(`\r\u001b[K${await t('test.PROGRESS_COMPLETED', completed, urlTasks.length)} `)
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
       }
     }
 
-    // 清除加载动画
     clearInterval(globalSpinner)
-    process.stdout.write('\r\u001b[K') // 清除当前行
+    process.stdout.write('\r\u001b[K')
 
-    // 整理并排序所有测试结果（与原test命令保持一致）
-    const sortedResults = sortTestResults(allResults)
+    const groupedResults = {}
+    allResults.forEach((result) => {
+      if (!groupedResults[result.configName]) {
+        groupedResults[result.configName] = {
+          configName: result.configName,
+          results: []
+        }
+      }
+      groupedResults[result.configName].results.push(result)
+    })
 
-    // 使用简化显示
+    const sortedResults = sortTestResults(Object.values(groupedResults))
     await displaySimpleResults(sortedResults)
 
-    // 显示测试完成
     console.log(chalk.green.bold(await t('test.TEST_COMPLETE')))
 
-    // 清理测试临时文件
     await cleanupTestTempFiles()
-
-    // 启动异步清理进程专门处理.claude.json中的所有临时项目记录
-    // （包括当前测试产生的记录和历史遗留的记录）
     setTimeout(() => {
       cleanupAllTempProjects()
     }, 2000)
 
     return allResults
   } catch (error) {
-    // 确保即使出错也清理临时文件
     await cleanupTestTempFiles()
     cleanupAllTempProjects()
     console.error(chalk.red(await t('test.TEST_FAILED')), error.message)
