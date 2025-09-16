@@ -92,7 +92,7 @@ module.exports = {
   success: {
     CONFIG_SAVED: '配置路径已保存',
     CONFIG_SWITCHED: '配置切换成功',
-    RESTART_TERMINAL: '(提示: 重启Claude Code终端后配置生效!)',
+    RESTART_TERMINAL: '(提示: [settings.json中环境变量 > 系统环境变量] & 重启Claude Code终端后配置生效!)',
     BACKUP_CREATED: 'settings文件已备份',
     ENV_SET_SUCCESS: '环境变量设置成功',
     ENV_CLEAR_SUCCESS: '环境变量清除成功',
@@ -145,7 +145,7 @@ module.exports = {
     BEST_ROUTE: '最优路线',
     CONFIG_FORMAT_ERROR: 'api配置文件格式不正确',
     CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    TESTING_CONFIGS: '正在测试{0}个配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
+    TESTING_CONFIGS: '正在测试配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
     TEST_COMPLETE: '有效性测试完成, 此结果代表能否在Claude Code中使用!',
     TEST_FAILED: '有效性测试失败:',
     VALID: '有效',
@@ -201,7 +201,7 @@ module.exports = {
     BEST_ROUTE: '最优路线: {0}',
     CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
     AVAILABLE_CONFIGS: '可用配置:',
-    TESTING_CONFIGS: '正在测试{0}个配置的URL延迟...',
+    TESTING_CONFIGS: '正在测试配置URL延迟...',
     LATENCY_TEST_COMPLETE: 'URL延迟测试完成! 成功: {0}/{1}',
     LATENCY_TEST_FAILED: 'URL延迟测试失败:',
     CONFIG_FORMAT_ERROR: 'api配置文件格式不正确'

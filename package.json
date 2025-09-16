@@ -52,7 +52,7 @@
   },
   "updateLogs": [
     "1. Modify the test command to support both API mock and CLI. API testing is used by default.",
-    "2. 调整ccapi test命令，支持API模拟和CLI两种测试方式，默认使用API测试(API测试快速，准确性较高[ccapi test]；CLI测试准确较慢[ccapi test -c])"
+    "2. 调整ccapi test有效性测试命令，支持API模拟和CLI两种测试方式，默认使用API测试(API测试快速，准确性较高[ccapi test]；CLI测试准确较慢[ccapi test -c])"
   ],
   "files": [
     "dist",

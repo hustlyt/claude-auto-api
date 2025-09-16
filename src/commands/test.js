@@ -754,7 +754,8 @@ async function displaySimpleResults(sortedResults) {
           : result.response
         : result.error || 'Success'
 
-      const responseDisplay = configData.testResponse ? ` [Response: ${responseText}]` : ''
+      const show = configData.testResponse === void 0 ? true : !!configData.testResponse;
+      const responseDisplay = show ? ` [Response: ${responseText}]` : ''
 
       console.log(`    ${index + 1}.[${result.url}] ${status}(${color.bold(latencyText)})${responseDisplay}`)
       console.log()

@@ -314,7 +314,8 @@ ccapi test openrouter -t 2    # Use 2nd Token
 
 - **ping test timeout**: Defaults to 5 seconds, can be controlled by adding timeout variable in ~/.ccapi-config.json file, e.g.: pingTimeout: 5000
 - **test timeout**: Defaults to 30 seconds (API mock method) or 60 seconds (CLI method), can be controlled by adding timeout variable in ~/.ccapi-config.json file, e.g.: testTimeout: 30000
-- **Test result response**: Not displayed by default. Since different providers return different results, response results are for reference only. Can enable result display by adding variable in ~/.ccapi-config.json file, e.g.: testResponse: true
+- **Test result response**: Displayed by default. Since different providers return different results, response results are for reference only. Can enable result display by adding variable in ~/.ccapi-config.json file, e.g.: testResponse: true
+- **Test concurrency in cli mode**: The default value is 3. Due to the high performance consumption of cli mode testing, batch testing is adopted. If all test results are timed out, it is recommended to set a smaller value and extend the timeout period.
 
   ```json5
   {
@@ -322,7 +323,8 @@ ccapi test openrouter -t 2    # Use 2nd Token
     "apiConfigPath": "/Users/4xian/Desktop/api.json5",
     "pingTimeout": 5000,
     "testTimeout": 30000,
-    "testResponse": false
+    "testResponse": true,
+    "testConcurrency": 3
   }
   ```
 - For array format URLs, all URL addresses will be tested, array configuration URLs will not be sorted by latency internally, maintaining original URL order
@@ -460,7 +462,7 @@ This file is the configuration file used by ccapi, where you can configure optio
   # test command timeout (default 30s for API mock method, 60s for CLI method)
   "testTimeout": 30000,
   # ping, test command result display
-  "testResponse": false,
+  "testResponse": true,
   # whether update prompts are needed
   "update": true,
   # whether to synchronously modify system environment variables when using use command

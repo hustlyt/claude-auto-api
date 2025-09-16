@@ -150,7 +150,7 @@ module.exports = {
     CONFIG_FORMAT_ERROR: 'api configuration file format error',
     CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
     TESTING_CONFIGS:
-      'Testing {0} configurations URL for availability in Claude Code (may take a while, please be patient)...',
+      'Testing URL for availability in Claude Code (may take a while, please be patient)...',
     TEST_COMPLETE: 'Validity test completed, this result shows whether it can be used in Claude Code!',
     TEST_FAILED: 'Validity test failed:',
     VALID: 'Valid',
@@ -206,7 +206,7 @@ module.exports = {
     BEST_ROUTE: 'Best route: {0}',
     CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
     AVAILABLE_CONFIGS: 'Available configurations:',
-    TESTING_CONFIGS: 'Testing URL latency for {0} configurations...',
+    TESTING_CONFIGS: 'Testing URL latency...',
     LATENCY_TEST_COMPLETE: 'URL latency test complete! Success: {0}/{1}',
     LATENCY_TEST_FAILED: 'URL latency test failed:',
     CONFIG_FORMAT_ERROR: 'api configuration file format error'

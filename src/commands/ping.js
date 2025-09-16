@@ -193,7 +193,8 @@ async function displayPingResults(sortedResults) {
 
       // ping 命令的响应显示逻辑
       let responseDisplay = ''
-      if (configData && configData.testResponse) {
+      const show = configData.testResponse === void 0 ? true : !!configData.testResponse;
+      if (show) {
         const responseText = result.error || 'Success'
         const finalResponse = responseText.length > maxText ? responseText.slice(0, maxText) + '...' : responseText
         responseDisplay = ` [Response: ${finalResponse}]`
