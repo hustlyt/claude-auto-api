@@ -42,7 +42,10 @@ First-time use requires setting the path to Claude Code's settings.json file and
 
 ```bash
 Examples:
-# Set both paths simultaneously
+# windows default path: C:\Users\Administrator\.claude\settings.json
+# mac default path:  ~/.claude/settings.json
+
+# mac: Set both paths simultaneously
 ccapi set --settings ~/.claude/settings.json --api /Users/4xian/Desktop/api.json5
 
 # Set them separately
@@ -322,7 +325,6 @@ ccapi test openrouter -t 2    # Use 2nd Token
     "testResponse": false
   }
   ```
-
 - For array format URLs, all URL addresses will be tested, array configuration URLs will not be sorted by latency internally, maintaining original URL order
 - Configurations sorted by best latency, lowest latency configurations appear first
 - Shows optimal route (fastest URL address) for each configuration

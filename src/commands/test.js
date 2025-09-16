@@ -196,7 +196,6 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
 
   // 执行单次测试的内部函数
   async function performSingleTest(testModel, attempt = 1) {
-
     try {
       const requestBody = {
         model: testModel,
@@ -236,7 +235,7 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
         '-H',
         `x-api-key: ${key || token}`,
         '-H',
-        `Authorization: Bearer ${token || key}`,
+        `Authorization: Bearer ${key || token}`,
         '-H',
         'x-app: cli',
         '-H',
@@ -280,8 +279,6 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
       let httpHeaders = ''
       let responseBody = ''
 
-      // console.log('response', fullResponse);
-      
       if (headerBodySplit.length < 2) {
         const lineSplit = fullResponse.split('\n\n')
         if (lineSplit.length < 2) {
@@ -294,12 +291,14 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
         responseBody = headerBodySplit.slice(1).join('\r\n\r\n')
       }
 
+      // console.log('httpHeaders', httpHeaders)
+      // console.log('responseBody', responseBody)
+
       // 检查HTTP状态码
       const statusMatch = httpHeaders.match(/HTTP\/[12](?:\.\d)?\s+(\d{3})\s*(.*)/)
       const statusCode = statusMatch ? parseInt(statusMatch[1]) : 0
       const statusText = statusMatch ? statusMatch[2].trim() : 'Unknown'
 
-      // 如果状态码不是2xx，则认为是错误
       if (statusCode < 200 || statusCode >= 300) {
         let errorMessage = `HTTP ${statusCode} ${statusText}`
 
@@ -310,7 +309,6 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
             errorMessage = errorJson.error.message
           }
         } catch (e) {
-          // 如果不是JSON，检查是否包含中文错误信息
           const cleanBody = responseBody.replace(/<[^>]*>/g, '').trim()
           if (cleanBody && cleanBody.length < 200) {
             errorMessage = cleanBody
@@ -325,14 +323,24 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
 
       if (!isEventStream) {
         // 非SSE响应，尝试解析为JSON
-        const jsonResponse = JSON.parse(responseBody.trim())
+        try {
+          const jsonResponse = JSON.parse(responseBody.trim())
 
-        if (jsonResponse.error) {
-          throw new Error(jsonResponse.error.message || 'API Error')
-        }
-        // 如果是成功的JSON响应，提取内容
-        if (jsonResponse.content && Array.isArray(jsonResponse.content)) {
-          responseText = jsonResponse.content.map((c) => c.text).join('')
+          if (jsonResponse.error) {
+            throw new Error(jsonResponse.error.message || 'API Error')
+          }
+          // 如果是成功的JSON响应，提取内容
+          if (jsonResponse.content && Array.isArray(jsonResponse.content)) {
+            responseText = jsonResponse.content.map((c) => c.text).join('')
+          }
+        } catch (parseError) {
+          const errorIndex = responseBody.indexOf('error')
+          if (errorIndex !== -1) {
+            const errorPart = responseBody.substring(errorIndex).replace(/\n/g, '').trim()
+            throw new Error(errorPart)
+          } else {
+            throw new Error(responseBody.replace(/\n/g, '').trim() || 'Invalid response format')
+          }
         }
       } else {
         // SSE响应处理
@@ -386,19 +394,21 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
       return {
         success: true,
         latency: testLatency,
-        response: responseText.length > maxText ? responseText.slice(0, maxText) + '...' : responseText.trim(),
+        response:
+          responseText.length > maxText
+            ? responseText.slice(0, maxText) + '...'
+            : responseText.replace(/\n/g, '').trim(),
         error: null,
         model: testModel,
         attempt
       }
-
     } catch (error) {
-      console.log(`Attempt ${attempt} failed:`, error.message)
+      // console.log(`Attempt ${attempt} failed:`, error.message)
 
       return {
         success: false,
         latency: 'error',
-        error: error.message,
+        error: error.message.replace(/\n/g, '').trim(),
         response: null,
         model: testModel,
         attempt
@@ -429,7 +439,6 @@ async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku
     return {
       ...result
     }
-
   } catch (error) {
     let message = await t('test.REQUEST_FAILED')
 
@@ -490,7 +499,7 @@ async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-2024102
       mcpConfigPath
     ]
 
-    const timeout = configData.testTimeout || 60000
+    const timeout = configData.testTimeout || 100000
     const spawnOptions = {
       cwd: tempWorkDir,
       stdio: ['pipe', 'pipe', 'pipe']

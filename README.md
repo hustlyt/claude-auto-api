@@ -41,8 +41,10 @@ ccapi -v
 初次使用需要设置 Claude Code 的 settings.json 文件路径和自定义API配置文件路径：
 
 ```bash
-例如:
-# 同时设置两个路径
+# windows 默认settings.json路径在 C:\Users\Administrator\.claude\settings.json
+# mac 默认settings.json路径在 ~/.claude/settings.json
+
+# 示例: mac同时设置两个路径
 ccapi set --settings ~/.claude/settings.json --api /Users/4xian/Desktop/api.json5
 
 # 分别设置
@@ -300,8 +302,8 @@ ccapi test -c openrouter
 
 **测试方式说明：**
 
-- **默认方式**：使用接口模拟方式，直接模拟Claude CLI请求头，速度快
-- **CLI方式**（`-c` 选项）：使用真实的Claude Code CLI环境，准确度最高，但速度较慢（40-50秒）
+- **默认方式**：使用接口模拟方式，直接模拟Claude CLI请求，速度快，准确性较高(部分厂商只允许在cli中调用，这种时候你可忽略结果，默认为成功)
+- **CLI方式**（`-c` 选项）：使用真实的Claude Code CLI环境，准确度最高，可能会出现调用各种mcp服务情况，速度较慢（1分钟左右）
 
 **配置说明：**
 
@@ -318,7 +320,6 @@ ccapi test -c openrouter
     "testResponse": false
   }
   ```
-
 - 对于数组格式的URL，会测试所有URL地址，数组配置的URL内部不会按延迟排序，保持原有的URL顺序
 - 配置按最佳延迟排序，延迟最低的配置排在前面
 - 显示每个配置的最优路线（最快的URL地址）
