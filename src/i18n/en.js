@@ -2,7 +2,8 @@
 module.exports = {
   // CLI basic information
   cli: {
-    description: 'A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support',
+    description:
+      'A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support',
     version: 'Show version information'
   },
 
@@ -31,11 +32,13 @@ module.exports = {
     test: {
       description: 'Test if API configuration is available in Claude Code',
       tokenOption: 'Specify Token index to use (starting from 1, only valid when testing single configuration)',
-      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)'
+      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)',
+      cliOption: 'Use Claude Code CLI method for testing instead of default API mock method'
     },
     auto: {
       description: 'Automatically test API configurations and switch to the optimal one',
-      pingOption: 'Use ping test latency results to select optimal configuration (fast and only verifies website URL latency)',
+      pingOption:
+        'Use ping test latency results to select optimal configuration (fast and only verifies website URL latency)',
       testOption: 'Use test results to select optimal configuration (slower but verifies real API availability)'
     },
     update: {
@@ -50,14 +53,16 @@ module.exports = {
       fastOption: 'Specify fast model index to use (starting from 1, only valid for array type fast)'
     },
     clear: {
-      description: 'Completely clear configuration: clear both settings.json and system environment variables related API configuration'
+      description:
+        'Completely clear configuration: clear both settings.json and system environment variables related API configuration'
     },
     lang: {
       description: 'View or set language',
       current: 'Current language',
       available: 'Available languages',
       usage: 'Usage: ccapi lang [language_code]',
-      examples: 'Examples:\n  ccapi lang     # View current language\n  ccapi lang zh  # Set to Chinese\n  ccapi lang en  # Set to English'
+      examples:
+        'Examples:\n  ccapi lang     # View current language\n  ccapi lang zh  # Set to Chinese\n  ccapi lang en  # Set to English'
     }
   },
 
@@ -65,7 +70,8 @@ module.exports = {
   errors: {
     CONFIG_NOT_FOUND: 'Configuration file not found, please use ccapi set to set path first',
     SETTINGS_NOT_FOUND: 'settings file does not exist, please check path setting',
-    API_CONFIG_NOT_FOUND: 'api configuration file does not exist, please check path setting (supports JSON, JSON5, YAML, TOML formats)',
+    API_CONFIG_NOT_FOUND:
+      'api configuration file does not exist, please check path setting (supports JSON, JSON5, YAML, TOML formats)',
     INVALID_JSON: 'JSON file format error',
     INVALID_YAML: 'YAML file format error',
     INVALID_TOML: 'TOML file format error',
@@ -143,11 +149,13 @@ module.exports = {
     BEST_ROUTE: 'Best route',
     CONFIG_FORMAT_ERROR: 'api configuration file format error',
     CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
-    TESTING_CONFIGS: 'Testing {0} configurations for availability in Claude Code (may take a while, please be patient)...',
+    TESTING_CONFIGS:
+      'Testing URL for availability in Claude Code (may take a while, please be patient)...',
     TEST_COMPLETE: 'Validity test completed, this result shows whether it can be used in Claude Code!',
     TEST_FAILED: 'Validity test failed:',
     VALID: 'Valid',
-    INVALID: 'Invalid'
+    INVALID: 'Invalid',
+    PROGRESS_COMPLETED: '✓ Completed {0}/{1} URL tests, continuing with next batch...'
   },
 
   // Environment variable related
@@ -198,7 +206,7 @@ module.exports = {
     BEST_ROUTE: 'Best route: {0}',
     CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
     AVAILABLE_CONFIGS: 'Available configurations:',
-    TESTING_CONFIGS: 'Testing URL latency for {0} configurations...',
+    TESTING_CONFIGS: 'Testing URL latency...',
     LATENCY_TEST_COMPLETE: 'URL latency test complete! Success: {0}/{1}',
     LATENCY_TEST_FAILED: 'URL latency test failed:',
     CONFIG_FORMAT_ERROR: 'api configuration file format error'
@@ -216,6 +224,7 @@ module.exports = {
     API_FORMAT_ERROR: 'api.json file format error',
     SETTINGS_FORMAT_ERROR: 'settings.json file format error',
     SWITCHING_CONFIG: 'Switching configuration: {0}',
+    SWITCHING_ENV: 'Setting system environment variables...',
     SETTINGS_SUCCESS_ENV_FAILED: 'settings.json updated successfully, environment variable update failed',
     CONFIG_SYNCED: 'Configuration synchronized to both settings.json and system environment variables',
     CURRENT_CONFIG_DETAILS: 'Current configuration details:',
@@ -251,7 +260,8 @@ module.exports = {
 
   // Clear related
   clear: {
-    CONFIRM: 'This will clear all API configurations in settings.json and system environment variables please enter ? (y/n):',
+    CONFIRM:
+      'This will clear all API configurations in settings.json and system environment variables please enter ? (y/n):',
     ENV_CONFIRM: 'This will clear all API configurations in system environment variables please enter ? (y/n):',
     CANCELLED: 'Operation cancelled',
     SUCCESS: 'Configuration completely cleared successfully',
@@ -315,6 +325,7 @@ module.exports = {
     ENV_CLEAR_SUCCESS: 'Environment variables cleared',
     // Validator errors
     SETTINGS_PATH_FORMAT_ERROR: 'settings path format error, please provide absolute path to settings.json file',
-    API_PATH_FORMAT_ERROR: 'api path format error, please provide absolute path to configuration file (supports .json, .json5, .jsonc, .yaml, .yml)'
+    API_PATH_FORMAT_ERROR:
+      'api path format error, please provide absolute path to configuration file (supports .json, .json5, .jsonc, .yaml, .yml)'
   }
 }

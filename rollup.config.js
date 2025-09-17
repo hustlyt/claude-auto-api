@@ -9,7 +9,7 @@ module.exports = {
     file: 'dist/index.js',
     format: 'cjs',
     banner: '#!/usr/bin/env node',
-    sourcemap: true,
+    sourcemap: false,
     inlineDynamicImports: true
   },
   plugins: [

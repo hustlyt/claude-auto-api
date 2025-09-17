@@ -3,3 +3,4 @@ rollup.config.js
 .*
 logs/*
 node_modules
+*.map

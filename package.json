@@ -1,6 +1,6 @@
 {
   "name": "@4xian/ccapi",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": "4xian (https://github.com/4xian)",
   "description": "A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support",
   "repository": {
@@ -28,11 +28,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/claude-code": "^1.0.98",
-    "@anthropic-ai/sdk": "^0.60.0",
     "@iarna/toml": "^2.2.5",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
+    "cross-spawn": "^7.0.6",
     "fs-extra": "^11.2.0",
     "js-toml": "^1.0.2",
     "js-yaml": "^4.1.0",
@@ -52,12 +51,8 @@
     "node": ">=18.0.0"
   },
   "updateLogs": [
-    "1. 新增版本检查与更新命令，一键更新到最新版本",
-    "2. 新增ping命令，测试厂商URL延迟",
-    "3. 调整test命令，最真实反映能否在Claude Code中使用",
-    "4. 新增一键修改系统环境变量",
-    "5. 新增i18n国际化支持",
-    "6. 具体更新内容请查看README.md"
+    "1. Modify the test command to support both API mock and CLI. API testing is used by default.",
+    "2. 调整ccapi test有效性测试命令，支持API模拟和CLI两种测试方式，默认使用API测试(API测试快速，准确性较高[ccapi test]；CLI测试准确较慢[ccapi test -c])"
   ],
   "files": [
     "dist",

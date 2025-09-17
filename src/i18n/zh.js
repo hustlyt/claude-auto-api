@@ -2,7 +2,8 @@
 module.exports = {
   // CLI 基础信息
   cli: {
-    description: '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
+    description:
+      '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
     version: '显示版本信息'
   },
 
@@ -31,7 +32,8 @@ module.exports = {
     test: {
       description: '测试API配置在Claude Code中是否可用',
       tokenOption: '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）',
-      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）'
+      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）',
+      cliOption: '使用Claude Code CLI方式进行测试，而非默认的接口模拟方式'
     },
     auto: {
       description: '自动测试API配置并切换到最优配置',
@@ -90,7 +92,7 @@ module.exports = {
   success: {
     CONFIG_SAVED: '配置路径已保存',
     CONFIG_SWITCHED: '配置切换成功',
-    RESTART_TERMINAL: '(提示: 重启Claude Code终端后配置生效!)',
+    RESTART_TERMINAL: '(提示: [settings.json中环境变量 > 系统环境变量] & 重启Claude Code终端后配置生效!)',
     BACKUP_CREATED: 'settings文件已备份',
     ENV_SET_SUCCESS: '环境变量设置成功',
     ENV_CLEAR_SUCCESS: '环境变量清除成功',
@@ -143,11 +145,12 @@ module.exports = {
     BEST_ROUTE: '最优路线',
     CONFIG_FORMAT_ERROR: 'api配置文件格式不正确',
     CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    TESTING_CONFIGS: '正在测试{0}个配置在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
+    TESTING_CONFIGS: '正在测试配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
     TEST_COMPLETE: '有效性测试完成, 此结果代表能否在Claude Code中使用!',
     TEST_FAILED: '有效性测试失败:',
     VALID: '有效',
-    INVALID: '无效'
+    INVALID: '无效',
+    PROGRESS_COMPLETED: '✓ 已完成{0}/{1}个URL测试，下一批次测试中...'
   },
 
   // 环境变量相关
@@ -198,7 +201,7 @@ module.exports = {
     BEST_ROUTE: '最优路线: {0}',
     CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
     AVAILABLE_CONFIGS: '可用配置:',
-    TESTING_CONFIGS: '正在测试{0}个配置的URL延迟...',
+    TESTING_CONFIGS: '正在测试配置URL延迟...',
     LATENCY_TEST_COMPLETE: 'URL延迟测试完成! 成功: {0}/{1}',
     LATENCY_TEST_FAILED: 'URL延迟测试失败:',
     CONFIG_FORMAT_ERROR: 'api配置文件格式不正确'
@@ -216,6 +219,7 @@ module.exports = {
     API_FORMAT_ERROR: 'api.json文件格式不正确',
     SETTINGS_FORMAT_ERROR: 'settings.json文件格式不正确',
     SWITCHING_CONFIG: '正在切换配置: {0}',
+    SWITCHING_ENV: '正在设置系统环境变量...',
     SETTINGS_SUCCESS_ENV_FAILED: 'settings.json更新成功，环境变量更新失败',
     CONFIG_SYNCED: '配置已同步更新到settings.json和系统环境变量',
     CURRENT_CONFIG_DETAILS: '当前配置详情:',
@@ -251,7 +255,8 @@ module.exports = {
 
   // 清理相关
   clear: {
-    CONFIRM: '确认清除所有配置？这将清除 settings.json 和系统环境变量中的所有API配置 (y/N):',
+    CONFIRM: '确认清除所有配置？将清除 settings.json 和系统环境变量中的所有API配置 (y/n):',
+    ENV_CONFIRM: '将清除系统环境变量中的所有API配置 请输入 (y/n):',
     CANCELLED: '操作已取消',
     SUCCESS: '配置完全清除成功',
     SETTINGS_CLEARED: 'settings.json中的API配置已清除',

@@ -41,15 +41,17 @@ ccapi -v
 初次使用需要设置 Claude Code 的 settings.json 文件路径和自定义API配置文件路径：
 
 ```bash
-例如:
-# 同时设置两个路径
+# windows 默认settings.json路径在 C:\Users\Administrator\.claude\settings.json
+# mac 默认settings.json路径在 ~/.claude/settings.json
+
+# 1. 示例: mac同时设置两个路径
 ccapi set --settings ~/.claude/settings.json --api /Users/4xian/Desktop/api.json5
 
-# 分别设置
+# 2. 分别设置
 ccapi set --settings ~/.claude/settings.json
 ccapi set --api /Users/4xian/Desktop/api.json5
 
-# 直接在配置文件中修改路径
+# 3. 直接在配置文件中修改路径
 在 ~/.ccapi-config.json 文件中(与.claude同级)，有存储路径的变量，直接修改即可
   {
     "settingsPath": "~/.claude/settings.json",
@@ -65,7 +67,7 @@ ccapi set
 支持多种配置文件格式：**JSON、JSON5、YAML、TOML**
 创建一个配置文件（如 `api.json`、`api.yaml`、`api.json5` 或 `api.toml`），格式如下：
 
-**JSON 格式示例：**
+**JSON5 格式示例：**
 
 ```json5
 {
@@ -284,7 +286,7 @@ ccapi ping openrouter
 
 ### 8. 测试API可用性
 
-测试中转站API配置在Cluade Code中是否可用，可以真实的反映出配置是否有效
+测试中转站API配置在Claude Code中是否可用，可以真实的反映出配置是否有效
 
 ```bash
 # 测试所有配置
@@ -292,21 +294,32 @@ ccapi test
 
 # 测试指定配置
 ccapi test openrouter
+
+# 使用 Claude Code CLI 方式测试（更准确，但速度较慢）
+ccapi test -c
+ccapi test -c openrouter
 ```
 
-**测试说明：**
+**测试方式说明：**
+
+- **默认方式**：使用接口模拟方式，直接模拟Claude CLI请求，速度快，准确性较高(部分厂商只允许在cli中调用，会出现不允许调用的情况，这种时候你可忽略结果，默认为成功)
+- **CLI方式**（`-c` 选项）：使用真实的Claude Code CLI环境，准确度最高，可能会出现调用各种mcp服务情况，速度较慢（1分钟左右）
+
+**配置说明：**
 
 - **ping测试超时时间**：默认为5秒，可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：pingTimeout: 5000
-- **test测试超时时间**：默认为60秒，可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：testTimeout: 60000 (该测试由于需要等待Claude Code响应，时间可能稍长，超时时间建议设置大点)
-- **测试返回的结果**：默认不显示，由于厂商不同，返回结果仅供参考，可在 ~/.ccapi-config.json 文件中新增变量是否显示结果，如：testResponse: true
+- **test测试超时时间**：默认为30秒（接口模拟方式）或 100秒（CLI方式），可在 ~/.ccapi-config.json 文件中新增变量控制超时，如：testTimeout: 30000
+- **测试返回的结果**：默认显示，由于厂商不同，返回结果仅供参考，可在 ~/.ccapi-config.json 文件中新增变量是否显示结果，如：testResponse: true
+- **test cli模式测试并发**：默认为3，cli模式测试由于消耗性能较高，采用分批测试，若测试结果全部都超时，建议数值小点，超时时间拉长
 
   ```json5
   {
     "settingsPath": "~/.claude/settings.json",
     "apiConfigPath": "/Users/4xian/Desktop/api.json5",
     "pingTimeout": 5000,
-    "testTimeout": 60000,
-    "testResponse": false
+    "testTimeout": 30000,
+    "testResponse": true,
+    "testConcurrency": 3
   }
   ```
 
@@ -441,11 +454,11 @@ ccapi lang en
   # api配置文件路径
   "apiConfigPath": "/Users/4xian/Desktop/api.json5",
   # ping命令超时时间
-  "pingTimeout": 5000,
+  "pingTimeout": 30000,
   # test命令超时时间
-  "testTimeout": 80000,
+  "testTimeout": 100000,
   # ping、test命令返回结果显示
-  "testResponse": false,
+  "testResponse": true,
   # 是否需要更新提示
   "update": true,
   # 使用use命令时是否同步修改系统环境变量
