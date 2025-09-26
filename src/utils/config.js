@@ -1,6 +1,6 @@
 const { readConfigFile, writeConfigFile, fileExists } = require('./file')
 const { CONFIG_FILE, ERROR_MESSAGES } = require('../utils/constants')
-
+const { t } = require('../i18n')
 /**
  * 读取用户配置
  */

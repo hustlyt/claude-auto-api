@@ -1,0 +1,62 @@
+name: Publish package to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'npm tag to publish under'
+        required: true
+        default: 'latest'
+      access:
+        description: 'npm publish access (public or restricted). Use "public" for scoped public packages.'
+        required: true
+        default: 'public'
+      run_prepublish:
+        description: 'Whether to run `npm run prepublishOnly` before publish'
+        required: true
+        default: 'true'
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install rollup globally
+        run: |
+          # The user requested installing rollup globally; use npm install -g
+          npm install -g rollup@latest
+
+      - name: Run prepublish (build)
+        if: ${{ inputs.run_prepublish == 'true' }}
+        run: npm run prepublishOnly
+
+      - name: Publish to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ inputs.tag }}
+          ACCESS: ${{ inputs.access }}
+        run: |
+          set -e
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "Error: NPM_TOKEN secret is not set. Please add a repository secret named NPM_TOKEN with your npm auth token." >&2
+            exit 1
+          fi
+          # configure npm auth
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          npm whoami || true
+          echo "Publishing with tag=$TAG access=$ACCESS"
+          npm publish --tag "$TAG" --access "$ACCESS"
