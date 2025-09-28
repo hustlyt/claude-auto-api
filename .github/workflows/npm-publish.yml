@@ -7,14 +7,6 @@ on:
         description: 'npm tag to publish under'
         required: true
         default: 'latest'
-      access:
-        description: 'npm publish access (public or restricted). Use "public" for scoped public packages.'
-        required: true
-        default: 'public'
-      run_prepublish:
-        description: 'Whether to run `npm run prepublishOnly` before publish'
-        required: true
-        default: 'true'
 
 jobs:
   publish:
@@ -40,15 +32,10 @@ jobs:
           # The user requested installing rollup globally; use npm install -g
           npm install -g rollup@latest
 
-      - name: Run prepublish (build)
-        if: ${{ inputs.run_prepublish == 'true' }}
-        run: npm run prepublishOnly
-
       - name: Publish to npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
-          ACCESS: ${{ inputs.access }}
         run: |
           set -e
           if [ -z "$NPM_TOKEN" ]; then
@@ -58,5 +45,5 @@ jobs:
           # configure npm auth
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           npm whoami || true
-          echo "Publishing with tag=$TAG access=$ACCESS"
-          npm publish --tag "$TAG" --access "$ACCESS"
+          echo "Publishing with tag=$TAG access=public"
+          npm publish --tag "$TAG" --access public
