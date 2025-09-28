@@ -1,6 +1,5 @@
 const { readConfigFile, writeConfigFile, fileExists } = require('./file')
 const { CONFIG_FILE, ERROR_MESSAGES } = require('../utils/constants')
-const { t } = require('./i18n')
 /**
  * 读取用户配置
  */
@@ -80,11 +79,11 @@ async function validateConfig() {
   }
 
   if (!(await fileExists(config.settingsPath))) {
-    throw new Error(await t(ERROR_MESSAGES.SETTINGS_NOT_FOUND))
+    throw new Error('settings.json file not found')
   }
 
   if (!(await fileExists(config.apiConfigPath))) {
-    throw new Error(await t(ERROR_MESSAGES.API_CONFIG_NOT_FOUND))
+    throw new Error('API configuration file not found')
   }
 
   return config

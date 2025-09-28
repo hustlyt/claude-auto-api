@@ -18,18 +18,18 @@ module.exports = {
     }),
     commonjs(),
     json(),
-    terser({
-      compress: {
-        drop_console: false, // 保留console输出，CLI工具需要
-        drop_debugger: true
-      },
-      mangle: {
-        keep_fnames: true // 保留函数名，便于调试
-      },
-      format: {
-        comments: false // 移除注释
-      }
-    })
+    // terser({
+    //   compress: {
+    //     drop_console: false, // 保留console输出，CLI工具需要
+    //     drop_debugger: true
+    //   },
+    //   mangle: {
+    //     keep_fnames: true // 保留函数名，便于调试
+    //   },
+    //   format: {
+    //     comments: false // 移除注释
+    //   }
+    // })
   ],
   external: ['fs', 'path', 'os', 'util']
 }

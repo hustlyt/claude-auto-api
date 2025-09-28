@@ -63,13 +63,13 @@ async function readConfigFile(filePath) {
     return parsed
   } catch (error) {
     if (error.name === 'JSONError' || error.message.includes('JSON')) {
-      throw new Error(`${await t(ERROR_MESSAGES.INVALID_JSON)}: ${filePath} - ${error.message}`)
+      throw new Error(`Invalid JSON format in file: ${filePath} - ${error.message}`)
     }
     if (error.name === 'YAMLException') {
-      throw new Error(`${await t(ERROR_MESSAGES.INVALID_YAML)}: ${filePath} - ${error.message}`)
+      throw new Error(`Invalid YAML format in file: ${filePath} - ${error.message}`)
     }
     if (error.name === 'TomlError' || error.message.includes('TOML')) {
-      throw new Error(`${await t(ERROR_MESSAGES.INVALID_TOML)}: ${filePath} - ${error.message}`)
+      throw new Error(`Invalid TOML format in file: ${filePath} - ${error.message}`)
     }
     throw error
   }
