@@ -1,6 +1,6 @@
 {
   "name": "@silencetao/ccapi",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "author": "4xian (https://github.com/4xian)",
   "description": "A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support",
   "repository": {
