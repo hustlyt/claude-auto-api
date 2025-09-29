@@ -2,20 +2,17 @@
 'use strict';
 
 var require$$0$1 = require('events');
-var require$$0$3 = require('child_process');
+var require$$0$2 = require('child_process');
 var require$$1 = require('path');
-var require$$0$2 = require('fs');
+var require$$3 = require('fs');
 var require$$4 = require('process');
-var require$$0$4 = require('os');
+var require$$0$3 = require('os');
 var require$$1$1 = require('tty');
 var require$$4$1 = require('util');
-var require$$0$5 = require('constants');
-var require$$0$6 = require('stream');
+var require$$0$4 = require('constants');
+var require$$0$5 = require('stream');
 var require$$5 = require('assert');
-var require$$1$2 = require('https');
-var require$$2$2 = require('http');
-var require$$3 = require('url');
-var require$$1$3 = require('readline');
+var require$$1$2 = require('readline');
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1150,9 +1147,9 @@ function suggestSimilar$1(word, candidates) {
 suggestSimilar$2.suggestSimilar = suggestSimilar$1;
 
 const EventEmitter = require$$0$1.EventEmitter;
-const childProcess = require$$0$3;
-const path$m = require$$1;
-const fs$n = require$$0$2;
+const childProcess = require$$0$2;
+const path$i = require$$1;
+const fs$l = require$$3;
 const process$1 = require$$4;
 
 const { Argument, humanReadableArgName } = argument;
@@ -2100,14 +2097,14 @@ Expecting one of '${allowedValues.join("', '")}'`);
 
     function findFile(baseDir, baseName) {
       // Look for specified file
-      const localBin = path$m.resolve(baseDir, baseName);
-      if (fs$n.existsSync(localBin)) return localBin;
+      const localBin = path$i.resolve(baseDir, baseName);
+      if (fs$l.existsSync(localBin)) return localBin;
 
       // Stop looking if candidate already has an expected extension.
-      if (sourceExt.includes(path$m.extname(baseName))) return undefined;
+      if (sourceExt.includes(path$i.extname(baseName))) return undefined;
 
       // Try all the extensions.
-      const foundExt = sourceExt.find(ext => fs$n.existsSync(`${localBin}${ext}`));
+      const foundExt = sourceExt.find(ext => fs$l.existsSync(`${localBin}${ext}`));
       if (foundExt) return `${localBin}${foundExt}`;
 
       return undefined;
@@ -2123,11 +2120,11 @@ Expecting one of '${allowedValues.join("', '")}'`);
     if (this._scriptPath) {
       let resolvedScriptPath; // resolve possible symlink for installed npm binary
       try {
-        resolvedScriptPath = fs$n.realpathSync(this._scriptPath);
+        resolvedScriptPath = fs$l.realpathSync(this._scriptPath);
       } catch (err) {
         resolvedScriptPath = this._scriptPath;
       }
-      executableDir = path$m.resolve(path$m.dirname(resolvedScriptPath), executableDir);
+      executableDir = path$i.resolve(path$i.dirname(resolvedScriptPath), executableDir);
     }
 
     // Look for a local file in preference to a command in PATH.
@@ -2136,7 +2133,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
 
       // Legacy search using prefix of script name instead of command name
       if (!localFile && !subcommand._executableFile && this._scriptPath) {
-        const legacyName = path$m.basename(this._scriptPath, path$m.extname(this._scriptPath));
+        const legacyName = path$i.basename(this._scriptPath, path$i.extname(this._scriptPath));
         if (legacyName !== this._name) {
           localFile = findFile(executableDir, `${legacyName}-${subcommand._name}`);
         }
@@ -2144,7 +2141,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
       executableFile = localFile || executableFile;
     }
 
-    launchWithNode = sourceExt.includes(path$m.extname(executableFile));
+    launchWithNode = sourceExt.includes(path$i.extname(executableFile));
 
     let proc;
     if (process$1.platform !== 'win32') {
@@ -3094,7 +3091,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
    */
 
   nameFromFilename(filename) {
-    this._name = path$m.basename(filename, path$m.extname(filename));
+    this._name = path$i.basename(filename, path$i.extname(filename));
 
     return this;
   }
@@ -4740,7 +4737,7 @@ var hasFlag$1 = (flag, argv = process.argv) => {
 	return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
 };
 
-const os$6 = require$$0$4;
+const os$4 = require$$0$3;
 const tty = require$$1$1;
 const hasFlag = hasFlag$1;
 
@@ -4810,7 +4807,7 @@ function supportsColor(haveStream, streamIsTTY) {
 	if (process.platform === 'win32') {
 		// Windows 10 build 10586 is the first Windows release that supports 256 colors.
 		// Windows 10 build 14931 is the first release that supports 16m/TrueColor.
-		const osRelease = os$6.release().split('.');
+		const osRelease = os$4.release().split('.');
 		if (
 			Number(osRelease[0]) >= 10 &&
 			Number(osRelease[2]) >= 10586
@@ -5271,15 +5268,15 @@ const chalkTag = (chalk, ...strings) => {
 
 Object.defineProperties(Chalk.prototype, styles);
 
-const chalk$e = Chalk(); // eslint-disable-line new-cap
-chalk$e.supportsColor = stdoutColor;
-chalk$e.stderr = Chalk({level: stderrColor ? stderrColor.level : 0}); // eslint-disable-line new-cap
-chalk$e.stderr.supportsColor = stderrColor;
+const chalk$a = Chalk(); // eslint-disable-line new-cap
+chalk$a.supportsColor = stdoutColor;
+chalk$a.stderr = Chalk({level: stderrColor ? stderrColor.level : 0}); // eslint-disable-line new-cap
+chalk$a.stderr.supportsColor = stderrColor;
 
-var source$1 = chalk$e;
+var source$1 = chalk$a;
 
 var name = "@silencetao/ccapi";
-var version$1 = "1.0.10";
+var version$1 = "1.0.11";
 var author = "4xian (https://github.com/4xian)";
 var description = "A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support";
 var repository = {
@@ -5362,11 +5359,11 @@ var require$$2$1 = {
 }
 };
 
-const { exec: exec$2 } = require$$0$3;
+const { exec: exec$1 } = require$$0$2;
 const { promisify: promisify$1 } = require$$4$1;
 const packageJson$3 = require$$2$1;
 
-const execPromise = promisify$1(exec$2);
+const execPromise = promisify$1(exec$1);
 
 /**
  * 从npm registry获取最新版本信息
@@ -5447,7 +5444,7 @@ var versionChecker = {
   checkUpdateQuietly: checkUpdateQuietly$1
 };
 
-var fs$m = {};
+var fs$k = {};
 
 var universalify$1 = {};
 
@@ -5474,7 +5471,7 @@ universalify$1.fromPromise = function (fn) {
   }, 'name', { value: fn.name })
 };
 
-var constants$1 = require$$0$5;
+var constants$1 = require$$0$4;
 
 var origCwd = process.cwd;
 var cwd = null;
@@ -5830,7 +5827,7 @@ function patch$1 (fs) {
   }
 }
 
-var Stream = require$$0$6.Stream;
+var Stream = require$$0$5.Stream;
 
 var legacyStreams = legacy$1;
 
@@ -5971,7 +5968,7 @@ function clone$1 (obj) {
   return copy
 }
 
-var fs$l = require$$0$2;
+var fs$j = require$$3;
 var polyfills = polyfills$1;
 var legacy = legacyStreams;
 var clone = clone_1;
@@ -6013,18 +6010,18 @@ else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
   };
 
 // Once time initialization
-if (!fs$l[gracefulQueue]) {
+if (!fs$j[gracefulQueue]) {
   // This queue can be shared by multiple loaded instances
   var queue = commonjsGlobal[gracefulQueue] || [];
-  publishQueue(fs$l, queue);
+  publishQueue(fs$j, queue);
 
   // Patch fs.close/closeSync to shared queue version, because we need
   // to retry() whenever a close happens *anywhere* in the program.
   // This is essential when multiple graceful-fs instances are
   // in play at the same time.
-  fs$l.close = (function (fs$close) {
+  fs$j.close = (function (fs$close) {
     function close (fd, cb) {
-      return fs$close.call(fs$l, fd, function (err) {
+      return fs$close.call(fs$j, fd, function (err) {
         // This function uses the graceful-fs shared queue
         if (!err) {
           resetQueue();
@@ -6039,12 +6036,12 @@ if (!fs$l[gracefulQueue]) {
       value: fs$close
     });
     return close
-  })(fs$l.close);
+  })(fs$j.close);
 
-  fs$l.closeSync = (function (fs$closeSync) {
+  fs$j.closeSync = (function (fs$closeSync) {
     function closeSync (fd) {
       // This function uses the graceful-fs shared queue
-      fs$closeSync.apply(fs$l, arguments);
+      fs$closeSync.apply(fs$j, arguments);
       resetQueue();
     }
 
@@ -6052,24 +6049,24 @@ if (!fs$l[gracefulQueue]) {
       value: fs$closeSync
     });
     return closeSync
-  })(fs$l.closeSync);
+  })(fs$j.closeSync);
 
   if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
     process.on('exit', function() {
-      debug(fs$l[gracefulQueue]);
-      require$$5.equal(fs$l[gracefulQueue].length, 0);
+      debug(fs$j[gracefulQueue]);
+      require$$5.equal(fs$j[gracefulQueue].length, 0);
     });
   }
 }
 
 if (!commonjsGlobal[gracefulQueue]) {
-  publishQueue(commonjsGlobal, fs$l[gracefulQueue]);
+  publishQueue(commonjsGlobal, fs$j[gracefulQueue]);
 }
 
-var gracefulFs = patch(clone(fs$l));
-if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs$l.__patched) {
-    gracefulFs = patch(fs$l);
-    fs$l.__patched = true;
+var gracefulFs = patch(clone(fs$j));
+if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs$j.__patched) {
+    gracefulFs = patch(fs$j);
+    fs$j.__patched = true;
 }
 
 function patch (fs) {
@@ -6343,7 +6340,7 @@ function patch (fs) {
 
 function enqueue (elem) {
   debug('ENQUEUE', elem[0].name, elem[1]);
-  fs$l[gracefulQueue].push(elem);
+  fs$j[gracefulQueue].push(elem);
   retry();
 }
 
@@ -6355,12 +6352,12 @@ var retryTimer;
 // delay between attempts so that we'll retry these jobs sooner
 function resetQueue () {
   var now = Date.now();
-  for (var i = 0; i < fs$l[gracefulQueue].length; ++i) {
+  for (var i = 0; i < fs$j[gracefulQueue].length; ++i) {
     // entries that are only a length of 2 are from an older version, don't
     // bother modifying those since they'll be retried anyway.
-    if (fs$l[gracefulQueue][i].length > 2) {
-      fs$l[gracefulQueue][i][3] = now; // startTime
-      fs$l[gracefulQueue][i][4] = now; // lastTime
+    if (fs$j[gracefulQueue][i].length > 2) {
+      fs$j[gracefulQueue][i][3] = now; // startTime
+      fs$j[gracefulQueue][i][4] = now; // lastTime
     }
   }
   // call retry to make sure we're actively processing the queue
@@ -6372,10 +6369,10 @@ function retry () {
   clearTimeout(retryTimer);
   retryTimer = undefined;
 
-  if (fs$l[gracefulQueue].length === 0)
+  if (fs$j[gracefulQueue].length === 0)
     return
 
-  var elem = fs$l[gracefulQueue].shift();
+  var elem = fs$j[gracefulQueue].shift();
   var fn = elem[0];
   var args = elem[1];
   // these items may be unset if they were added by an older graceful-fs
@@ -6410,7 +6407,7 @@ function retry () {
     } else {
       // if we can't do this job yet, push it to the end of the queue
       // and let the next iteration check again
-      fs$l[gracefulQueue].push(elem);
+      fs$j[gracefulQueue].push(elem);
     }
   }
 
@@ -6566,19 +6563,19 @@ function retry () {
 	    'Warning', 'fs-extra-WARN0003'
 	  );
 	} 
-} (fs$m));
+} (fs$k));
 
 var makeDir$1 = {};
 
 var utils$1 = {};
 
-const path$l = require$$1;
+const path$h = require$$1;
 
 // https://github.com/nodejs/node/issues/8987
 // https://github.com/libuv/libuv/pull/1088
 utils$1.checkPath = function checkPath (pth) {
   if (process.platform === 'win32') {
-    const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path$l.parse(pth).root, ''));
+    const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path$h.parse(pth).root, ''));
 
     if (pathHasInvalidWinCharacters) {
       const error = new Error(`Path contains invalid characters: ${pth}`);
@@ -6588,7 +6585,7 @@ utils$1.checkPath = function checkPath (pth) {
   }
 };
 
-const fs$k = fs$m;
+const fs$i = fs$k;
 const { checkPath } = utils$1;
 
 const getMode = options => {
@@ -6600,7 +6597,7 @@ const getMode = options => {
 makeDir$1.makeDir = async (dir, options) => {
   checkPath(dir);
 
-  return fs$k.mkdir(dir, {
+  return fs$i.mkdir(dir, {
     mode: getMode(options),
     recursive: true
   })
@@ -6609,7 +6606,7 @@ makeDir$1.makeDir = async (dir, options) => {
 makeDir$1.makeDirSync = (dir, options) => {
   checkPath(dir);
 
-  return fs$k.mkdirSync(dir, {
+  return fs$i.mkdirSync(dir, {
     mode: getMode(options),
     recursive: true
   })
@@ -6630,31 +6627,31 @@ var mkdirs$2 = {
 };
 
 const u$d = universalify$1.fromPromise;
-const fs$j = fs$m;
+const fs$h = fs$k;
 
 function pathExists$6 (path) {
-  return fs$j.access(path).then(() => true).catch(() => false)
+  return fs$h.access(path).then(() => true).catch(() => false)
 }
 
 var pathExists_1 = {
   pathExists: u$d(pathExists$6),
-  pathExistsSync: fs$j.existsSync
+  pathExistsSync: fs$h.existsSync
 };
 
-const fs$i = fs$m;
+const fs$g = fs$k;
 const u$c = universalify$1.fromPromise;
 
 async function utimesMillis$1 (path, atime, mtime) {
   // if (!HAS_MILLIS_RES) return fs.utimes(path, atime, mtime, callback)
-  const fd = await fs$i.open(path, 'r+');
+  const fd = await fs$g.open(path, 'r+');
 
   let closeErr = null;
 
   try {
-    await fs$i.futimes(fd, atime, mtime);
+    await fs$g.futimes(fd, atime, mtime);
   } finally {
     try {
-      await fs$i.close(fd);
+      await fs$g.close(fd);
     } catch (e) {
       closeErr = e;
     }
@@ -6666,9 +6663,9 @@ async function utimesMillis$1 (path, atime, mtime) {
 }
 
 function utimesMillisSync$1 (path, atime, mtime) {
-  const fd = fs$i.openSync(path, 'r+');
-  fs$i.futimesSync(fd, atime, mtime);
-  return fs$i.closeSync(fd)
+  const fd = fs$g.openSync(path, 'r+');
+  fs$g.futimesSync(fd, atime, mtime);
+  return fs$g.closeSync(fd)
 }
 
 var utimes = {
@@ -6676,14 +6673,14 @@ var utimes = {
   utimesMillisSync: utimesMillisSync$1
 };
 
-const fs$h = fs$m;
-const path$k = require$$1;
+const fs$f = fs$k;
+const path$g = require$$1;
 const u$b = universalify$1.fromPromise;
 
 function getStats$1 (src, dest, opts) {
   const statFunc = opts.dereference
-    ? (file) => fs$h.stat(file, { bigint: true })
-    : (file) => fs$h.lstat(file, { bigint: true });
+    ? (file) => fs$f.stat(file, { bigint: true })
+    : (file) => fs$f.lstat(file, { bigint: true });
   return Promise.all([
     statFunc(src),
     statFunc(dest).catch(err => {
@@ -6696,8 +6693,8 @@ function getStats$1 (src, dest, opts) {
 function getStatsSync (src, dest, opts) {
   let destStat;
   const statFunc = opts.dereference
-    ? (file) => fs$h.statSync(file, { bigint: true })
-    : (file) => fs$h.lstatSync(file, { bigint: true });
+    ? (file) => fs$f.statSync(file, { bigint: true })
+    : (file) => fs$f.lstatSync(file, { bigint: true });
   const srcStat = statFunc(src);
   try {
     destStat = statFunc(dest);
@@ -6712,8 +6709,8 @@ async function checkPaths (src, dest, funcName, opts) {
   const { srcStat, destStat } = await getStats$1(src, dest, opts);
   if (destStat) {
     if (areIdentical$2(srcStat, destStat)) {
-      const srcBaseName = path$k.basename(src);
-      const destBaseName = path$k.basename(dest);
+      const srcBaseName = path$g.basename(src);
+      const destBaseName = path$g.basename(dest);
       if (funcName === 'move' &&
         srcBaseName !== destBaseName &&
         srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
@@ -6741,8 +6738,8 @@ function checkPathsSync (src, dest, funcName, opts) {
 
   if (destStat) {
     if (areIdentical$2(srcStat, destStat)) {
-      const srcBaseName = path$k.basename(src);
-      const destBaseName = path$k.basename(dest);
+      const srcBaseName = path$g.basename(src);
+      const destBaseName = path$g.basename(dest);
       if (funcName === 'move' &&
         srcBaseName !== destBaseName &&
         srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
@@ -6769,13 +6766,13 @@ function checkPathsSync (src, dest, funcName, opts) {
 // checks the src and dest inodes. It starts from the deepest
 // parent and stops once it reaches the src parent or the root path.
 async function checkParentPaths (src, srcStat, dest, funcName) {
-  const srcParent = path$k.resolve(path$k.dirname(src));
-  const destParent = path$k.resolve(path$k.dirname(dest));
-  if (destParent === srcParent || destParent === path$k.parse(destParent).root) return
+  const srcParent = path$g.resolve(path$g.dirname(src));
+  const destParent = path$g.resolve(path$g.dirname(dest));
+  if (destParent === srcParent || destParent === path$g.parse(destParent).root) return
 
   let destStat;
   try {
-    destStat = await fs$h.stat(destParent, { bigint: true });
+    destStat = await fs$f.stat(destParent, { bigint: true });
   } catch (err) {
     if (err.code === 'ENOENT') return
     throw err
@@ -6789,12 +6786,12 @@ async function checkParentPaths (src, srcStat, dest, funcName) {
 }
 
 function checkParentPathsSync (src, srcStat, dest, funcName) {
-  const srcParent = path$k.resolve(path$k.dirname(src));
-  const destParent = path$k.resolve(path$k.dirname(dest));
-  if (destParent === srcParent || destParent === path$k.parse(destParent).root) return
+  const srcParent = path$g.resolve(path$g.dirname(src));
+  const destParent = path$g.resolve(path$g.dirname(dest));
+  if (destParent === srcParent || destParent === path$g.parse(destParent).root) return
   let destStat;
   try {
-    destStat = fs$h.statSync(destParent, { bigint: true });
+    destStat = fs$f.statSync(destParent, { bigint: true });
   } catch (err) {
     if (err.code === 'ENOENT') return
     throw err
@@ -6812,8 +6809,8 @@ function areIdentical$2 (srcStat, destStat) {
 // return true if dest is a subdir of src, otherwise false.
 // It only checks the path strings.
 function isSrcSubdir (src, dest) {
-  const srcArr = path$k.resolve(src).split(path$k.sep).filter(i => i);
-  const destArr = path$k.resolve(dest).split(path$k.sep).filter(i => i);
+  const srcArr = path$g.resolve(src).split(path$g.sep).filter(i => i);
+  const destArr = path$g.resolve(dest).split(path$g.sep).filter(i => i);
   return srcArr.every((cur, i) => destArr[i] === cur)
 }
 
@@ -6833,8 +6830,8 @@ var stat$4 = {
   areIdentical: areIdentical$2
 };
 
-const fs$g = fs$m;
-const path$j = require$$1;
+const fs$e = fs$k;
+const path$f = require$$1;
 const { mkdirs: mkdirs$1 } = mkdirs$2;
 const { pathExists: pathExists$5 } = pathExists_1;
 const { utimesMillis } = utimes;
@@ -6866,7 +6863,7 @@ async function copy$2 (src, dest, opts = {}) {
   if (!include) return
 
   // check if the parent of dest exists, and create it if it doesn't exist
-  const destParent = path$j.dirname(dest);
+  const destParent = path$f.dirname(dest);
   const dirExists = await pathExists$5(destParent);
   if (!dirExists) {
     await mkdirs$1(destParent);
@@ -6881,7 +6878,7 @@ async function runFilter (src, dest, opts) {
 }
 
 async function getStatsAndPerformCopy (destStat, src, dest, opts) {
-  const statFn = opts.dereference ? fs$g.stat : fs$g.lstat;
+  const statFn = opts.dereference ? fs$e.stat : fs$e.lstat;
   const srcStat = await statFn(src);
 
   if (srcStat.isDirectory()) return onDir$1(srcStat, destStat, src, dest, opts)
@@ -6902,7 +6899,7 @@ async function onFile$1 (srcStat, destStat, src, dest, opts) {
   if (!destStat) return copyFile$1(srcStat, src, dest, opts)
 
   if (opts.overwrite) {
-    await fs$g.unlink(dest);
+    await fs$e.unlink(dest);
     return copyFile$1(srcStat, src, dest, opts)
   }
   if (opts.errorOnExist) {
@@ -6911,7 +6908,7 @@ async function onFile$1 (srcStat, destStat, src, dest, opts) {
 }
 
 async function copyFile$1 (srcStat, src, dest, opts) {
-  await fs$g.copyFile(src, dest);
+  await fs$e.copyFile(src, dest);
   if (opts.preserveTimestamps) {
     // Make sure the file is writable before setting the timestamp
     // otherwise open fails with EPERM when invoked with 'r+'
@@ -6925,11 +6922,11 @@ async function copyFile$1 (srcStat, src, dest, opts) {
     // Note that The initial srcStat.atime cannot be trusted
     // because it is modified by the read(2) system call
     // (See https://nodejs.org/api/fs.html#fs_stat_time_values)
-    const updatedSrcStat = await fs$g.stat(src);
+    const updatedSrcStat = await fs$e.stat(src);
     await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
   }
 
-  return fs$g.chmod(dest, srcStat.mode)
+  return fs$e.chmod(dest, srcStat.mode)
 }
 
 function fileIsNotWritable$1 (srcMode) {
@@ -6937,21 +6934,21 @@ function fileIsNotWritable$1 (srcMode) {
 }
 
 function makeFileWritable$1 (dest, srcMode) {
-  return fs$g.chmod(dest, srcMode | 0o200)
+  return fs$e.chmod(dest, srcMode | 0o200)
 }
 
 async function onDir$1 (srcStat, destStat, src, dest, opts) {
   // the dest directory might not exist, create it
   if (!destStat) {
-    await fs$g.mkdir(dest);
+    await fs$e.mkdir(dest);
   }
 
   const promises = [];
 
   // loop through the files in the current directory to copy everything
-  for await (const item of await fs$g.opendir(src)) {
-    const srcItem = path$j.join(src, item.name);
-    const destItem = path$j.join(dest, item.name);
+  for await (const item of await fs$e.opendir(src)) {
+    const srcItem = path$f.join(src, item.name);
+    const destItem = path$f.join(dest, item.name);
 
     promises.push(
       runFilter(srcItem, destItem, opts).then(include => {
@@ -6970,31 +6967,31 @@ async function onDir$1 (srcStat, destStat, src, dest, opts) {
   await Promise.all(promises);
 
   if (!destStat) {
-    await fs$g.chmod(dest, srcStat.mode);
+    await fs$e.chmod(dest, srcStat.mode);
   }
 }
 
 async function onLink$1 (destStat, src, dest, opts) {
-  let resolvedSrc = await fs$g.readlink(src);
+  let resolvedSrc = await fs$e.readlink(src);
   if (opts.dereference) {
-    resolvedSrc = path$j.resolve(process.cwd(), resolvedSrc);
+    resolvedSrc = path$f.resolve(process.cwd(), resolvedSrc);
   }
   if (!destStat) {
-    return fs$g.symlink(resolvedSrc, dest)
+    return fs$e.symlink(resolvedSrc, dest)
   }
 
   let resolvedDest = null;
   try {
-    resolvedDest = await fs$g.readlink(dest);
+    resolvedDest = await fs$e.readlink(dest);
   } catch (e) {
     // dest exists and is a regular file or directory,
     // Windows may throw UNKNOWN error. If dest already exists,
     // fs throws error anyway, so no need to guard against it here.
-    if (e.code === 'EINVAL' || e.code === 'UNKNOWN') return fs$g.symlink(resolvedSrc, dest)
+    if (e.code === 'EINVAL' || e.code === 'UNKNOWN') return fs$e.symlink(resolvedSrc, dest)
     throw e
   }
   if (opts.dereference) {
-    resolvedDest = path$j.resolve(process.cwd(), resolvedDest);
+    resolvedDest = path$f.resolve(process.cwd(), resolvedDest);
   }
   if (stat$3.isSrcSubdir(resolvedSrc, resolvedDest)) {
     throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`)
@@ -7008,14 +7005,14 @@ async function onLink$1 (destStat, src, dest, opts) {
   }
 
   // copy the link
-  await fs$g.unlink(dest);
-  return fs$g.symlink(resolvedSrc, dest)
+  await fs$e.unlink(dest);
+  return fs$e.symlink(resolvedSrc, dest)
 }
 
 var copy_1 = copy$2;
 
-const fs$f = gracefulFs;
-const path$i = require$$1;
+const fs$d = gracefulFs;
+const path$e = require$$1;
 const mkdirsSync$1 = mkdirs$2.mkdirsSync;
 const utimesMillisSync = utimes.utimesMillisSync;
 const stat$2 = stat$4;
@@ -7041,13 +7038,13 @@ function copySync$1 (src, dest, opts) {
   const { srcStat, destStat } = stat$2.checkPathsSync(src, dest, 'copy', opts);
   stat$2.checkParentPathsSync(src, srcStat, dest, 'copy');
   if (opts.filter && !opts.filter(src, dest)) return
-  const destParent = path$i.dirname(dest);
-  if (!fs$f.existsSync(destParent)) mkdirsSync$1(destParent);
+  const destParent = path$e.dirname(dest);
+  if (!fs$d.existsSync(destParent)) mkdirsSync$1(destParent);
   return getStats(destStat, src, dest, opts)
 }
 
 function getStats (destStat, src, dest, opts) {
-  const statSync = opts.dereference ? fs$f.statSync : fs$f.lstatSync;
+  const statSync = opts.dereference ? fs$d.statSync : fs$d.lstatSync;
   const srcStat = statSync(src);
 
   if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts)
@@ -7067,7 +7064,7 @@ function onFile (srcStat, destStat, src, dest, opts) {
 
 function mayCopyFile (srcStat, src, dest, opts) {
   if (opts.overwrite) {
-    fs$f.unlinkSync(dest);
+    fs$d.unlinkSync(dest);
     return copyFile(srcStat, src, dest, opts)
   } else if (opts.errorOnExist) {
     throw new Error(`'${dest}' already exists`)
@@ -7075,7 +7072,7 @@ function mayCopyFile (srcStat, src, dest, opts) {
 }
 
 function copyFile (srcStat, src, dest, opts) {
-  fs$f.copyFileSync(src, dest);
+  fs$d.copyFileSync(src, dest);
   if (opts.preserveTimestamps) handleTimestamps(srcStat.mode, src, dest);
   return setDestMode(dest, srcStat.mode)
 }
@@ -7097,14 +7094,14 @@ function makeFileWritable (dest, srcMode) {
 }
 
 function setDestMode (dest, srcMode) {
-  return fs$f.chmodSync(dest, srcMode)
+  return fs$d.chmodSync(dest, srcMode)
 }
 
 function setDestTimestamps (src, dest) {
   // The initial srcStat.atime cannot be trusted
   // because it is modified by the read(2) system call
   // (See https://nodejs.org/api/fs.html#fs_stat_time_values)
-  const updatedSrcStat = fs$f.statSync(src);
+  const updatedSrcStat = fs$d.statSync(src);
   return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime)
 }
 
@@ -7114,13 +7111,13 @@ function onDir (srcStat, destStat, src, dest, opts) {
 }
 
 function mkDirAndCopy (srcMode, src, dest, opts) {
-  fs$f.mkdirSync(dest);
+  fs$d.mkdirSync(dest);
   copyDir(src, dest, opts);
   return setDestMode(dest, srcMode)
 }
 
 function copyDir (src, dest, opts) {
-  const dir = fs$f.opendirSync(src);
+  const dir = fs$d.opendirSync(src);
 
   try {
     let dirent;
@@ -7134,34 +7131,34 @@ function copyDir (src, dest, opts) {
 }
 
 function copyDirItem (item, src, dest, opts) {
-  const srcItem = path$i.join(src, item);
-  const destItem = path$i.join(dest, item);
+  const srcItem = path$e.join(src, item);
+  const destItem = path$e.join(dest, item);
   if (opts.filter && !opts.filter(srcItem, destItem)) return
   const { destStat } = stat$2.checkPathsSync(srcItem, destItem, 'copy', opts);
   return getStats(destStat, srcItem, destItem, opts)
 }
 
 function onLink (destStat, src, dest, opts) {
-  let resolvedSrc = fs$f.readlinkSync(src);
+  let resolvedSrc = fs$d.readlinkSync(src);
   if (opts.dereference) {
-    resolvedSrc = path$i.resolve(process.cwd(), resolvedSrc);
+    resolvedSrc = path$e.resolve(process.cwd(), resolvedSrc);
   }
 
   if (!destStat) {
-    return fs$f.symlinkSync(resolvedSrc, dest)
+    return fs$d.symlinkSync(resolvedSrc, dest)
   } else {
     let resolvedDest;
     try {
-      resolvedDest = fs$f.readlinkSync(dest);
+      resolvedDest = fs$d.readlinkSync(dest);
     } catch (err) {
       // dest exists and is a regular file or directory,
       // Windows may throw UNKNOWN error. If dest already exists,
       // fs throws error anyway, so no need to guard against it here.
-      if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return fs$f.symlinkSync(resolvedSrc, dest)
+      if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return fs$d.symlinkSync(resolvedSrc, dest)
       throw err
     }
     if (opts.dereference) {
-      resolvedDest = path$i.resolve(process.cwd(), resolvedDest);
+      resolvedDest = path$e.resolve(process.cwd(), resolvedDest);
     }
     if (stat$2.isSrcSubdir(resolvedSrc, resolvedDest)) {
       throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`)
@@ -7178,8 +7175,8 @@ function onLink (destStat, src, dest, opts) {
 }
 
 function copyLink (resolvedSrc, dest) {
-  fs$f.unlinkSync(dest);
-  return fs$f.symlinkSync(resolvedSrc, dest)
+  fs$d.unlinkSync(dest);
+  return fs$d.symlinkSync(resolvedSrc, dest)
 }
 
 var copySync_1 = copySync$1;
@@ -7190,15 +7187,15 @@ var copy$1 = {
   copySync: copySync_1
 };
 
-const fs$e = gracefulFs;
+const fs$c = gracefulFs;
 const u$9 = universalify$1.fromCallback;
 
 function remove$2 (path, callback) {
-  fs$e.rm(path, { recursive: true, force: true }, callback);
+  fs$c.rm(path, { recursive: true, force: true }, callback);
 }
 
 function removeSync$1 (path) {
-  fs$e.rmSync(path, { recursive: true, force: true });
+  fs$c.rmSync(path, { recursive: true, force: true });
 }
 
 var remove_1 = {
@@ -7207,32 +7204,32 @@ var remove_1 = {
 };
 
 const u$8 = universalify$1.fromPromise;
-const fs$d = fs$m;
-const path$h = require$$1;
+const fs$b = fs$k;
+const path$d = require$$1;
 const mkdir$3 = mkdirs$2;
 const remove$1 = remove_1;
 
 const emptyDir = u$8(async function emptyDir (dir) {
   let items;
   try {
-    items = await fs$d.readdir(dir);
+    items = await fs$b.readdir(dir);
   } catch {
     return mkdir$3.mkdirs(dir)
   }
 
-  return Promise.all(items.map(item => remove$1.remove(path$h.join(dir, item))))
+  return Promise.all(items.map(item => remove$1.remove(path$d.join(dir, item))))
 });
 
 function emptyDirSync (dir) {
   let items;
   try {
-    items = fs$d.readdirSync(dir);
+    items = fs$b.readdirSync(dir);
   } catch {
     return mkdir$3.mkdirsSync(dir)
   }
 
   items.forEach(item => {
-    item = path$h.join(dir, item);
+    item = path$d.join(dir, item);
     remove$1.removeSync(item);
   });
 }
@@ -7245,27 +7242,27 @@ var empty = {
 };
 
 const u$7 = universalify$1.fromPromise;
-const path$g = require$$1;
-const fs$c = fs$m;
+const path$c = require$$1;
+const fs$a = fs$k;
 const mkdir$2 = mkdirs$2;
 
 async function createFile$1 (file) {
   let stats;
   try {
-    stats = await fs$c.stat(file);
+    stats = await fs$a.stat(file);
   } catch { }
   if (stats && stats.isFile()) return
 
-  const dir = path$g.dirname(file);
+  const dir = path$c.dirname(file);
 
   let dirStats = null;
   try {
-    dirStats = await fs$c.stat(dir);
+    dirStats = await fs$a.stat(dir);
   } catch (err) {
     // if the directory doesn't exist, make it
     if (err.code === 'ENOENT') {
       await mkdir$2.mkdirs(dir);
-      await fs$c.writeFile(file, '');
+      await fs$a.writeFile(file, '');
       return
     } else {
       throw err
@@ -7273,27 +7270,27 @@ async function createFile$1 (file) {
   }
 
   if (dirStats.isDirectory()) {
-    await fs$c.writeFile(file, '');
+    await fs$a.writeFile(file, '');
   } else {
     // parent is not a directory
     // This is just to cause an internal ENOTDIR error to be thrown
-    await fs$c.readdir(dir);
+    await fs$a.readdir(dir);
   }
 }
 
 function createFileSync$1 (file) {
   let stats;
   try {
-    stats = fs$c.statSync(file);
+    stats = fs$a.statSync(file);
   } catch { }
   if (stats && stats.isFile()) return
 
-  const dir = path$g.dirname(file);
+  const dir = path$c.dirname(file);
   try {
-    if (!fs$c.statSync(dir).isDirectory()) {
+    if (!fs$a.statSync(dir).isDirectory()) {
       // parent is not a directory
       // This is just to cause an internal ENOTDIR error to be thrown
-      fs$c.readdirSync(dir);
+      fs$a.readdirSync(dir);
     }
   } catch (err) {
     // If the stat call above failed because the directory doesn't exist, create it
@@ -7301,7 +7298,7 @@ function createFileSync$1 (file) {
     else throw err
   }
 
-  fs$c.writeFileSync(file, '');
+  fs$a.writeFileSync(file, '');
 }
 
 var file$1 = {
@@ -7310,8 +7307,8 @@ var file$1 = {
 };
 
 const u$6 = universalify$1.fromPromise;
-const path$f = require$$1;
-const fs$b = fs$m;
+const path$b = require$$1;
+const fs$9 = fs$k;
 const mkdir$1 = mkdirs$2;
 const { pathExists: pathExists$4 } = pathExists_1;
 const { areIdentical: areIdentical$1 } = stat$4;
@@ -7319,14 +7316,14 @@ const { areIdentical: areIdentical$1 } = stat$4;
 async function createLink$1 (srcpath, dstpath) {
   let dstStat;
   try {
-    dstStat = await fs$b.lstat(dstpath);
+    dstStat = await fs$9.lstat(dstpath);
   } catch {
     // ignore error
   }
 
   let srcStat;
   try {
-    srcStat = await fs$b.lstat(srcpath);
+    srcStat = await fs$9.lstat(srcpath);
   } catch (err) {
     err.message = err.message.replace('lstat', 'ensureLink');
     throw err
@@ -7334,7 +7331,7 @@ async function createLink$1 (srcpath, dstpath) {
 
   if (dstStat && areIdentical$1(srcStat, dstStat)) return
 
-  const dir = path$f.dirname(dstpath);
+  const dir = path$b.dirname(dstpath);
 
   const dirExists = await pathExists$4(dir);
 
@@ -7342,29 +7339,29 @@ async function createLink$1 (srcpath, dstpath) {
     await mkdir$1.mkdirs(dir);
   }
 
-  await fs$b.link(srcpath, dstpath);
+  await fs$9.link(srcpath, dstpath);
 }
 
 function createLinkSync$1 (srcpath, dstpath) {
   let dstStat;
   try {
-    dstStat = fs$b.lstatSync(dstpath);
+    dstStat = fs$9.lstatSync(dstpath);
   } catch {}
 
   try {
-    const srcStat = fs$b.lstatSync(srcpath);
+    const srcStat = fs$9.lstatSync(srcpath);
     if (dstStat && areIdentical$1(srcStat, dstStat)) return
   } catch (err) {
     err.message = err.message.replace('lstat', 'ensureLink');
     throw err
   }
 
-  const dir = path$f.dirname(dstpath);
-  const dirExists = fs$b.existsSync(dir);
-  if (dirExists) return fs$b.linkSync(srcpath, dstpath)
+  const dir = path$b.dirname(dstpath);
+  const dirExists = fs$9.existsSync(dir);
+  if (dirExists) return fs$9.linkSync(srcpath, dstpath)
   mkdir$1.mkdirsSync(dir);
 
-  return fs$b.linkSync(srcpath, dstpath)
+  return fs$9.linkSync(srcpath, dstpath)
 }
 
 var link = {
@@ -7372,8 +7369,8 @@ var link = {
   createLinkSync: createLinkSync$1
 };
 
-const path$e = require$$1;
-const fs$a = fs$m;
+const path$a = require$$1;
+const fs$8 = fs$k;
 const { pathExists: pathExists$3 } = pathExists_1;
 
 const u$5 = universalify$1.fromPromise;
@@ -7401,9 +7398,9 @@ const u$5 = universalify$1.fromPromise;
  */
 
 async function symlinkPaths$1 (srcpath, dstpath) {
-  if (path$e.isAbsolute(srcpath)) {
+  if (path$a.isAbsolute(srcpath)) {
     try {
-      await fs$a.lstat(srcpath);
+      await fs$8.lstat(srcpath);
     } catch (err) {
       err.message = err.message.replace('lstat', 'ensureSymlink');
       throw err
@@ -7415,8 +7412,8 @@ async function symlinkPaths$1 (srcpath, dstpath) {
     }
   }
 
-  const dstdir = path$e.dirname(dstpath);
-  const relativeToDst = path$e.join(dstdir, srcpath);
+  const dstdir = path$a.dirname(dstpath);
+  const relativeToDst = path$a.join(dstdir, srcpath);
 
   const exists = await pathExists$3(relativeToDst);
   if (exists) {
@@ -7427,7 +7424,7 @@ async function symlinkPaths$1 (srcpath, dstpath) {
   }
 
   try {
-    await fs$a.lstat(srcpath);
+    await fs$8.lstat(srcpath);
   } catch (err) {
     err.message = err.message.replace('lstat', 'ensureSymlink');
     throw err
@@ -7435,13 +7432,13 @@ async function symlinkPaths$1 (srcpath, dstpath) {
 
   return {
     toCwd: srcpath,
-    toDst: path$e.relative(dstdir, srcpath)
+    toDst: path$a.relative(dstdir, srcpath)
   }
 }
 
 function symlinkPathsSync$1 (srcpath, dstpath) {
-  if (path$e.isAbsolute(srcpath)) {
-    const exists = fs$a.existsSync(srcpath);
+  if (path$a.isAbsolute(srcpath)) {
+    const exists = fs$8.existsSync(srcpath);
     if (!exists) throw new Error('absolute srcpath does not exist')
     return {
       toCwd: srcpath,
@@ -7449,9 +7446,9 @@ function symlinkPathsSync$1 (srcpath, dstpath) {
     }
   }
 
-  const dstdir = path$e.dirname(dstpath);
-  const relativeToDst = path$e.join(dstdir, srcpath);
-  const exists = fs$a.existsSync(relativeToDst);
+  const dstdir = path$a.dirname(dstpath);
+  const relativeToDst = path$a.join(dstdir, srcpath);
+  const exists = fs$8.existsSync(relativeToDst);
   if (exists) {
     return {
       toCwd: relativeToDst,
@@ -7459,11 +7456,11 @@ function symlinkPathsSync$1 (srcpath, dstpath) {
     }
   }
 
-  const srcExists = fs$a.existsSync(srcpath);
+  const srcExists = fs$8.existsSync(srcpath);
   if (!srcExists) throw new Error('relative srcpath does not exist')
   return {
     toCwd: srcpath,
-    toDst: path$e.relative(dstdir, srcpath)
+    toDst: path$a.relative(dstdir, srcpath)
   }
 }
 
@@ -7472,7 +7469,7 @@ var symlinkPaths_1 = {
   symlinkPathsSync: symlinkPathsSync$1
 };
 
-const fs$9 = fs$m;
+const fs$7 = fs$k;
 const u$4 = universalify$1.fromPromise;
 
 async function symlinkType$1 (srcpath, type) {
@@ -7480,7 +7477,7 @@ async function symlinkType$1 (srcpath, type) {
 
   let stats;
   try {
-    stats = await fs$9.lstat(srcpath);
+    stats = await fs$7.lstat(srcpath);
   } catch {
     return 'file'
   }
@@ -7493,7 +7490,7 @@ function symlinkTypeSync$1 (srcpath, type) {
 
   let stats;
   try {
-    stats = fs$9.lstatSync(srcpath);
+    stats = fs$7.lstatSync(srcpath);
   } catch {
     return 'file'
   }
@@ -7506,8 +7503,8 @@ var symlinkType_1 = {
 };
 
 const u$3 = universalify$1.fromPromise;
-const path$d = require$$1;
-const fs$8 = fs$m;
+const path$9 = require$$1;
+const fs$6 = fs$k;
 
 const { mkdirs, mkdirsSync } = mkdirs$2;
 
@@ -7521,13 +7518,13 @@ const { areIdentical } = stat$4;
 async function createSymlink$1 (srcpath, dstpath, type) {
   let stats;
   try {
-    stats = await fs$8.lstat(dstpath);
+    stats = await fs$6.lstat(dstpath);
   } catch { }
 
   if (stats && stats.isSymbolicLink()) {
     const [srcStat, dstStat] = await Promise.all([
-      fs$8.stat(srcpath),
-      fs$8.stat(dstpath)
+      fs$6.stat(srcpath),
+      fs$6.stat(dstpath)
     ]);
 
     if (areIdentical(srcStat, dstStat)) return
@@ -7536,34 +7533,34 @@ async function createSymlink$1 (srcpath, dstpath, type) {
   const relative = await symlinkPaths(srcpath, dstpath);
   srcpath = relative.toDst;
   const toType = await symlinkType(relative.toCwd, type);
-  const dir = path$d.dirname(dstpath);
+  const dir = path$9.dirname(dstpath);
 
   if (!(await pathExists$2(dir))) {
     await mkdirs(dir);
   }
 
-  return fs$8.symlink(srcpath, dstpath, toType)
+  return fs$6.symlink(srcpath, dstpath, toType)
 }
 
 function createSymlinkSync$1 (srcpath, dstpath, type) {
   let stats;
   try {
-    stats = fs$8.lstatSync(dstpath);
+    stats = fs$6.lstatSync(dstpath);
   } catch { }
   if (stats && stats.isSymbolicLink()) {
-    const srcStat = fs$8.statSync(srcpath);
-    const dstStat = fs$8.statSync(dstpath);
+    const srcStat = fs$6.statSync(srcpath);
+    const dstStat = fs$6.statSync(dstpath);
     if (areIdentical(srcStat, dstStat)) return
   }
 
   const relative = symlinkPathsSync(srcpath, dstpath);
   srcpath = relative.toDst;
   type = symlinkTypeSync(relative.toCwd, type);
-  const dir = path$d.dirname(dstpath);
-  const exists = fs$8.existsSync(dir);
-  if (exists) return fs$8.symlinkSync(srcpath, dstpath, type)
+  const dir = path$9.dirname(dstpath);
+  const exists = fs$6.existsSync(dir);
+  if (exists) return fs$6.symlinkSync(srcpath, dstpath, type)
   mkdirsSync(dir);
-  return fs$8.symlinkSync(srcpath, dstpath, type)
+  return fs$6.symlinkSync(srcpath, dstpath, type)
 }
 
 var symlink = {
@@ -7612,7 +7609,7 @@ let _fs;
 try {
   _fs = gracefulFs;
 } catch (_) {
-  _fs = require$$0$2;
+  _fs = require$$3;
 }
 const universalify = universalify$1;
 const { stringify: stringify$5, stripBom } = utils;
@@ -7708,28 +7705,28 @@ var jsonfile = {
 };
 
 const u$2 = universalify$1.fromPromise;
-const fs$7 = fs$m;
-const path$c = require$$1;
+const fs$5 = fs$k;
+const path$8 = require$$1;
 const mkdir = mkdirs$2;
 const pathExists$1 = pathExists_1.pathExists;
 
 async function outputFile$1 (file, data, encoding = 'utf-8') {
-  const dir = path$c.dirname(file);
+  const dir = path$8.dirname(file);
 
   if (!(await pathExists$1(dir))) {
     await mkdir.mkdirs(dir);
   }
 
-  return fs$7.writeFile(file, data, encoding)
+  return fs$5.writeFile(file, data, encoding)
 }
 
 function outputFileSync$1 (file, ...args) {
-  const dir = path$c.dirname(file);
-  if (!fs$7.existsSync(dir)) {
+  const dir = path$8.dirname(file);
+  if (!fs$5.existsSync(dir)) {
     mkdir.mkdirsSync(dir);
   }
 
-  fs$7.writeFileSync(file, ...args);
+  fs$5.writeFileSync(file, ...args);
 }
 
 var outputFile_1 = {
@@ -7774,8 +7771,8 @@ jsonFile.readJSONSync = jsonFile.readJsonSync;
 
 var json$1 = jsonFile;
 
-const fs$6 = fs$m;
-const path$b = require$$1;
+const fs$4 = fs$k;
+const path$7 = require$$1;
 const { copy } = copy$1;
 const { remove } = remove_1;
 const { mkdirp } = mkdirs$2;
@@ -7790,8 +7787,8 @@ async function move$1 (src, dest, opts = {}) {
   await stat$1.checkParentPaths(src, srcStat, dest, 'move');
 
   // If the parent of dest is not root, make sure it exists before proceeding
-  const destParent = path$b.dirname(dest);
-  const parsedParentPath = path$b.parse(destParent);
+  const destParent = path$7.dirname(dest);
+  const parsedParentPath = path$7.parse(destParent);
   if (parsedParentPath.root !== destParent) {
     await mkdirp(destParent);
   }
@@ -7810,7 +7807,7 @@ async function doRename$1 (src, dest, overwrite, isChangingCase) {
 
   try {
     // Try w/ rename first, and try copy + remove if EXDEV
-    await fs$6.rename(src, dest);
+    await fs$4.rename(src, dest);
   } catch (err) {
     if (err.code !== 'EXDEV') {
       throw err
@@ -7832,8 +7829,8 @@ async function moveAcrossDevice$1 (src, dest, overwrite) {
 
 var move_1 = move$1;
 
-const fs$5 = gracefulFs;
-const path$a = require$$1;
+const fs$3 = gracefulFs;
+const path$6 = require$$1;
 const copySync = copy$1.copySync;
 const removeSync = remove_1.removeSync;
 const mkdirpSync = mkdirs$2.mkdirpSync;
@@ -7845,13 +7842,13 @@ function moveSync (src, dest, opts) {
 
   const { srcStat, isChangingCase = false } = stat.checkPathsSync(src, dest, 'move', opts);
   stat.checkParentPathsSync(src, srcStat, dest, 'move');
-  if (!isParentRoot(dest)) mkdirpSync(path$a.dirname(dest));
+  if (!isParentRoot(dest)) mkdirpSync(path$6.dirname(dest));
   return doRename(src, dest, overwrite, isChangingCase)
 }
 
 function isParentRoot (dest) {
-  const parent = path$a.dirname(dest);
-  const parsedPath = path$a.parse(parent);
+  const parent = path$6.dirname(dest);
+  const parsedPath = path$6.parse(parent);
   return parsedPath.root === parent
 }
 
@@ -7861,13 +7858,13 @@ function doRename (src, dest, overwrite, isChangingCase) {
     removeSync(dest);
     return rename(src, dest, overwrite)
   }
-  if (fs$5.existsSync(dest)) throw new Error('dest already exists.')
+  if (fs$3.existsSync(dest)) throw new Error('dest already exists.')
   return rename(src, dest, overwrite)
 }
 
 function rename (src, dest, overwrite) {
   try {
-    fs$5.renameSync(src, dest);
+    fs$3.renameSync(src, dest);
   } catch (err) {
     if (err.code !== 'EXDEV') throw err
     return moveAcrossDevice(src, dest, overwrite)
@@ -7894,7 +7891,7 @@ var move = {
 
 var lib$1 = {
   // Export promiseified graceful-fs:
-  ...fs$m,
+  ...fs$k,
   // Export extra methods:
   ...copy$1,
   ...empty,
@@ -7962,7 +7959,7 @@ let token;
 let key;
 let root;
 
-var parse$3 = function parse (text, reviver) {
+var parse$1 = function parse (text, reviver) {
     source = String(text);
     parseState = 'start';
     stack = [];
@@ -8523,7 +8520,7 @@ const lexStates = {
         switch (c) {
         case '\\':
             read();
-            buffer += escape$1();
+            buffer += escape();
             return
 
         case '"':
@@ -8678,7 +8675,7 @@ function literal (s) {
     }
 }
 
-function escape$1 () {
+function escape () {
     const c = peek();
     switch (c) {
     case 'b':
@@ -9326,7 +9323,7 @@ var stringify$2 = function stringify (value, replacer, space) {
 };
 
 const JSON5$1 = {
-    parse: parse$3,
+    parse: parse$1,
     stringify: stringify$2,
 };
 
@@ -10097,7 +10094,7 @@ var json = failsafe.extend({
   ]
 });
 
-var core$1 = json;
+var core = json;
 
 var Type$5 = type;
 
@@ -10444,7 +10441,7 @@ var set$1 = new Type('tag:yaml.org,2002:set', {
   construct: constructYamlSet
 });
 
-var _default = core$1.extend({
+var _default = core.extend({
   implicit: [
     timestamp,
     merge
@@ -13165,7 +13162,7 @@ jsYaml.Type                = type;
 jsYaml.Schema              = schema;
 jsYaml.FAILSAFE_SCHEMA     = failsafe;
 jsYaml.JSON_SCHEMA         = json;
-jsYaml.CORE_SCHEMA         = core$1;
+jsYaml.CORE_SCHEMA         = core;
 jsYaml.DEFAULT_SCHEMA      = _default;
 jsYaml.load                = loader.load;
 jsYaml.loadAll             = loader.loadAll;
@@ -17075,7 +17072,7 @@ var distExports = dist.exports;
 
 var toml$1 = {};
 
-var parse$2 = {exports: {}};
+var parse = {exports: {}};
 
 var tomlParser = {exports: {}};
 
@@ -18755,7 +18752,7 @@ function parseAsync (str, opts) {
 
 var parseStream_1 = parseStream;
 
-const stream = require$$0$6;
+const stream = require$$0$5;
 const TOMLParser = tomlParserExports;
 
 function parseStream (stm) {
@@ -18833,12 +18830,12 @@ function parseTransform () {
   })
 }
 
-parse$2.exports = parseString_1;
-parse$2.exports.async = parseAsync_1;
-parse$2.exports.stream = parseStream_1;
-parse$2.exports.prettyError = parsePrettyError;
+parse.exports = parseString_1;
+parse.exports.async = parseAsync_1;
+parse.exports.stream = parseStream_1;
+parse.exports.prettyError = parsePrettyError;
 
-var parseExports = parse$2.exports;
+var parseExports = parse.exports;
 
 var stringify$1 = {exports: {}};
 
@@ -19143,14 +19140,14 @@ var stringifyExports = stringify$1.exports;
 toml$1.parse = parseExports;
 toml$1.stringify = stringifyExports;
 
-const os$5 = require$$0$4;
-const path$9 = require$$1;
+const os$3 = require$$0$3;
+const path$5 = require$$1;
 
 // 配置文件路径
-const CONFIG_FILE$1 = path$9.join(os$5.homedir(), '.ccapi-config.json');
+const CONFIG_FILE$1 = path$5.join(os$3.homedir(), '.ccapi-config.json');
 
 // Claude settings.json中的环境变量键名
-const CLAUDE_ENV_KEYS$5 = {
+const CLAUDE_ENV_KEYS$4 = {
   url: 'ANTHROPIC_BASE_URL',
   key: 'ANTHROPIC_API_KEY',
   token: 'ANTHROPIC_AUTH_TOKEN',
@@ -19198,13 +19195,13 @@ const SUCCESS_MESSAGES$1 = SUCCESS_KEYS;
 
 var constants = {
   CONFIG_FILE: CONFIG_FILE$1,
-  CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$5,
+  CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$4,
   ERROR_MESSAGES: ERROR_MESSAGES$5,
   SUCCESS_MESSAGES: SUCCESS_MESSAGES$1
 };
 
-const fs$4 = lib$1;
-const path$8 = require$$1;
+const fs$2 = lib$1;
+const path$4 = require$$1;
 const JSON5 = require$$2.default;
 const yaml = jsYaml;
 const { load: tomlLoad } = distExports;
@@ -19227,24 +19224,24 @@ const SUPPORTED_FORMATS = {
  * 根据文件扩展名获取格式类型
  */
 function getConfigFormat(filePath) {
-  const ext = path$8.extname(filePath).toLowerCase();
+  const ext = path$4.extname(filePath).toLowerCase();
   return SUPPORTED_FORMATS[ext] || null
 }
 
 /**
  * 读取配置文件（支持 JSON、JSON5、JSONC、YAML、TOML 格式）
  */
-async function readConfigFile$9(filePath) {
+async function readConfigFile$5(filePath) {
   try {
-    if (!(await fs$4.pathExists(filePath))) {
+    if (!(await fs$2.pathExists(filePath))) {
       throw new Error('File does not exist: ' + filePath)
     }
 
-    const content = await fs$4.readFile(filePath, 'utf8');
+    const content = await fs$2.readFile(filePath, 'utf8');
     const format = getConfigFormat(filePath);
 
     if (!format) {
-      throw new Error('Unsupported configuration file format: ' + path$8.extname(filePath))
+      throw new Error('Unsupported configuration file format: ' + path$4.extname(filePath))
     }
 
     let parsed;
@@ -19286,7 +19283,7 @@ async function readConfigFile$9(filePath) {
 async function writeConfigFile$4(filePath, data) {
   try {
     // 确保目录存在
-    await fs$4.ensureDir(path$8.dirname(filePath));
+    await fs$2.ensureDir(path$4.dirname(filePath));
 
     const format = getConfigFormat(filePath);
     let content;
@@ -19309,10 +19306,10 @@ async function writeConfigFile$4(filePath, data) {
         content = TOML.stringify(data);
         break
       default:
-        throw new Error('Unsupported configuration file format: ' + path$8.extname(filePath))
+        throw new Error('Unsupported configuration file format: ' + path$4.extname(filePath))
     }
 
-    await fs$4.writeFile(filePath, content, 'utf8');
+    await fs$2.writeFile(filePath, content, 'utf8');
   } catch (error) {
     throw new Error('Failed to write file: ' + filePath + ' - ' + error.message)
   }
@@ -19327,31 +19324,31 @@ function validateApiConfigPath$1(filePath) {
   }
 
   // 检查是否为绝对路径
-  if (!path$8.isAbsolute(filePath)) {
+  if (!path$4.isAbsolute(filePath)) {
     return false
   }
 
   // 检查文件扩展名 - 支持更多格式
-  const ext = path$8.extname(filePath).toLowerCase();
+  const ext = path$4.extname(filePath).toLowerCase();
   const allowedExtensions = Object.keys(SUPPORTED_FORMATS);
 
   return allowedExtensions.includes(ext)
 }
 
 var configReader = {
-  readConfigFile: readConfigFile$9,
+  readConfigFile: readConfigFile$5,
   writeConfigFile: writeConfigFile$4,
   validateApiConfigPath: validateApiConfigPath$1};
 
-const fs$3 = lib$1;
-const path$7 = require$$1;
+const fs$1 = lib$1;
+const path$3 = require$$1;
 const { readConfigFile: readFile, writeConfigFile: writeFile } = configReader;
 const { ERROR_MESSAGES: ERROR_MESSAGES$3 } = constants;
 
 /**
  * 读取配置文件
  */
-async function readConfigFile$8(filePath) {
+async function readConfigFile$4(filePath) {
   return await readFile(filePath)
 }
 
@@ -19368,7 +19365,7 @@ async function writeConfigFile$3(filePath, data) {
 async function backupFile$2(filePath) {
   try {
     const backupPath = `${filePath}.backup`;
-    await fs$3.copy(filePath, backupPath);
+    await fs$1.copy(filePath, backupPath);
     return backupPath
   } catch (error) {
     throw new Error(`Failed to backup file: ${error.message}`)
@@ -19379,7 +19376,7 @@ async function backupFile$2(filePath) {
  * 检查文件是否存在
  */
 async function fileExists$3(filePath) {
-  return await fs$3.pathExists(filePath)
+  return await fs$1.pathExists(filePath)
 }
 
 /**
@@ -19387,7 +19384,7 @@ async function fileExists$3(filePath) {
  */
 async function readFileContent$1(filePath) {
   try {
-    return await fs$3.readFile(filePath, 'utf8')
+    return await fs$1.readFile(filePath, 'utf8')
   } catch (error) {
     throw new Error(`Failed to read file: ${error.message}`)
   }
@@ -19399,8 +19396,8 @@ async function readFileContent$1(filePath) {
 async function writeFileContent$1(filePath, content) {
   try {
     // 确保目录存在
-    await fs$3.ensureDir(path$7.dirname(filePath));
-    await fs$3.writeFile(filePath, content, 'utf8');
+    await fs$1.ensureDir(path$3.dirname(filePath));
+    await fs$1.writeFile(filePath, content, 'utf8');
   } catch (error) {
     throw new Error(`Failed to write file: ${error.message}`)
   }
@@ -19415,17 +19412,17 @@ function validatePath$1(filePath) {
   }
 
   // 检查是否为绝对路径
-  if (!path$7.isAbsolute(filePath)) {
+  if (!path$3.isAbsolute(filePath)) {
     return false
   }
 
   // 检查文件扩展名
-  const ext = path$7.extname(filePath).toLowerCase();
+  const ext = path$3.extname(filePath).toLowerCase();
   return ext === '.json'
 }
 
 var file = {
-  readConfigFile: readConfigFile$8,
+  readConfigFile: readConfigFile$4,
   writeConfigFile: writeConfigFile$3,
   readFileContent: readFileContent$1,
   writeFileContent: writeFileContent$1,
@@ -19434,17 +19431,17 @@ var file = {
   validatePath: validatePath$1
 };
 
-const { readConfigFile: readConfigFile$7, writeConfigFile: writeConfigFile$2, fileExists: fileExists$2 } = file;
+const { readConfigFile: readConfigFile$3, writeConfigFile: writeConfigFile$2, fileExists: fileExists$2 } = file;
 const { CONFIG_FILE, ERROR_MESSAGES: ERROR_MESSAGES$2 } = constants;
 /**
  * 读取用户配置
  */
-async function readConfig$5() {
+async function readConfig$3() {
   try {
     if (!(await fileExists$2(CONFIG_FILE))) {
       return { lang: 'zh' } // 默认中文
     }
-    const config = await readConfigFile$7(CONFIG_FILE);
+    const config = await readConfigFile$3(CONFIG_FILE);
     // 确保lang字段存在，默认为中文
     if (!config.lang) {
       config.lang = 'zh';
@@ -19470,7 +19467,7 @@ async function writeConfig$1(config) {
  * 获取settings.json路径
  */
 async function getSettingsPath$1() {
-  const config = await readConfig$5();
+  const config = await readConfig$3();
   return config.settingsPath || null
 }
 
@@ -19478,7 +19475,7 @@ async function getSettingsPath$1() {
  * 获取api.json路径
  */
 async function getApiConfigPath$1() {
-  const config = await readConfig$5();
+  const config = await readConfig$3();
   return config.apiConfigPath || null
 }
 
@@ -19486,7 +19483,7 @@ async function getApiConfigPath$1() {
  * 设置settings.json路径
  */
 async function setSettingsPath$1(path) {
-  const config = await readConfig$5();
+  const config = await readConfig$3();
   config.settingsPath = path;
   await writeConfig$1(config);
 }
@@ -19495,7 +19492,7 @@ async function setSettingsPath$1(path) {
  * 设置api.json路径
  */
 async function setApiConfigPath$1(path) {
-  const config = await readConfig$5();
+  const config = await readConfig$3();
   config.apiConfigPath = path;
   await writeConfig$1(config);
 }
@@ -19503,8 +19500,8 @@ async function setApiConfigPath$1(path) {
 /**
  * 验证配置完整性
  */
-async function validateConfig$7() {
-  const config = await readConfig$5();
+async function validateConfig$3() {
+  const config = await readConfig$3();
 
   if (!config.settingsPath) {
     throw new Error('settings.json file path not set')
@@ -19526,13 +19523,13 @@ async function validateConfig$7() {
 }
 
 var config = {
-  readConfig: readConfig$5,
+  readConfig: readConfig$3,
   writeConfig: writeConfig$1,
   getSettingsPath: getSettingsPath$1,
   getApiConfigPath: getApiConfigPath$1,
   setSettingsPath: setSettingsPath$1,
   setApiConfigPath: setApiConfigPath$1,
-  validateConfig: validateConfig$7
+  validateConfig: validateConfig$3
 };
 
 // 中文语言文件
@@ -19555,27 +19552,13 @@ var zh = {
       description: '显示当前API配置列表',
       alias: '列举'
     },
-    use: {
+    claude: {
       description: '切换到指定的API配置',
       urlOption: '指定要切换的URL索引（从1开始，仅对数组类型url有效）',
       keyOption: '指定要切换的Key索引（从1开始，仅对数组类型key有效）',
       tokenOption: '指定要切换的Token索引（从1开始，仅对数组类型token有效）',
       modelOption: '指定要切换的模型索引（从1开始，仅对数组类型model有效）',
       fastOption: '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）'
-    },
-    ping: {
-      description: '测试API配置中所有URL的网络延迟'
-    },
-    test: {
-      description: '测试API配置在Claude Code中是否可用',
-      tokenOption: '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）',
-      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）',
-      cliOption: '使用Claude Code CLI方式进行测试，而非默认的接口模拟方式'
-    },
-    auto: {
-      description: '自动测试API配置并切换到最优配置',
-      pingOption: '使用ping测试延迟结果选择最优配置切换（快速且只验证网站URL延迟）',
-      testOption: '使用test测试结果选择最优配置切换（稍慢但验证真实API可用性）'
     },
     update: {
       description: '更新ccapi到最新版本'
@@ -19660,35 +19643,6 @@ var zh = {
     Token: 'Token'
   },
 
-  // 测试相关
-  test: {
-    TESTING: '正在测试',
-    TESTING_CONFIG: '正在测试配置',
-    TEST_RESULTS: '测试结果',
-    LATENCY_TEST: '延迟测试',
-    API_TEST: 'API测试',
-    SUCCESS: '成功',
-    FAILED: '失败',
-    ERROR: '错误',
-    TIMEOUT: '超时',
-    BEST_CONFIG: '最佳配置',
-    AUTO_SWITCH_SUCCESS: '自动切换成功',
-    NO_AVAILABLE_CONFIG: '没有可用的配置',
-    GET_CLAUDE_PATH_FAILED: 'Claude Code路径获取失败:',
-    CLAUDE_NOT_FOUND: 'Claude Code可执行文件未找到，请确保已安装 Claude Code',
-    REQUEST_FAILED: '请求失败',
-    MISSING_AUTH: '缺少认证信息 (key 或 token)',
-    TEST_RESULTS_TITLE: '测试结果(按响应延迟从低到高): ',
-    BEST_ROUTE: '最优路线',
-    CONFIG_FORMAT_ERROR: 'api配置文件格式不正确',
-    CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    TESTING_CONFIGS: '正在测试配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
-    TEST_COMPLETE: '有效性测试完成, 此结果代表能否在Claude Code中使用!',
-    TEST_FAILED: '有效性测试失败:',
-    VALID: '有效',
-    INVALID: '无效',
-    PROGRESS_COMPLETED: '✓ 已完成{0}/{1}个URL测试，下一批次测试中...'
-  },
 
   // 环境变量相关
   env: {
@@ -19732,27 +19686,10 @@ var zh = {
     ENV_CMD_FAILED: '环境变量命令执行失败:'
   },
 
-  // Ping 相关
-  ping: {
-    LATENCY_TEST_RESULTS: '延迟测试结果(按厂商URL延迟从低到高):',
-    BEST_ROUTE: '最优路线: {0}',
-    CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    AVAILABLE_CONFIGS: '可用配置:',
-    TESTING_CONFIGS: '正在测试配置URL延迟...',
-    LATENCY_TEST_COMPLETE: 'URL延迟测试完成! 成功: {0}/{1}',
-    LATENCY_TEST_FAILED: 'URL延迟测试失败:',
-    CONFIG_FORMAT_ERROR: 'api配置文件格式不正确'
-  },
 
-  // 自动选择相关
-  auto: {
-    NO_CONFIGS_AVAILABLE: '暂无可用的配置进行测试',
-    FOUND_OPTIMAL_CONFIG: '已找到最优配置,开始切换中...',
-    AUTO_SWITCH_FAILED: '自动切换配置失败:'
-  },
 
-  // 使用配置相关
-  use: {
+  // Claude 配置相关
+  claude: {
     API_FORMAT_ERROR: 'api.json文件格式不正确',
     SETTINGS_FORMAT_ERROR: 'settings.json文件格式不正确',
     SWITCHING_CONFIG: '正在切换配置: {0}',
@@ -19880,28 +19817,13 @@ var en = {
       description: 'Display current API configuration list',
       alias: 'list'
     },
-    use: {
+    claude: {
       description: 'Switch to specified API configuration',
       urlOption: 'Specify URL index to switch to (starting from 1, only valid for array type url)',
       keyOption: 'Specify Key index to switch to (starting from 1, only valid for array type key)',
       tokenOption: 'Specify Token index to switch to (starting from 1, only valid for array type token)',
       modelOption: 'Specify model index to switch to (starting from 1, only valid for array type model)',
       fastOption: 'Specify fast model index to switch to (starting from 1, only valid for array type fast)'
-    },
-    ping: {
-      description: 'Test network latency of all URLs in API configuration'
-    },
-    test: {
-      description: 'Test if API configuration is available in Claude Code',
-      tokenOption: 'Specify Token index to use (starting from 1, only valid when testing single configuration)',
-      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)',
-      cliOption: 'Use Claude Code CLI method for testing instead of default API mock method'
-    },
-    auto: {
-      description: 'Automatically test API configurations and switch to the optimal one',
-      pingOption:
-        'Use ping test latency results to select optimal configuration (fast and only verifies website URL latency)',
-      testOption: 'Use test results to select optimal configuration (slower but verifies real API availability)'
     },
     update: {
       description: 'Update ccapi to latest version'
@@ -19989,36 +19911,6 @@ var en = {
     Token: 'Token'
   },
 
-  // Test related
-  test: {
-    TESTING: 'Testing',
-    TESTING_CONFIG: 'Testing configuration',
-    TEST_RESULTS: 'Test results',
-    LATENCY_TEST: 'Latency test',
-    API_TEST: 'API test',
-    SUCCESS: 'Success',
-    FAILED: 'Failed',
-    ERROR: 'Error',
-    TIMEOUT: 'Timeout',
-    BEST_CONFIG: 'Best configuration',
-    AUTO_SWITCH_SUCCESS: 'Auto switch successful',
-    NO_AVAILABLE_CONFIG: 'No available configuration',
-    GET_CLAUDE_PATH_FAILED: 'Failed to get Claude path:',
-    CLAUDE_NOT_FOUND: 'Claude executable not found, please ensure Claude Code is installed',
-    REQUEST_FAILED: 'Request failed',
-    MISSING_AUTH: 'Missing authentication (key or token)',
-    TEST_RESULTS_TITLE: 'Test results (by response latency from low to high): ',
-    BEST_ROUTE: 'Best route',
-    CONFIG_FORMAT_ERROR: 'api configuration file format error',
-    CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
-    TESTING_CONFIGS:
-      'Testing URL for availability in Claude Code (may take a while, please be patient)...',
-    TEST_COMPLETE: 'Validity test completed, this result shows whether it can be used in Claude Code!',
-    TEST_FAILED: 'Validity test failed:',
-    VALID: 'Valid',
-    INVALID: 'Invalid',
-    PROGRESS_COMPLETED: '✓ Completed {0}/{1} URL tests, continuing with next batch...'
-  },
 
   // Environment variable related
   env: {
@@ -20062,27 +19954,10 @@ var en = {
     ENV_CMD_FAILED: 'Environment variable command execution failed:'
   },
 
-  // Ping related
-  ping: {
-    LATENCY_TEST_RESULTS: 'Latency test results (by vendor URL latency from low to high):',
-    BEST_ROUTE: 'Best route: {0}',
-    CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
-    AVAILABLE_CONFIGS: 'Available configurations:',
-    TESTING_CONFIGS: 'Testing URL latency...',
-    LATENCY_TEST_COMPLETE: 'URL latency test complete! Success: {0}/{1}',
-    LATENCY_TEST_FAILED: 'URL latency test failed:',
-    CONFIG_FORMAT_ERROR: 'api configuration file format error'
-  },
 
-  // Auto selection related
-  auto: {
-    NO_CONFIGS_AVAILABLE: 'No configurations available for testing',
-    FOUND_OPTIMAL_CONFIG: 'Found optimal configuration, switching...',
-    AUTO_SWITCH_FAILED: 'Auto switch configuration failed:'
-  },
 
-  // Use configuration related
-  use: {
+  // Claude configuration related
+  claude: {
     API_FORMAT_ERROR: 'api.json file format error',
     SETTINGS_FORMAT_ERROR: 'settings.json file format error',
     SWITCHING_CONFIG: 'Switching configuration: {0}',
@@ -20192,7 +20067,7 @@ var en = {
   }
 };
 
-const { readConfig: readConfig$4, writeConfig } = config;
+const { readConfig: readConfig$2, writeConfig } = config;
 const zhMessages = zh;
 const enMessages = en;
 
@@ -20216,7 +20091,7 @@ async function getCurrentLang$1() {
   }
   
   try {
-    const config = await readConfig$4();
+    const config = await readConfig$2();
     currentLang = config.lang || 'zh'; // 默认中文
     return currentLang
   } catch (error) {
@@ -20233,10 +20108,10 @@ async function getCurrentLang$1() {
 async function setLang$1(lang) {
   if (!SUPPORTED_LANGUAGES[lang]) {
     const supportedList = Object.keys(SUPPORTED_LANGUAGES).map(k => `${k} (${SUPPORTED_LANGUAGES[k]})`).join(', ');
-    throw new Error(await t$f('utils.UNSUPPORTED_LANGUAGE', supportedList))
+    throw new Error(await t$a('utils.UNSUPPORTED_LANGUAGE', supportedList))
   }
   
-  const config = await readConfig$4();
+  const config = await readConfig$2();
   config.lang = lang;
   await writeConfig(config);
   
@@ -20275,7 +20150,7 @@ function loadMessages(lang = 'zh') {
  * @param {...any} args 参数，用于字符串替换 {0}, {1} 等
  * @returns {string} 翻译后的文本
  */
-async function t$f(key, ...args) {
+async function t$a(key, ...args) {
   try {
     // 获取当前语言和消息
     const lang = await getCurrentLang$1();
@@ -20338,30 +20213,30 @@ function isLanguageSupported$1(lang) {
 var i18n = {
   getCurrentLang: getCurrentLang$1,
   setLang: setLang$1,
-  t: t$f,
+  t: t$a,
   getSupportedLanguages: getSupportedLanguages$1,
   isLanguageSupported: isLanguageSupported$1};
 
-const chalk$d = source$1;
+const chalk$9 = source$1;
 const packageJson$2 = require$$2$1;
 
 /**
  * 显示版本信息
  */
 async function versionCommand$1() {
-  console.log(chalk$d.green.bold(`${packageJson$2.name} v${packageJson$2.version}`));
+  console.log(chalk$9.green.bold(`${packageJson$2.name} v${packageJson$2.version}`));
 }
 
 var version = versionCommand$1;
 
 const { validatePath } = file;
 const { validateApiConfigPath } = configReader;
-const { t: t$e } = i18n;
+const { t: t$9 } = i18n;
 
 /**
  * 验证API配置数据结构
  */
-function validateApiConfig$5(apiConfig) {
+function validateApiConfig$2(apiConfig) {
   if (!apiConfig) {
     return false
   }
@@ -20386,7 +20261,7 @@ function validateApiConfig$5(apiConfig) {
 /**
  * 验证settings.json结构
  */
-function validateSettingsConfig$3(settings) {
+function validateSettingsConfig$2(settings) {
   if (!settings || typeof settings !== 'object') {
     return false
   }
@@ -20424,7 +20299,7 @@ async function validateSetCommand$1(options) {
   if (settings && !validatePath(settings)) {
     return {
       valid: false,
-      error: await t$e('utils.SETTINGS_PATH_FORMAT_ERROR')
+      error: await t$9('utils.SETTINGS_PATH_FORMAT_ERROR')
     }
   }
 
@@ -20432,7 +20307,7 @@ async function validateSetCommand$1(options) {
   if (api && !validateApiConfigPath(api)) {
     return {
       valid: false,
-      error: await t$e('utils.API_PATH_FORMAT_ERROR')
+      error: await t$9('utils.API_PATH_FORMAT_ERROR')
     }
   }
 
@@ -20440,19 +20315,19 @@ async function validateSetCommand$1(options) {
 }
 
 var validator = {
-  validateApiConfig: validateApiConfig$5,
-  validateSettingsConfig: validateSettingsConfig$3,
+  validateApiConfig: validateApiConfig$2,
+  validateSettingsConfig: validateSettingsConfig$2,
   validateConfigName: validateConfigName$2,
   validateSetCommand: validateSetCommand$1
 };
 
-const chalk$c = source$1;
-const os$4 = require$$0$4;
-const path$6 = require$$1;
+const chalk$8 = source$1;
+const os$2 = require$$0$3;
+const path$2 = require$$1;
 const { validateSetCommand } = validator;
 const { setSettingsPath, setApiConfigPath, getSettingsPath, getApiConfigPath } = config;
 const { fileExists: fileExists$1 } = file;
-const { t: t$d } = i18n;
+const { t: t$8 } = i18n;
 
 /**
  * 设置配置文件路径命令
@@ -20462,7 +20337,7 @@ async function setCommand$1(options) {
     const { settings, api } = options;
     // 如果没有提供任何参数，显示当前配置路径
     if (!settings && !api) {
-      console.log(chalk$c.green(await t$d('prompts.CURRENT_CONFIG_PATHS')));
+      console.log(chalk$8.green(await t$8('prompts.CURRENT_CONFIG_PATHS')));
 
       try {
         const currentSettingsPath = await getSettingsPath();
@@ -20470,47 +20345,47 @@ async function setCommand$1(options) {
 
         if (currentSettingsPath) {
           const settingsExists = await fileExists$1(currentSettingsPath);
-          const statusIcon = settingsExists ? chalk$c.green('✓') : chalk$c.red('✗');
-          console.log(`  settings.json: ${statusIcon} ${chalk$c.cyan(currentSettingsPath)}`);
+          const statusIcon = settingsExists ? chalk$8.green('✓') : chalk$8.red('✗');
+          console.log(`  settings.json: ${statusIcon} ${chalk$8.cyan(currentSettingsPath)}`);
           if (!settingsExists) {
             console.log(
-              `    ${chalk$c.yellow((await t$d('prompts.WARNING')) + ': ' + (await t$d('prompts.FILE_NOT_EXISTS')))}`
+              `    ${chalk$8.yellow((await t$8('prompts.WARNING')) + ': ' + (await t$8('prompts.FILE_NOT_EXISTS')))}`
             );
           }
         } else {
-          console.log(`  settings.json: ${chalk$c.yellow(await t$d('prompts.NOT_SET'))}`);
+          console.log(`  settings.json: ${chalk$8.yellow(await t$8('prompts.NOT_SET'))}`);
         }
 
         if (currentApiPath) {
           const apiExists = await fileExists$1(currentApiPath);
-          const statusIcon = apiExists ? chalk$c.green('✓') : chalk$c.red('✗');
-          console.log(`  api: ${statusIcon} ${chalk$c.cyan(currentApiPath)}`);
+          const statusIcon = apiExists ? chalk$8.green('✓') : chalk$8.red('✗');
+          console.log(`  api: ${statusIcon} ${chalk$8.cyan(currentApiPath)}`);
           if (!apiExists) {
             console.log(
-              `    ${chalk$c.yellow((await t$d('prompts.WARNING')) + ': ' + (await t$d('prompts.FILE_NOT_EXISTS')))}`
+              `    ${chalk$8.yellow((await t$8('prompts.WARNING')) + ': ' + (await t$8('prompts.FILE_NOT_EXISTS')))}`
             );
           }
         } else {
-          console.log(`  api: ${chalk$c.yellow(await t$d('prompts.NOT_SET'))}`);
+          console.log(`  api: ${chalk$8.yellow(await t$8('prompts.NOT_SET'))}`);
         }
 
         // 显示codex配置路径
-        const codexConfigPath = path$6.join(os$4.homedir(), '.codex', 'config.toml');
+        const codexConfigPath = path$2.join(os$2.homedir(), '.codex', 'config.toml');
         const codexExists = await fileExists$1(codexConfigPath);
-        const codexStatusIcon = codexExists ? chalk$c.green('✓') : chalk$c.red('✗');
-        console.log(`  codex: ${codexStatusIcon} ${chalk$c.cyan(codexConfigPath)}`);
+        const codexStatusIcon = codexExists ? chalk$8.green('✓') : chalk$8.red('✗');
+        console.log(`  codex: ${codexStatusIcon} ${chalk$8.cyan(codexConfigPath)}`);
         if (!codexExists) {
           console.log(
-            `    ${chalk$c.yellow((await t$d('prompts.WARNING')) + ': ' + (await t$d('prompts.FILE_NOT_EXISTS')))}`
+            `    ${chalk$8.yellow((await t$8('prompts.WARNING')) + ': ' + (await t$8('prompts.FILE_NOT_EXISTS')))}`
           );
         }
 
         console.log();
-        console.log(await t$d('prompts.SET_PATHS_HELP'));
-        console.log(`  ${chalk$c.cyan('ccapi set --settings <path>')} - ${await t$d('prompts.SET_SETTINGS_HELP')}`);
-        console.log(`  ${chalk$c.cyan('ccapi set --api <path>')} - ${await t$d('prompts.SET_API_HELP')}`);
+        console.log(await t$8('prompts.SET_PATHS_HELP'));
+        console.log(`  ${chalk$8.cyan('ccapi set --settings <path>')} - ${await t$8('prompts.SET_SETTINGS_HELP')}`);
+        console.log(`  ${chalk$8.cyan('ccapi set --api <path>')} - ${await t$8('prompts.SET_API_HELP')}`);
       } catch (error) {
-        console.error(chalk$c.red((await t$d('errors.READ_CONFIG_FAILED')) + ':'), error.message);
+        console.error(chalk$8.red((await t$8('errors.READ_CONFIG_FAILED')) + ':'), error.message);
       }
       return
     }
@@ -20519,7 +20394,7 @@ async function setCommand$1(options) {
     const validation = await validateSetCommand(options);
 
     if (!validation.valid) {
-      console.error(chalk$c.red((await t$d('errors.PARAM_ERROR')) + ':'), validation.error);
+      console.error(chalk$8.red((await t$8('errors.PARAM_ERROR')) + ':'), validation.error);
       return
     }
 
@@ -20530,55 +20405,398 @@ async function setCommand$1(options) {
       // 检查文件是否存在
       if (!(await fileExists$1(settings))) {
         console.warn(
-          chalk$c.yellow((await t$d('prompts.WARNING')) + ':'),
-          await t$d('setPaths.SETTINGS_FILE_NOT_EXIST', settings)
+          chalk$8.yellow((await t$8('prompts.WARNING')) + ':'),
+          await t$8('setPaths.SETTINGS_FILE_NOT_EXIST', settings)
         );
-        console.log(await t$d('prompts.PATH_SAVED_ENSURE_EXISTS'));
+        console.log(await t$8('prompts.PATH_SAVED_ENSURE_EXISTS'));
       }
 
       await setSettingsPath(settings);
-      results.push(`settings.json path: ${chalk$c.green(settings)}`);
+      results.push(`settings.json path: ${chalk$8.green(settings)}`);
     }
 
     // 设置api.json路径
     if (api) {
       // 检查文件是否存在
       if (!(await fileExists$1(api))) {
-        console.warn(chalk$c.yellow((await t$d('prompts.WARNING')) + ':'), await t$d('setPaths.API_FILE_NOT_EXIST', api));
-        console.log(await t$d('prompts.PATH_SAVED_ENSURE_EXISTS'));
+        console.warn(chalk$8.yellow((await t$8('prompts.WARNING')) + ':'), await t$8('setPaths.API_FILE_NOT_EXIST', api));
+        console.log(await t$8('prompts.PATH_SAVED_ENSURE_EXISTS'));
       }
 
       await setApiConfigPath(api);
-      results.push(`api path: ${chalk$c.green(api)}`);
+      results.push(`api path: ${chalk$8.green(api)}`);
     }
 
     // 显示结果
-    console.log(chalk$c.blue(await t$d('success.CONFIG_SAVED')));
+    console.log(chalk$8.blue(await t$8('success.CONFIG_SAVED')));
     results.forEach((result) => console.log(`  ${result}`));
   } catch (error) {
-    console.error(chalk$c.red((await t$d('errors.SET_FAILED')) + ':'), error.message);
+    console.error(chalk$8.red((await t$8('errors.SET_FAILED')) + ':'), error.message);
     process.exit(1);
   }
 }
 
 var set = setCommand$1;
 
-const chalk$b = source$1;
-const { validateConfig: validateConfig$6 } = config;
-const { readConfigFile: readConfigFile$6 } = file;
-const { validateApiConfig: validateApiConfig$4, validateSettingsConfig: validateSettingsConfig$2 } = validator;
-const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$4 } = constants;
-const { t: t$c } = i18n;
-const maxText$5 = 30;
+const os$1 = require$$0$3;
+const path$1 = require$$1;
+const fs = lib$1;
+const { exec } = require$$0$2;
+const { promisify } = require$$4$1;
+const chalk$7 = source$1;
+const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$3 } = constants;
+const { t: t$7 } = i18n;
+
+const execAsync = promisify(exec);
+const maxText$3 = 30;
+
+// 配置标识环境变量名
+const CONFIG_IDENTIFIER$1 = 'CCAPI_CURRENT_CONFIG';
+
+/**
+ * 获取当前平台类型
+ */
+async function getPlatformType() {
+  const platform = os$1.platform();
+  if (platform === 'win32') return 'windows'
+  if (platform === 'darwin') return 'mac'
+  if (platform === 'linux') return 'linux'
+
+  throw new Error(await t$7('utils.PLATFORM_NOT_SUPPORTED', platform))
+}
+
+/**
+ * 获取Shell配置文件路径（Mac/Linux）
+ */
+async function getShellConfigPath() {
+  const homeDir = os$1.homedir();
+  const shell = process.env.SHELL || '/bin/bash';
+
+  // 优先级: .zshrc > .bashrc > .bash_profile > .profile
+  const configFiles = [
+    path$1.join(homeDir, '.zshrc'),
+    path$1.join(homeDir, '.bashrc'),
+    path$1.join(homeDir, '.bash_profile'),
+    path$1.join(homeDir, '.profile')
+  ];
+
+  // 如果是zsh，优先使用.zshrc
+  if (shell.includes('zsh')) {
+    return configFiles[0]
+  }
+
+  // 寻找第一个存在的配置文件
+  for (const configFile of configFiles) {
+    if (await fs.pathExists(configFile)) {
+      return configFile
+    }
+  }
+
+  // 如果都不存在，创建对应shell的默认配置文件
+  if (shell.includes('zsh')) {
+    return configFiles[0] // .zshrc
+  }
+  return configFiles[1] // .bashrc
+}
+
+/**
+ * 删除Windows环境变量
+ */
+async function removeWindowsEnvVar(key) {
+  try {
+    // Windows删除环境变量，设置为空值
+    const command = `reg delete "HKEY_CURRENT_USER\\Environment" /v "${key}" /f`;
+    await execAsync(command);
+    return true
+  } catch (error) {
+    // 忽略变量不存在的错误
+    if (error.message.includes('ERROR: The system was unable to find')) {
+      return true
+    }
+    return false
+  }
+}
+
+/**
+ * 设置Unix系统环境变量（Mac/Linux）- 批量设置
+ */
+async function setUnixEnvVars(envVars) {
+  try {
+    const configPath = await getShellConfigPath();
+
+    // 读取现有配置文件内容
+    let content = '';
+    if (await fs.pathExists(configPath)) {
+      content = await fs.readFile(configPath, 'utf8');
+    }
+
+    // CCAPI环境变量标记区域
+    const startMarker = '# CCAPI Environment Variables - START';
+    const endMarker = '# CCAPI Environment Variables - END';
+
+    // 移除旧的CCAPI配置区域
+    const startIndex = content.indexOf(startMarker);
+    const endIndex = content.indexOf(endMarker);
+
+    if (startIndex !== -1 && endIndex !== -1) {
+      content = content.substring(0, startIndex) + content.substring(endIndex + endMarker.length + 1);
+    }
+
+    // 构建新的环境变量区域
+    const envLines = ['', startMarker, ...Object.entries(envVars).map(([k, v]) => `export ${k}="${v}"`), endMarker, ''];
+
+    // 写入配置文件
+    const newContent = content.trim() + '\n' + envLines.join('\n');
+    await fs.writeFile(configPath, newContent);
+
+    return true
+  } catch (error) {
+    console.error(chalk$7.red(await t$7('utils.ENV_SET_FAILED')), error.message);
+    return false
+  }
+}
+
+/**
+ * 设置Windows系统环境变量 - 批量设置
+ */
+async function setWindowsEnvVars(envVars) {
+  try {
+    // Windows需要逐个设置，但我们可以并行执行
+    const promises = Object.entries(envVars).map(async ([key, value]) => {
+      try {
+        const command = `setx "${key}" "${value}"`;
+        await execAsync(command);
+        return { key, success: true }
+      } catch (error) {
+        console.error(chalk$7.red(await t$7('utils.ENV_SET_FAILED_KEY', key)), error.message);
+        return { key, success: false, error: error.message }
+      }
+    });
+
+    const allResults = await Promise.allSettled(promises);
+    let successCount = 0;
+
+    allResults.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value.success) {
+        successCount++;
+      }
+    });
+
+    return successCount === Object.keys(envVars).length
+  } catch (error) {
+    console.error(chalk$7.red(await t$7('utils.ENV_SET_FAILED')), error.message);
+    return false
+  }
+}
+
+/**
+ * 删除Unix系统环境变量（Mac/Linux）
+ */
+async function removeUnixEnvVars() {
+  try {
+    const configPath = await getShellConfigPath();
+
+    if (!(await fs.pathExists(configPath))) {
+      return true
+    }
+
+    const content = await fs.readFile(configPath, 'utf8');
+
+    // CCAPI环境变量标记区域
+    const startMarker = '# CCAPI Environment Variables - START';
+    const endMarker = '# CCAPI Environment Variables - END';
+
+    // 移除CCAPI配置区域
+    const startIndex = content.indexOf(startMarker);
+    const endIndex = content.indexOf(endMarker);
+
+    if (startIndex !== -1 && endIndex !== -1) {
+      const newContent = content.substring(0, startIndex) + content.substring(endIndex + endMarker.length + 1);
+      await fs.writeFile(configPath, newContent.trim() + '\n');
+    }
+
+    return true
+  } catch (error) {
+    console.error(chalk$7.red.bold(await t$7('utils.ENV_DELETE_FAILED')), error.message);
+    return false
+  }
+}
+
+/**
+ * 获取系统中已设置的相关环境变量
+ */
+async function getSystemEnvVars() {
+  const envVars = {};
+
+  // 获取所有CLAUDE_ENV_KEYS相关的环境变量
+  const allKeys = Object.values(CLAUDE_ENV_KEYS$3);
+  allKeys.push(CONFIG_IDENTIFIER$1); // 添加配置标识符
+
+  for (const key of allKeys) {
+    const value = process.env[key];
+    if (value) {
+      envVars[key] = value;
+    }
+  }
+
+  return envVars
+}
+
+/**
+ * 设置配置到系统环境变量
+ */
+async function setSystemEnvVars$2(config, configName, tip = true) {
+  try {
+    const platform = await getPlatformType(); // 这里会抛出不支持平台的错误
+
+    // console.log(await t('claude.SWITCHING_ENV'))
+
+    // 构建所有要设置的环境变量
+    const envVarsToSet = {};
+
+    // 添加配置标识符
+    envVarsToSet[CONFIG_IDENTIFIER$1] = configName;
+
+    // 遍历配置对象，添加相关环境变量
+    for (const [configKey, envKey] of Object.entries(CLAUDE_ENV_KEYS$3)) {
+      if (config[configKey]) {
+        let value = config[configKey];
+
+        // 处理数组类型，取第一个值
+        if (Array.isArray(value)) {
+          value = value[0];
+        }
+
+        envVarsToSet[envKey] = value;
+      }
+    }
+
+    // 根据平台设置环境变量
+    let success = false;
+    if (platform === 'windows') {
+      success = await setWindowsEnvVars(envVarsToSet);
+    } else {
+      success = await setUnixEnvVars(envVarsToSet);
+    }
+
+    if (!tip) return success
+
+    if (success) {
+      // 显示已设置的环境变量
+      console.log();
+      console.log(
+        chalk$7.green.bold(await t$7('utils.ENV_SET_SUCCESS_MSG', configName)),
+        chalk$7.yellow.bold(await t$7('success.RESTART_TERMINAL'))
+      );
+      console.log();
+
+      // 按照CLAUDE_ENV_KEYS的顺序显示环境变量
+      for (const [configKey, envKey] of Object.entries(CLAUDE_ENV_KEYS$3)) {
+        if (envVarsToSet[envKey]) {
+          let displayValue = envVarsToSet[envKey];
+
+          // 对敏感信息进行脱敏处理
+          if (configKey === 'key' || configKey === 'token') {
+            displayValue = displayValue.length > maxText$3 ? displayValue.slice(0, maxText$3) + '...' : displayValue;
+          }
+
+          console.log(`  ${chalk$7.cyan(envKey)}: ${chalk$7.green(displayValue)}`);
+        }
+      }
+      console.log();
+    } else {
+      console.log();
+      console.error(chalk$7.red.bold(await t$7('utils.ENV_SET_FAILED_MSG')));
+    }
+
+    return success
+  } catch (error) {
+    console.error(chalk$7.red(await t$7('utils.ENV_SET_FAILED')), error.message);
+    return false
+  }
+}
+
+/**
+ * 清除系统中的相关环境变量
+ */
+async function clearSystemEnvVars$2() {
+  try {
+    const platform = await getPlatformType(); // 这里会抛出不支持平台的错误
+    // console.log(chalk.green.bold('正在清除系统环境变量...'))
+
+    if (platform === 'windows') {
+      // Windows: 删除注册表中的环境变量
+      const allKeys = Object.values(CLAUDE_ENV_KEYS$3);
+      allKeys.push(CONFIG_IDENTIFIER$1);
+
+      let successCount = 0;
+      for (const key of allKeys) {
+        const success = await removeWindowsEnvVar(key);
+        if (success) successCount++;
+      }
+    } else {
+      // Unix: 删除shell配置文件中的环境变量
+      await removeUnixEnvVars();
+    }
+    console.log(
+      chalk$7.green.bold(await t$7('utils.ENV_CLEAR_SUCCESS')),
+      chalk$7.yellow.bold(await t$7('success.RESTART_TERMINAL'))
+    );
+    return true
+  } catch (error) {
+    console.error(chalk$7.red.bold(await t$7('utils.ENV_CLEAR_FAILED')), error.message);
+    return false
+  }
+}
+
+/**
+ * 获取当前使用的配置名称
+ */
+function getCurrentConfigName$2() {
+  return process.env[CONFIG_IDENTIFIER$1] || null
+}
+
+/**
+ * 检测环境变量设置状态
+ */
+async function checkEnvStatus$2() {
+  const envVars = await getSystemEnvVars();
+  const currentConfig = getCurrentConfigName$2();
+
+  return {
+    hasEnvVars: Object.keys(envVars).length > 1, // 除了CONFIG_IDENTIFIER之外还有其他变量
+    currentConfig,
+    envVars
+  }
+}
+
+var env$1 = {
+  setSystemEnvVars: setSystemEnvVars$2,
+  clearSystemEnvVars: clearSystemEnvVars$2,
+  getCurrentConfigName: getCurrentConfigName$2,
+  checkEnvStatus: checkEnvStatus$2,
+  CONFIG_IDENTIFIER: CONFIG_IDENTIFIER$1
+};
+
+const chalk$6 = source$1;
+const { validateConfig: validateConfig$2, readConfig: readConfig$1 } = config;
+const { readConfigFile: readConfigFile$2, writeConfigFile: writeConfigFile$1, backupFile: backupFile$1 } = file;
+const { validateApiConfig: validateApiConfig$1, validateSettingsConfig: validateSettingsConfig$1, validateConfigName: validateConfigName$1 } = validator;
+const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$2, ERROR_MESSAGES: ERROR_MESSAGES$1, SUCCESS_MESSAGES } = constants;
+const { setSystemEnvVars: setSystemEnvVars$1 } = env$1;
+const { t: t$6 } = i18n;
+
+const maxText$2 = 30;
+
 /**
  * 获取当前使用的配置名称和各字段索引信息
  */
 function getCurrentConfigInfo(settingsData, apiConfig) {
-  const currentUrl = settingsData.env?.[CLAUDE_ENV_KEYS$4.url];
-  const currentKey = settingsData.env?.[CLAUDE_ENV_KEYS$4.key];
-  const currentToken = settingsData.env?.[CLAUDE_ENV_KEYS$4.token];
-  const currentModel = settingsData.env?.[CLAUDE_ENV_KEYS$4.model];
-  const currentFast = settingsData.env?.[CLAUDE_ENV_KEYS$4.fast];
+  const currentUrl = settingsData.env?.[CLAUDE_ENV_KEYS$2.url];
+  const currentKey = settingsData.env?.[CLAUDE_ENV_KEYS$2.key];
+  const currentToken = settingsData.env?.[CLAUDE_ENV_KEYS$2.token];
+  const currentModel = settingsData.env?.[CLAUDE_ENV_KEYS$2.model];
+  const currentFast = settingsData.env?.[CLAUDE_ENV_KEYS$2.fast];
 
   // 优先基于 key/token 匹配，如果都没有则基于 URL 匹配
   const matchField = currentKey || currentToken;
@@ -20695,8 +20913,8 @@ function getCurrentConfigInfo(settingsData, apiConfig) {
  */
 async function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
   // 获取本地化标签
-  const localizedLabel = await t$c(`list.${label}`) || label;
-  
+  const localizedLabel = await t$6(`list.${label}`) || label;
+
   if (Array.isArray(fieldValue)) {
     const lines = [`${localizedLabel}:`];
     fieldValue.forEach((value, index) => {
@@ -20705,23 +20923,23 @@ async function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = fa
 
       // 处理敏感信息脱敏
       let displayValue = value;
-      if (isMasked && value && value.length > maxText$5) {
-        displayValue = value.slice(0, maxText$5) + '...';
+      if (isMasked && value && value.length > maxText$2) {
+        displayValue = value.slice(0, maxText$2) + '...';
       }
 
-      const valueDisplay = isCurrentValue ? chalk$b.green.bold(displayValue) : chalk$b.cyan(displayValue);
+      const valueDisplay = isCurrentValue ? chalk$6.green.bold(displayValue) : chalk$6.cyan(displayValue);
       const text = `${prefix}${index + 1}: ${valueDisplay}`;
-      lines.push(isCurrentValue ? chalk$b.green.bold(text) : text);
+      lines.push(isCurrentValue ? chalk$6.green.bold(text) : text);
     });
     return lines
   } else {
     // 字符串情况，保持原样
     let displayValue = fieldValue;
-    if (isMasked && fieldValue && fieldValue.length > maxText$5) {
-      displayValue = fieldValue.slice(0, maxText$5) + '...';
+    if (isMasked && fieldValue && fieldValue.length > maxText$2) {
+      displayValue = fieldValue.slice(0, maxText$2) + '...';
     }
 
-    const valueDisplay = currentIndex === 0 ? chalk$b.green.bold(displayValue) : chalk$b.cyan(displayValue);
+    const valueDisplay = currentIndex === 0 ? chalk$6.green.bold(displayValue) : chalk$6.cyan(displayValue);
     return [`${localizedLabel}: ${valueDisplay}`]
   }
 }
@@ -20731,8 +20949,8 @@ async function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = fa
  */
 async function formatConfigDisplay(name, config, currentInfo) {
   const isCurrent = name === currentInfo.name;
-  const prefix = isCurrent ? chalk$b.green.bold('*') : '  ';
-  const nameDisplay = isCurrent ? chalk$b.green.bold(`[${name}]`) : chalk$b.cyan(`[${name}]`);
+  const prefix = isCurrent ? chalk$6.green.bold('*') : '  ';
+  const nameDisplay = isCurrent ? chalk$6.green.bold(`[${name}]`) : chalk$6.cyan(`[${name}]`);
 
   // 设置默认值
   config.model = config.model || 'claude-sonnet-4-20250514';
@@ -20777,11 +20995,11 @@ async function formatConfigDisplay(name, config, currentInfo) {
   }
 
   if (config.http) {
-    details.push(`HTTP: ${chalk$b.cyan(config.http)}`);
+    details.push(`HTTP: ${chalk$6.cyan(config.http)}`);
   }
 
   if (config.https) {
-    details.push(`HTTPS: ${chalk$b.cyan(config.https)}`);
+    details.push(`HTTPS: ${chalk$6.cyan(config.https)}`);
   }
 
   console.log(`${prefix}${nameDisplay}`);
@@ -20793,22 +21011,22 @@ async function formatConfigDisplay(name, config, currentInfo) {
 /**
  * 列举配置命令
  */
-async function listCommand$1() {
+async function listConfigs() {
   try {
     // 验证配置
-    const config = await validateConfig$6();
+    const config = await validateConfig$2();
 
     // 读取API配置文件
-    const apiConfig = await readConfigFile$6(config.apiConfigPath);
-    if (!validateApiConfig$4(apiConfig)) {
-      console.error(chalk$b.red(await t$c('common.PARAMETER_ERROR')), await t$c('listDisplay.API_FORMAT_ERROR'));
+    const apiConfig = await readConfigFile$2(config.apiConfigPath);
+    if (!validateApiConfig$1(apiConfig)) {
+      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('listDisplay.API_FORMAT_ERROR'));
       return
     }
 
     // 读取settings.json文件
-    const settingsData = await readConfigFile$6(config.settingsPath);
-    if (!validateSettingsConfig$2(settingsData)) {
-      console.error(chalk$b.red(await t$c('common.PARAMETER_ERROR')), await t$c('listDisplay.SETTINGS_FORMAT_ERROR'));
+    const settingsData = await readConfigFile$2(config.settingsPath);
+    if (!validateSettingsConfig$1(settingsData)) {
+      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('listDisplay.SETTINGS_FORMAT_ERROR'));
       return
     }
 
@@ -20816,11 +21034,11 @@ async function listCommand$1() {
     const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig);
 
     // 显示配置列表
-    console.log(chalk$b.green.bold(await t$c('listDisplay.AVAILABLE_API_CONFIGS')));
+    console.log(chalk$6.green.bold(await t$6('listDisplay.AVAILABLE_API_CONFIGS')));
 
     const configNames = Object.keys(apiConfig);
     if (configNames.length === 0) {
-      console.log(chalk$b.yellow(await t$c('listDisplay.NO_CONFIGS_AVAILABLE')));
+      console.log(chalk$6.yellow(await t$6('listDisplay.NO_CONFIGS_AVAILABLE')));
       return
     }
 
@@ -20832,371 +21050,29 @@ async function listCommand$1() {
 
     // 显示当前状态
     if (currentConfigInfo.name) {
-      console.log(chalk$b.green.bold(await t$c('listDisplay.CURRENT_CONFIG', currentConfigInfo.name)));
+      console.log(chalk$6.green.bold(await t$6('listDisplay.CURRENT_CONFIG', currentConfigInfo.name)));
     } else {
-      console.log(chalk$b.yellow(await t$c('listDisplay.NO_CURRENT_CONFIG')));
+      console.log(chalk$6.yellow(await t$6('listDisplay.NO_CURRENT_CONFIG')));
     }
+
+    // 显示使用方法
+    console.log();
+    console.log('使用方法:');
+    console.log(`  ${chalk$6.cyan('ccapi claude <config_name>')} - 切换到指定的配置`);
+    console.log(`  例如: ${chalk$6.cyan('ccapi claude openai')}`);
+    console.log(`  ${chalk$6.cyan('ccapi claude <config_name> -u <index>')} - 使用指定配置和URL索引`);
+    console.log(`  ${chalk$6.cyan('ccapi claude <config_name> -k <index>')} - 使用指定配置和Key索引`);
   } catch (error) {
     const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set');
     if (no) {
-      console.error(chalk$b.red(await t$c('common.CONFIG_ERROR')), error.message);
-      console.log(await t$c('listDisplay.USE_SET_CMD', chalk$b.cyan('ccapi set')));
+      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), error.message);
+      console.log(await t$6('listDisplay.USE_SET_CMD', chalk$6.cyan('ccapi set')));
     } else {
-      console.error(chalk$b.red(await t$c('listDisplay.LIST_FAILED')), error.message);
+      console.error(chalk$6.red(await t$6('listDisplay.LIST_FAILED')), error.message);
     }
     process.exit(1);
   }
 }
-
-var list = listCommand$1;
-
-const os$3 = require$$0$4;
-const path$5 = require$$1;
-const fs$2 = lib$1;
-const { exec: exec$1 } = require$$0$3;
-const { promisify } = require$$4$1;
-const chalk$a = source$1;
-const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$3 } = constants;
-const { t: t$b } = i18n;
-
-const execAsync = promisify(exec$1);
-const maxText$4 = 30;
-
-// 配置标识环境变量名
-const CONFIG_IDENTIFIER$1 = 'CCAPI_CURRENT_CONFIG';
-
-/**
- * 获取当前平台类型
- */
-async function getPlatformType() {
-  const platform = os$3.platform();
-  if (platform === 'win32') return 'windows'
-  if (platform === 'darwin') return 'mac'
-  if (platform === 'linux') return 'linux'
-
-  throw new Error(await t$b('utils.PLATFORM_NOT_SUPPORTED', platform))
-}
-
-/**
- * 获取Shell配置文件路径（Mac/Linux）
- */
-async function getShellConfigPath() {
-  const homeDir = os$3.homedir();
-  const shell = process.env.SHELL || '/bin/bash';
-
-  // 优先级: .zshrc > .bashrc > .bash_profile > .profile
-  const configFiles = [
-    path$5.join(homeDir, '.zshrc'),
-    path$5.join(homeDir, '.bashrc'),
-    path$5.join(homeDir, '.bash_profile'),
-    path$5.join(homeDir, '.profile')
-  ];
-
-  // 如果是zsh，优先使用.zshrc
-  if (shell.includes('zsh')) {
-    return configFiles[0]
-  }
-
-  // 寻找第一个存在的配置文件
-  for (const configFile of configFiles) {
-    if (await fs$2.pathExists(configFile)) {
-      return configFile
-    }
-  }
-
-  // 如果都不存在，创建对应shell的默认配置文件
-  if (shell.includes('zsh')) {
-    return configFiles[0] // .zshrc
-  }
-  return configFiles[1] // .bashrc
-}
-
-/**
- * 删除Windows环境变量
- */
-async function removeWindowsEnvVar(key) {
-  try {
-    // Windows删除环境变量，设置为空值
-    const command = `reg delete "HKEY_CURRENT_USER\\Environment" /v "${key}" /f`;
-    await execAsync(command);
-    return true
-  } catch (error) {
-    // 忽略变量不存在的错误
-    if (error.message.includes('ERROR: The system was unable to find')) {
-      return true
-    }
-    return false
-  }
-}
-
-/**
- * 设置Unix系统环境变量（Mac/Linux）- 批量设置
- */
-async function setUnixEnvVars(envVars) {
-  try {
-    const configPath = await getShellConfigPath();
-
-    // 读取现有配置文件内容
-    let content = '';
-    if (await fs$2.pathExists(configPath)) {
-      content = await fs$2.readFile(configPath, 'utf8');
-    }
-
-    // CCAPI环境变量标记区域
-    const startMarker = '# CCAPI Environment Variables - START';
-    const endMarker = '# CCAPI Environment Variables - END';
-
-    // 移除旧的CCAPI配置区域
-    const startIndex = content.indexOf(startMarker);
-    const endIndex = content.indexOf(endMarker);
-
-    if (startIndex !== -1 && endIndex !== -1) {
-      content = content.substring(0, startIndex) + content.substring(endIndex + endMarker.length + 1);
-    }
-
-    // 构建新的环境变量区域
-    const envLines = ['', startMarker, ...Object.entries(envVars).map(([k, v]) => `export ${k}="${v}"`), endMarker, ''];
-
-    // 写入配置文件
-    const newContent = content.trim() + '\n' + envLines.join('\n');
-    await fs$2.writeFile(configPath, newContent);
-
-    return true
-  } catch (error) {
-    console.error(chalk$a.red(await t$b('utils.ENV_SET_FAILED')), error.message);
-    return false
-  }
-}
-
-/**
- * 设置Windows系统环境变量 - 批量设置
- */
-async function setWindowsEnvVars(envVars) {
-  try {
-    // Windows需要逐个设置，但我们可以并行执行
-    const promises = Object.entries(envVars).map(async ([key, value]) => {
-      try {
-        const command = `setx "${key}" "${value}"`;
-        await execAsync(command);
-        return { key, success: true }
-      } catch (error) {
-        console.error(chalk$a.red(await t$b('utils.ENV_SET_FAILED_KEY', key)), error.message);
-        return { key, success: false, error: error.message }
-      }
-    });
-
-    const allResults = await Promise.allSettled(promises);
-    let successCount = 0;
-
-    allResults.forEach((result, index) => {
-      if (result.status === 'fulfilled' && result.value.success) {
-        successCount++;
-      }
-    });
-
-    return successCount === Object.keys(envVars).length
-  } catch (error) {
-    console.error(chalk$a.red(await t$b('utils.ENV_SET_FAILED')), error.message);
-    return false
-  }
-}
-
-/**
- * 删除Unix系统环境变量（Mac/Linux）
- */
-async function removeUnixEnvVars() {
-  try {
-    const configPath = await getShellConfigPath();
-
-    if (!(await fs$2.pathExists(configPath))) {
-      return true
-    }
-
-    const content = await fs$2.readFile(configPath, 'utf8');
-
-    // CCAPI环境变量标记区域
-    const startMarker = '# CCAPI Environment Variables - START';
-    const endMarker = '# CCAPI Environment Variables - END';
-
-    // 移除CCAPI配置区域
-    const startIndex = content.indexOf(startMarker);
-    const endIndex = content.indexOf(endMarker);
-
-    if (startIndex !== -1 && endIndex !== -1) {
-      const newContent = content.substring(0, startIndex) + content.substring(endIndex + endMarker.length + 1);
-      await fs$2.writeFile(configPath, newContent.trim() + '\n');
-    }
-
-    return true
-  } catch (error) {
-    console.error(chalk$a.red.bold(await t$b('utils.ENV_DELETE_FAILED')), error.message);
-    return false
-  }
-}
-
-/**
- * 获取系统中已设置的相关环境变量
- */
-async function getSystemEnvVars() {
-  const envVars = {};
-
-  // 获取所有CLAUDE_ENV_KEYS相关的环境变量
-  const allKeys = Object.values(CLAUDE_ENV_KEYS$3);
-  allKeys.push(CONFIG_IDENTIFIER$1); // 添加配置标识符
-
-  for (const key of allKeys) {
-    const value = process.env[key];
-    if (value) {
-      envVars[key] = value;
-    }
-  }
-
-  return envVars
-}
-
-/**
- * 设置配置到系统环境变量
- */
-async function setSystemEnvVars$2(config, configName, tip = true) {
-  try {
-    const platform = await getPlatformType(); // 这里会抛出不支持平台的错误
-
-    // console.log(await t('use.SWITCHING_ENV'))
-
-    // 构建所有要设置的环境变量
-    const envVarsToSet = {};
-
-    // 添加配置标识符
-    envVarsToSet[CONFIG_IDENTIFIER$1] = configName;
-
-    // 遍历配置对象，添加相关环境变量
-    for (const [configKey, envKey] of Object.entries(CLAUDE_ENV_KEYS$3)) {
-      if (config[configKey]) {
-        let value = config[configKey];
-
-        // 处理数组类型，取第一个值
-        if (Array.isArray(value)) {
-          value = value[0];
-        }
-
-        envVarsToSet[envKey] = value;
-      }
-    }
-
-    // 根据平台设置环境变量
-    let success = false;
-    if (platform === 'windows') {
-      success = await setWindowsEnvVars(envVarsToSet);
-    } else {
-      success = await setUnixEnvVars(envVarsToSet);
-    }
-
-    if (!tip) return success
-
-    if (success) {
-      // 显示已设置的环境变量
-      console.log();
-      console.log(
-        chalk$a.green.bold(await t$b('utils.ENV_SET_SUCCESS_MSG', configName)),
-        chalk$a.yellow.bold(await t$b('success.RESTART_TERMINAL'))
-      );
-      console.log();
-
-      // 按照CLAUDE_ENV_KEYS的顺序显示环境变量
-      for (const [configKey, envKey] of Object.entries(CLAUDE_ENV_KEYS$3)) {
-        if (envVarsToSet[envKey]) {
-          let displayValue = envVarsToSet[envKey];
-
-          // 对敏感信息进行脱敏处理
-          if (configKey === 'key' || configKey === 'token') {
-            displayValue = displayValue.length > maxText$4 ? displayValue.slice(0, maxText$4) + '...' : displayValue;
-          }
-
-          console.log(`  ${chalk$a.cyan(envKey)}: ${chalk$a.green(displayValue)}`);
-        }
-      }
-      console.log();
-    } else {
-      console.log();
-      console.error(chalk$a.red.bold(await t$b('utils.ENV_SET_FAILED_MSG')));
-    }
-
-    return success
-  } catch (error) {
-    console.error(chalk$a.red(await t$b('utils.ENV_SET_FAILED')), error.message);
-    return false
-  }
-}
-
-/**
- * 清除系统中的相关环境变量
- */
-async function clearSystemEnvVars$2() {
-  try {
-    const platform = await getPlatformType(); // 这里会抛出不支持平台的错误
-    // console.log(chalk.green.bold('正在清除系统环境变量...'))
-
-    if (platform === 'windows') {
-      // Windows: 删除注册表中的环境变量
-      const allKeys = Object.values(CLAUDE_ENV_KEYS$3);
-      allKeys.push(CONFIG_IDENTIFIER$1);
-
-      let successCount = 0;
-      for (const key of allKeys) {
-        const success = await removeWindowsEnvVar(key);
-        if (success) successCount++;
-      }
-    } else {
-      // Unix: 删除shell配置文件中的环境变量
-      await removeUnixEnvVars();
-    }
-    console.log(
-      chalk$a.green.bold(await t$b('utils.ENV_CLEAR_SUCCESS')),
-      chalk$a.yellow.bold(await t$b('success.RESTART_TERMINAL'))
-    );
-    return true
-  } catch (error) {
-    console.error(chalk$a.red.bold(await t$b('utils.ENV_CLEAR_FAILED')), error.message);
-    return false
-  }
-}
-
-/**
- * 获取当前使用的配置名称
- */
-function getCurrentConfigName$2() {
-  return process.env[CONFIG_IDENTIFIER$1] || null
-}
-
-/**
- * 检测环境变量设置状态
- */
-async function checkEnvStatus$2() {
-  const envVars = await getSystemEnvVars();
-  const currentConfig = getCurrentConfigName$2();
-
-  return {
-    hasEnvVars: Object.keys(envVars).length > 1, // 除了CONFIG_IDENTIFIER之外还有其他变量
-    currentConfig,
-    envVars
-  }
-}
-
-var env$1 = {
-  setSystemEnvVars: setSystemEnvVars$2,
-  clearSystemEnvVars: clearSystemEnvVars$2,
-  getCurrentConfigName: getCurrentConfigName$2,
-  checkEnvStatus: checkEnvStatus$2,
-  CONFIG_IDENTIFIER: CONFIG_IDENTIFIER$1
-};
-
-const chalk$9 = source$1;
-const { validateConfig: validateConfig$5, readConfig: readConfig$3 } = config;
-const { readConfigFile: readConfigFile$5, writeConfigFile: writeConfigFile$1, backupFile: backupFile$1 } = file;
-const { validateApiConfig: validateApiConfig$3, validateSettingsConfig: validateSettingsConfig$1, validateConfigName: validateConfigName$1 } = validator;
-const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$2, ERROR_MESSAGES: ERROR_MESSAGES$1, SUCCESS_MESSAGES } = constants;
-const { setSystemEnvVars: setSystemEnvVars$1 } = env$1;
-const { t: t$a } = i18n;
 
 /**
  * 更新settings.json中的环境变量
@@ -21275,7 +21151,7 @@ async function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
     // 数组情况：选择指定索引的值，默认为第一个
     const index = selectedIndex > 0 ? selectedIndex - 1 : 0;
     if (index >= fieldValue.length) {
-      throw new Error(await t$a('common.INDEX_OUT_OF_RANGE', selectedIndex, `1-${fieldValue.length}`))
+      throw new Error(await t$6('common.INDEX_OUT_OF_RANGE', selectedIndex, `1-${fieldValue.length}`))
     }
     return fieldValue[index]
   } else {
@@ -21287,29 +21163,35 @@ async function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
 /**
  * 使用指定配置命令
  */
-async function useCommand$2(configName, options = {}) {
+async function claudeCommand$1(configName, options = {}) {
   try {
+    // 如果没有提供配置名，显示配置列表
+    if (!configName) {
+      await listConfigs();
+      return
+    }
+
     // 验证配置
-    const config = await validateConfig$5();
+    const config = await validateConfig$2();
 
     // 读取API配置文件
-    const apiConfig = await readConfigFile$5(config.apiConfigPath);
-    if (!validateApiConfig$3(apiConfig)) {
-      console.error(chalk$9.red(await t$a('common.PARAMETER_ERROR')), await t$a('use.API_FORMAT_ERROR'));
+    const apiConfig = await readConfigFile$2(config.apiConfigPath);
+    if (!validateApiConfig$1(apiConfig)) {
+      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('claude.API_FORMAT_ERROR'));
       return
     }
 
     // 验证配置名称是否存在
     if (!validateConfigName$1(apiConfig, configName)) {
-      console.error(chalk$9.red(await t$a('common.CONFIG_ERROR')), `${await t$a(ERROR_MESSAGES$1.CONFIG_NAME_NOT_FOUND)}: ${configName}`);
-      console.log(chalk$9.green(await t$a('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '));
+      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), `${await t$6(ERROR_MESSAGES$1.CONFIG_NAME_NOT_FOUND)}: ${configName}`);
+      console.log(chalk$6.green(await t$6('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '));
       return
     }
 
     // 读取settings.json文件
-    const settingsData = await readConfigFile$5(config.settingsPath);
+    const settingsData = await readConfigFile$2(config.settingsPath);
     if (!validateSettingsConfig$1(settingsData)) {
-      console.error(chalk$9.red(await t$a('common.PARAMETER_ERROR')), await t$a('use.SETTINGS_FORMAT_ERROR'));
+      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('claude.SETTINGS_FORMAT_ERROR'));
       return
     }
 
@@ -21358,7 +21240,7 @@ async function useCommand$2(configName, options = {}) {
       targetConfig.model = selectedModel;
       targetConfig.fast = selectedFast;
     } catch (error) {
-      console.error(chalk$9.red(await t$a('common.PARAMETER_ERROR')), error.message);
+      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), error.message);
       return
     }
 
@@ -21370,10 +21252,10 @@ async function useCommand$2(configName, options = {}) {
 
     // 备份settings.json
     const backupPath = await backupFile$1(config.settingsPath);
-    console.log(await t$a(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`);
+    console.log(await t$6(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`);
 
     // 更新配置
-    console.log(await t$a('use.SWITCHING_CONFIG', configName));
+    console.log(await t$6('claude.SWITCHING_CONFIG', configName));
     const updatedSettings = updateSettingsEnv(settingsData, targetConfig);
 
     // 保存更新后的settings.json
@@ -21381,2348 +21263,66 @@ async function useCommand$2(configName, options = {}) {
 
     // 同步设置到系统环境变量
     let success = false;
-    const configData = await readConfig$3();
+    const configData = await readConfig$1();
     const updateEnv = configData.useNoEnv !== void 0 ? configData.useNoEnv : true;
     if (updateEnv) {
       try {
         success = await setSystemEnvVars$1(targetConfig, configName, false);
       } catch (error) {
-        console.log(chalk$9.red(await t$a('use.SETTINGS_SUCCESS_ENV_FAILED')));
+        console.log(chalk$6.red(await t$6('claude.SETTINGS_SUCCESS_ENV_FAILED')));
       }
     }
 
     // 显示成功信息
     console.log();
     console.log(
-      chalk$9.green.bold(await t$a(SUCCESS_MESSAGES.CONFIG_SWITCHED)) + chalk$9.yellow.bold(await t$a(SUCCESS_MESSAGES.RESTART_TERMINAL))
+      chalk$6.green.bold(await t$6(SUCCESS_MESSAGES.CONFIG_SWITCHED)) + chalk$6.yellow.bold(await t$6(SUCCESS_MESSAGES.RESTART_TERMINAL))
     );
     if (success) {
-      console.log(chalk$9.cyan(await t$a('use.CONFIG_SYNCED')));
+      console.log(chalk$6.cyan(await t$6('claude.CONFIG_SYNCED')));
     }
     console.log();
-    console.log(chalk$9.green.bold(await t$a('use.CURRENT_CONFIG_DETAILS')));
-    console.log(await t$a('use.NAME_LABEL', chalk$9.cyan(configName)));
-    console.log(await t$a('use.URL_LABEL', chalk$9.cyan(targetConfig.url)));
+    console.log(chalk$6.green.bold(await t$6('claude.CURRENT_CONFIG_DETAILS')));
+    console.log(await t$6('claude.NAME_LABEL', chalk$6.cyan(configName)));
+    console.log(await t$6('claude.URL_LABEL', chalk$6.cyan(targetConfig.url)));
 
     // 显示选中的模型信息
-    console.log(await t$a('use.MODEL_LABEL', chalk$9.cyan(targetConfig.model)));
+    console.log(await t$6('claude.MODEL_LABEL', chalk$6.cyan(targetConfig.model)));
 
     if (targetConfig.fast) {
-      console.log(await t$a('use.FAST_LABEL', chalk$9.cyan(targetConfig.fast)));
+      console.log(await t$6('claude.FAST_LABEL', chalk$6.cyan(targetConfig.fast)));
     }
 
     if (targetConfig.key) {
       const maskedKey = targetConfig.key.length > 25 ? targetConfig.key.slice(0, 25) + '...' : targetConfig.key;
-      console.log(await t$a('use.KEY_LABEL', chalk$9.cyan(maskedKey)));
+      console.log(await t$6('claude.KEY_LABEL', chalk$6.cyan(maskedKey)));
     }
     if (targetConfig.token) {
       const maskedToken = targetConfig.token.length > 25 ? targetConfig.token.slice(0, 25) + '...' : targetConfig.token;
-      console.log(await t$a('use.TOKEN_LABEL', chalk$9.cyan(maskedToken)));
+      console.log(await t$6('claude.TOKEN_LABEL', chalk$6.cyan(maskedToken)));
     }
     if (targetConfig.http) {
-      console.log(await t$a('use.HTTP_LABEL', chalk$9.cyan(targetConfig.http)));
+      console.log(await t$6('claude.HTTP_LABEL', chalk$6.cyan(targetConfig.http)));
     }
     if (targetConfig.https) {
-      console.log(await t$a('use.HTTPS_LABEL', chalk$9.cyan(targetConfig.https)));
+      console.log(await t$6('claude.HTTPS_LABEL', chalk$6.cyan(targetConfig.https)));
     }
     console.log();
   } catch (error) {
     const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set');
     if (no) {
-      console.error(chalk$9.red(await t$a('common.CONFIG_ERROR')), error.message);
-      console.log(await t$a('use.USE_SET_CMD', chalk$9.cyan('ccapi set')));
+      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), error.message);
+      console.log(await t$6('claude.USE_SET_CMD', chalk$6.cyan('ccapi set')));
     } else {
-      console.error(chalk$9.red(await t$a('use.SWITCH_CONFIG_FAILED')), error.message);
+      console.error(chalk$6.red(await t$6('claude.SWITCH_CONFIG_FAILED')), error.message);
     }
     process.exit(1);
   }
 }
 
-var use = useCommand$2;
+var claude = claudeCommand$1;
 
-var crossSpawn = {exports: {}};
-
-var windows;
-var hasRequiredWindows;
-
-function requireWindows () {
-	if (hasRequiredWindows) return windows;
-	hasRequiredWindows = 1;
-	windows = isexe;
-	isexe.sync = sync;
-
-	var fs = require$$0$2;
-
-	function checkPathExt (path, options) {
-	  var pathext = options.pathExt !== undefined ?
-	    options.pathExt : process.env.PATHEXT;
-
-	  if (!pathext) {
-	    return true
-	  }
-
-	  pathext = pathext.split(';');
-	  if (pathext.indexOf('') !== -1) {
-	    return true
-	  }
-	  for (var i = 0; i < pathext.length; i++) {
-	    var p = pathext[i].toLowerCase();
-	    if (p && path.substr(-p.length).toLowerCase() === p) {
-	      return true
-	    }
-	  }
-	  return false
-	}
-
-	function checkStat (stat, path, options) {
-	  if (!stat.isSymbolicLink() && !stat.isFile()) {
-	    return false
-	  }
-	  return checkPathExt(path, options)
-	}
-
-	function isexe (path, options, cb) {
-	  fs.stat(path, function (er, stat) {
-	    cb(er, er ? false : checkStat(stat, path, options));
-	  });
-	}
-
-	function sync (path, options) {
-	  return checkStat(fs.statSync(path), path, options)
-	}
-	return windows;
-}
-
-var mode;
-var hasRequiredMode;
-
-function requireMode () {
-	if (hasRequiredMode) return mode;
-	hasRequiredMode = 1;
-	mode = isexe;
-	isexe.sync = sync;
-
-	var fs = require$$0$2;
-
-	function isexe (path, options, cb) {
-	  fs.stat(path, function (er, stat) {
-	    cb(er, er ? false : checkStat(stat, options));
-	  });
-	}
-
-	function sync (path, options) {
-	  return checkStat(fs.statSync(path), options)
-	}
-
-	function checkStat (stat, options) {
-	  return stat.isFile() && checkMode(stat, options)
-	}
-
-	function checkMode (stat, options) {
-	  var mod = stat.mode;
-	  var uid = stat.uid;
-	  var gid = stat.gid;
-
-	  var myUid = options.uid !== undefined ?
-	    options.uid : process.getuid && process.getuid();
-	  var myGid = options.gid !== undefined ?
-	    options.gid : process.getgid && process.getgid();
-
-	  var u = parseInt('100', 8);
-	  var g = parseInt('010', 8);
-	  var o = parseInt('001', 8);
-	  var ug = u | g;
-
-	  var ret = (mod & o) ||
-	    (mod & g) && gid === myGid ||
-	    (mod & u) && uid === myUid ||
-	    (mod & ug) && myUid === 0;
-
-	  return ret
-	}
-	return mode;
-}
-
-var core;
-if (process.platform === 'win32' || commonjsGlobal.TESTING_WINDOWS) {
-  core = requireWindows();
-} else {
-  core = requireMode();
-}
-
-var isexe_1 = isexe$1;
-isexe$1.sync = sync;
-
-function isexe$1 (path, options, cb) {
-  if (typeof options === 'function') {
-    cb = options;
-    options = {};
-  }
-
-  if (!cb) {
-    if (typeof Promise !== 'function') {
-      throw new TypeError('callback not provided')
-    }
-
-    return new Promise(function (resolve, reject) {
-      isexe$1(path, options || {}, function (er, is) {
-        if (er) {
-          reject(er);
-        } else {
-          resolve(is);
-        }
-      });
-    })
-  }
-
-  core(path, options || {}, function (er, is) {
-    // ignore EACCES because that just means we aren't allowed to run it
-    if (er) {
-      if (er.code === 'EACCES' || options && options.ignoreErrors) {
-        er = null;
-        is = false;
-      }
-    }
-    cb(er, is);
-  });
-}
-
-function sync (path, options) {
-  // my kingdom for a filtered catch
-  try {
-    return core.sync(path, options || {})
-  } catch (er) {
-    if (options && options.ignoreErrors || er.code === 'EACCES') {
-      return false
-    } else {
-      throw er
-    }
-  }
-}
-
-const isWindows = process.platform === 'win32' ||
-    process.env.OSTYPE === 'cygwin' ||
-    process.env.OSTYPE === 'msys';
-
-const path$4 = require$$1;
-const COLON = isWindows ? ';' : ':';
-const isexe = isexe_1;
-
-const getNotFoundError = (cmd) =>
-  Object.assign(new Error(`not found: ${cmd}`), { code: 'ENOENT' });
-
-const getPathInfo = (cmd, opt) => {
-  const colon = opt.colon || COLON;
-
-  // If it has a slash, then we don't bother searching the pathenv.
-  // just check the file itself, and that's it.
-  const pathEnv = cmd.match(/\//) || isWindows && cmd.match(/\\/) ? ['']
-    : (
-      [
-        // windows always checks the cwd first
-        ...(isWindows ? [process.cwd()] : []),
-        ...(opt.path || process.env.PATH ||
-          /* istanbul ignore next: very unusual */ '').split(colon),
-      ]
-    );
-  const pathExtExe = isWindows
-    ? opt.pathExt || process.env.PATHEXT || '.EXE;.CMD;.BAT;.COM'
-    : '';
-  const pathExt = isWindows ? pathExtExe.split(colon) : [''];
-
-  if (isWindows) {
-    if (cmd.indexOf('.') !== -1 && pathExt[0] !== '')
-      pathExt.unshift('');
-  }
-
-  return {
-    pathEnv,
-    pathExt,
-    pathExtExe,
-  }
-};
-
-const which$1 = (cmd, opt, cb) => {
-  if (typeof opt === 'function') {
-    cb = opt;
-    opt = {};
-  }
-  if (!opt)
-    opt = {};
-
-  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
-  const found = [];
-
-  const step = i => new Promise((resolve, reject) => {
-    if (i === pathEnv.length)
-      return opt.all && found.length ? resolve(found)
-        : reject(getNotFoundError(cmd))
-
-    const ppRaw = pathEnv[i];
-    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
-
-    const pCmd = path$4.join(pathPart, cmd);
-    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
-      : pCmd;
-
-    resolve(subStep(p, i, 0));
-  });
-
-  const subStep = (p, i, ii) => new Promise((resolve, reject) => {
-    if (ii === pathExt.length)
-      return resolve(step(i + 1))
-    const ext = pathExt[ii];
-    isexe(p + ext, { pathExt: pathExtExe }, (er, is) => {
-      if (!er && is) {
-        if (opt.all)
-          found.push(p + ext);
-        else
-          return resolve(p + ext)
-      }
-      return resolve(subStep(p, i, ii + 1))
-    });
-  });
-
-  return cb ? step(0).then(res => cb(null, res), cb) : step(0)
-};
-
-const whichSync = (cmd, opt) => {
-  opt = opt || {};
-
-  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
-  const found = [];
-
-  for (let i = 0; i < pathEnv.length; i ++) {
-    const ppRaw = pathEnv[i];
-    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
-
-    const pCmd = path$4.join(pathPart, cmd);
-    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
-      : pCmd;
-
-    for (let j = 0; j < pathExt.length; j ++) {
-      const cur = p + pathExt[j];
-      try {
-        const is = isexe.sync(cur, { pathExt: pathExtExe });
-        if (is) {
-          if (opt.all)
-            found.push(cur);
-          else
-            return cur
-        }
-      } catch (ex) {}
-    }
-  }
-
-  if (opt.all && found.length)
-    return found
-
-  if (opt.nothrow)
-    return null
-
-  throw getNotFoundError(cmd)
-};
-
-var which_1 = which$1;
-which$1.sync = whichSync;
-
-var pathKey$1 = {exports: {}};
-
-const pathKey = (options = {}) => {
-	const environment = options.env || process.env;
-	const platform = options.platform || process.platform;
-
-	if (platform !== 'win32') {
-		return 'PATH';
-	}
-
-	return Object.keys(environment).reverse().find(key => key.toUpperCase() === 'PATH') || 'Path';
-};
-
-pathKey$1.exports = pathKey;
-// TODO: Remove this for the next major release
-pathKey$1.exports.default = pathKey;
-
-var pathKeyExports = pathKey$1.exports;
-
-const path$3 = require$$1;
-const which = which_1;
-const getPathKey = pathKeyExports;
-
-function resolveCommandAttempt(parsed, withoutPathExt) {
-    const env = parsed.options.env || process.env;
-    const cwd = process.cwd();
-    const hasCustomCwd = parsed.options.cwd != null;
-    // Worker threads do not have process.chdir()
-    const shouldSwitchCwd = hasCustomCwd && process.chdir !== undefined && !process.chdir.disabled;
-
-    // If a custom `cwd` was specified, we need to change the process cwd
-    // because `which` will do stat calls but does not support a custom cwd
-    if (shouldSwitchCwd) {
-        try {
-            process.chdir(parsed.options.cwd);
-        } catch (err) {
-            /* Empty */
-        }
-    }
-
-    let resolved;
-
-    try {
-        resolved = which.sync(parsed.command, {
-            path: env[getPathKey({ env })],
-            pathExt: withoutPathExt ? path$3.delimiter : undefined,
-        });
-    } catch (e) {
-        /* Empty */
-    } finally {
-        if (shouldSwitchCwd) {
-            process.chdir(cwd);
-        }
-    }
-
-    // If we successfully resolved, ensure that an absolute path is returned
-    // Note that when a custom `cwd` was used, we need to resolve to an absolute path based on it
-    if (resolved) {
-        resolved = path$3.resolve(hasCustomCwd ? parsed.options.cwd : '', resolved);
-    }
-
-    return resolved;
-}
-
-function resolveCommand$1(parsed) {
-    return resolveCommandAttempt(parsed) || resolveCommandAttempt(parsed, true);
-}
-
-var resolveCommand_1 = resolveCommand$1;
-
-var _escape = {};
-
-// See http://www.robvanderwoude.com/escapechars.php
-const metaCharsRegExp = /([()\][%!^"`<>&|;, *?])/g;
-
-function escapeCommand(arg) {
-    // Escape meta chars
-    arg = arg.replace(metaCharsRegExp, '^$1');
-
-    return arg;
-}
-
-function escapeArgument(arg, doubleEscapeMetaChars) {
-    // Convert to string
-    arg = `${arg}`;
-
-    // Algorithm below is based on https://qntm.org/cmd
-    // It's slightly altered to disable JS backtracking to avoid hanging on specially crafted input
-    // Please see https://github.com/moxystudio/node-cross-spawn/pull/160 for more information
-
-    // Sequence of backslashes followed by a double quote:
-    // double up all the backslashes and escape the double quote
-    arg = arg.replace(/(?=(\\+?)?)\1"/g, '$1$1\\"');
-
-    // Sequence of backslashes followed by the end of the string
-    // (which will become a double quote later):
-    // double up all the backslashes
-    arg = arg.replace(/(?=(\\+?)?)\1$/, '$1$1');
-
-    // All other backslashes occur literally
-
-    // Quote the whole thing:
-    arg = `"${arg}"`;
-
-    // Escape meta chars
-    arg = arg.replace(metaCharsRegExp, '^$1');
-
-    // Double escape meta chars if necessary
-    if (doubleEscapeMetaChars) {
-        arg = arg.replace(metaCharsRegExp, '^$1');
-    }
-
-    return arg;
-}
-
-_escape.command = escapeCommand;
-_escape.argument = escapeArgument;
-
-var shebangRegex$1 = /^#!(.*)/;
-
-const shebangRegex = shebangRegex$1;
-
-var shebangCommand$1 = (string = '') => {
-	const match = string.match(shebangRegex);
-
-	if (!match) {
-		return null;
-	}
-
-	const [path, argument] = match[0].replace(/#! ?/, '').split(' ');
-	const binary = path.split('/').pop();
-
-	if (binary === 'env') {
-		return argument;
-	}
-
-	return argument ? `${binary} ${argument}` : binary;
-};
-
-const fs$1 = require$$0$2;
-const shebangCommand = shebangCommand$1;
-
-function readShebang$1(command) {
-    // Read the first 150 bytes from the file
-    const size = 150;
-    const buffer = Buffer.alloc(size);
-
-    let fd;
-
-    try {
-        fd = fs$1.openSync(command, 'r');
-        fs$1.readSync(fd, buffer, 0, size, 0);
-        fs$1.closeSync(fd);
-    } catch (e) { /* Empty */ }
-
-    // Attempt to extract shebang (null is returned if not a shebang)
-    return shebangCommand(buffer.toString());
-}
-
-var readShebang_1 = readShebang$1;
-
-const path$2 = require$$1;
-const resolveCommand = resolveCommand_1;
-const escape = _escape;
-const readShebang = readShebang_1;
-
-const isWin$1 = process.platform === 'win32';
-const isExecutableRegExp = /\.(?:com|exe)$/i;
-const isCmdShimRegExp = /node_modules[\\/].bin[\\/][^\\/]+\.cmd$/i;
-
-function detectShebang(parsed) {
-    parsed.file = resolveCommand(parsed);
-
-    const shebang = parsed.file && readShebang(parsed.file);
-
-    if (shebang) {
-        parsed.args.unshift(parsed.file);
-        parsed.command = shebang;
-
-        return resolveCommand(parsed);
-    }
-
-    return parsed.file;
-}
-
-function parseNonShell(parsed) {
-    if (!isWin$1) {
-        return parsed;
-    }
-
-    // Detect & add support for shebangs
-    const commandFile = detectShebang(parsed);
-
-    // We don't need a shell if the command filename is an executable
-    const needsShell = !isExecutableRegExp.test(commandFile);
-
-    // If a shell is required, use cmd.exe and take care of escaping everything correctly
-    // Note that `forceShell` is an hidden option used only in tests
-    if (parsed.options.forceShell || needsShell) {
-        // Need to double escape meta chars if the command is a cmd-shim located in `node_modules/.bin/`
-        // The cmd-shim simply calls execute the package bin file with NodeJS, proxying any argument
-        // Because the escape of metachars with ^ gets interpreted when the cmd.exe is first called,
-        // we need to double escape them
-        const needsDoubleEscapeMetaChars = isCmdShimRegExp.test(commandFile);
-
-        // Normalize posix paths into OS compatible paths (e.g.: foo/bar -> foo\bar)
-        // This is necessary otherwise it will always fail with ENOENT in those cases
-        parsed.command = path$2.normalize(parsed.command);
-
-        // Escape command & arguments
-        parsed.command = escape.command(parsed.command);
-        parsed.args = parsed.args.map((arg) => escape.argument(arg, needsDoubleEscapeMetaChars));
-
-        const shellCommand = [parsed.command].concat(parsed.args).join(' ');
-
-        parsed.args = ['/d', '/s', '/c', `"${shellCommand}"`];
-        parsed.command = process.env.comspec || 'cmd.exe';
-        parsed.options.windowsVerbatimArguments = true; // Tell node's spawn that the arguments are already escaped
-    }
-
-    return parsed;
-}
-
-function parse$1(command, args, options) {
-    // Normalize arguments, similar to nodejs
-    if (args && !Array.isArray(args)) {
-        options = args;
-        args = null;
-    }
-
-    args = args ? args.slice(0) : []; // Clone array to avoid changing the original
-    options = Object.assign({}, options); // Clone object to avoid changing the original
-
-    // Build our parsed object
-    const parsed = {
-        command,
-        args,
-        options,
-        file: undefined,
-        original: {
-            command,
-            args,
-        },
-    };
-
-    // Delegate further parsing to shell or non-shell
-    return options.shell ? parsed : parseNonShell(parsed);
-}
-
-var parse_1 = parse$1;
-
-const isWin = process.platform === 'win32';
-
-function notFoundError(original, syscall) {
-    return Object.assign(new Error(`${syscall} ${original.command} ENOENT`), {
-        code: 'ENOENT',
-        errno: 'ENOENT',
-        syscall: `${syscall} ${original.command}`,
-        path: original.command,
-        spawnargs: original.args,
-    });
-}
-
-function hookChildProcess(cp, parsed) {
-    if (!isWin) {
-        return;
-    }
-
-    const originalEmit = cp.emit;
-
-    cp.emit = function (name, arg1) {
-        // If emitting "exit" event and exit code is 1, we need to check if
-        // the command exists and emit an "error" instead
-        // See https://github.com/IndigoUnited/node-cross-spawn/issues/16
-        if (name === 'exit') {
-            const err = verifyENOENT(arg1, parsed);
-
-            if (err) {
-                return originalEmit.call(cp, 'error', err);
-            }
-        }
-
-        return originalEmit.apply(cp, arguments); // eslint-disable-line prefer-rest-params
-    };
-}
-
-function verifyENOENT(status, parsed) {
-    if (isWin && status === 1 && !parsed.file) {
-        return notFoundError(parsed.original, 'spawn');
-    }
-
-    return null;
-}
-
-function verifyENOENTSync(status, parsed) {
-    if (isWin && status === 1 && !parsed.file) {
-        return notFoundError(parsed.original, 'spawnSync');
-    }
-
-    return null;
-}
-
-var enoent$1 = {
-    hookChildProcess,
-    verifyENOENT,
-    verifyENOENTSync,
-    notFoundError,
-};
-
-const cp = require$$0$3;
-const parse = parse_1;
-const enoent = enoent$1;
-
-function spawn$2(command, args, options) {
-    // Parse the arguments
-    const parsed = parse(command, args, options);
-
-    // Spawn the child process
-    const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
-
-    // Hook into child process "exit" event to emit an error if the command
-    // does not exists, see: https://github.com/IndigoUnited/node-cross-spawn/issues/16
-    enoent.hookChildProcess(spawned, parsed);
-
-    return spawned;
-}
-
-function spawnSync(command, args, options) {
-    // Parse the arguments
-    const parsed = parse(command, args, options);
-
-    // Spawn the child process
-    const result = cp.spawnSync(parsed.command, parsed.args, parsed.options);
-
-    // Analyze if the command does not exist, see: https://github.com/IndigoUnited/node-cross-spawn/issues/16
-    result.error = result.error || enoent.verifyENOENTSync(result.status, parsed);
-
-    return result;
-}
-
-crossSpawn.exports = spawn$2;
-crossSpawn.exports.spawn = spawn$2;
-crossSpawn.exports.sync = spawnSync;
-
-crossSpawn.exports._parse = parse;
-crossSpawn.exports._enoent = enoent;
-
-var crossSpawnExports = crossSpawn.exports;
-
-var cleanup;
-var hasRequiredCleanup;
-
-function requireCleanup () {
-	if (hasRequiredCleanup) return cleanup;
-	hasRequiredCleanup = 1;
-	const fs = require$$0$2;
-	const os = require$$0$4;
-	const path = require$$1;
-
-	/**
-	 * 获取 Claude 配置文件路径（跨平台兼容）
-	 */
-	function getClaudeConfigPath() {
-	  // Claude Code 在所有平台都使用用户主目录下的 .claude.json
-	  return path.join(os.homedir(), '.claude.json')
-	}
-
-	/**
-	 * 检查项目路径是否为临时测试项目（跨平台兼容）
-	 */
-	function isTempTestProject(projectPath) {
-	  // 规范化路径，统一处理路径分隔符
-	  const normalizedPath = path.normalize(projectPath);
-	  
-	  // 检查路径中是否包含临时测试标识
-	  // 使用 path.sep 确保在所有平台上正确识别
-	  return normalizedPath.includes('ccapi-test-') && 
-	         (normalizedPath.includes(path.join('tmp', '')) || 
-	          normalizedPath.includes(path.join('Temp', '')) ||
-	          normalizedPath.includes(path.join('temp', '')) ||
-	          normalizedPath.includes('var' + path.sep + 'folders') ||
-	          normalizedPath.includes('AppData'))
-	}
-
-	/**
-	 * 清理.claude.json中所有临时测试项目记录的工具（跨平台兼容）
-	 */
-	function cleanupAllTempProjects() {
-	  const claudeJsonPath = getClaudeConfigPath();
-	  
-	  if (!fs.existsSync(claudeJsonPath)) {
-	    return 0
-	  }
-
-	  try {
-	    const claudeConfig = JSON.parse(fs.readFileSync(claudeJsonPath, 'utf8'));
-	    
-	    if (!claudeConfig.projects) {
-	      return 0
-	    }
-
-	    // 查找所有临时测试项目记录（跨平台兼容）
-	    const tempProjects = [];
-	    Object.keys(claudeConfig.projects).forEach(projectPath => {
-	      if (isTempTestProject(projectPath)) {
-	        tempProjects.push(projectPath);
-	      }
-	    });
-
-	    if (tempProjects.length === 0) {
-	      return 0
-	    }
-
-	    // 删除所有临时项目记录
-	    tempProjects.forEach(project => {
-	      delete claudeConfig.projects[project];
-	    });
-
-	    // 写回配置文件
-	    fs.writeFileSync(claudeJsonPath, JSON.stringify(claudeConfig, null, 2));
-	    return tempProjects.length
-
-	  } catch (error) {
-	    return 0
-	  }
-	}
-
-	cleanup = { 
-	  cleanupAllTempProjects,
-	  getClaudeConfigPath,
-	  isTempTestProject
-	};
-	return cleanup;
-}
-
-const chalk$8 = source$1;
-const { validateConfig: validateConfig$4 } = config;
-const { readConfigFile: readConfigFile$4 } = file;
-const { validateApiConfig: validateApiConfig$2 } = validator;
-const { readConfig: readConfig$2 } = config;
-const spawn$1 = crossSpawnExports;
-const os$2 = require$$0$4;
-const fs = require$$0$2;
-const path$1 = require$$1;
-const { t: t$9 } = i18n;
-
-let configData$1;
-let testTempDirs = [];
-const maxText$3 = 100;
-
-/**
- * 创建测试用的临时settings文件供claude cli使用
- */
-function createTestSettingsFile(url, key, token, model) {
-  const tmpDir = os$2.tmpdir();
-  const randomSuffix = Math.random().toString(36).substring(2, 15);
-  const settingsPath = path$1.join(tmpDir, `ccapi-test-${randomSuffix}.json`);
-
-  testTempDirs.push(settingsPath);
-
-  const testSettings = {
-    cleanupPeriodDays: 1,
-    env: {
-      ANTHROPIC_BASE_URL: url,
-      ANTHROPIC_MODEL: model
-    },
-    includeCoAuthoredBy: false,
-    permissions: {
-      allow: [],
-      deny: []
-    },
-    hooks: {},
-    mcpServers: {}
-  };
-
-  if (key) {
-    testSettings.env.ANTHROPIC_API_KEY = key;
-  }
-  if (token) {
-    testSettings.env.ANTHROPIC_AUTH_TOKEN = token;
-  }
-
-  // 创建空的MCP配置文件
-  const mcpConfigPath = path$1.join(path$1.dirname(settingsPath), `ccapi-mcp-${randomSuffix}.json`);
-  const emptyMcpConfig = {
-    mcpServers: {}
-  };
-  fs.writeFileSync(mcpConfigPath, JSON.stringify(emptyMcpConfig, null, 2));
-  testTempDirs.push(mcpConfigPath);
-
-  fs.writeFileSync(settingsPath, JSON.stringify(testSettings, null, 2));
-
-  return { settingsPath, mcpConfigPath }
-}
-
-/**
- * 清理测试临时settings文件
- */
-async function cleanupTestTempFiles() {
-  if (testTempDirs.length === 0) return
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // 清理临时settings文件
-  testTempDirs.forEach((tempFile) => {
-    if (tempFile && fs.existsSync(tempFile)) {
-      try {
-        fs.unlinkSync(tempFile);
-      } catch (error) {
-        // console.warn(chalk.yellow(`警告: 无法删除临时文件 ${tempFile}: ${error.message}`))
-      }
-    }
-  });
-
-  testTempDirs = [];
-}
-
-/**
- * 延迟分级颜色
- */
-const LATENCY_COLORS$1 = {
-  EXCELLENT: { color: chalk$8.green, threshold: 300 },
-  GOOD: { color: chalk$8.yellow, threshold: 800 },
-  POOR: { color: chalk$8.red}
-};
-
-async function getConfigData$1() {
-  configData$1 = await readConfig$2();
-}
-getConfigData$1();
-
-/**
- * 获取延迟颜色和状态
- */
-function getLatencyColor$1(latency) {
-  if (latency === 'error') {
-    return { color: chalk$8.red, text: 'error', status: '●' }
-  }
-
-  const ms = parseInt(latency);
-  if (ms <= LATENCY_COLORS$1.EXCELLENT.threshold) {
-    return {
-      color: LATENCY_COLORS$1.EXCELLENT.color,
-      text: `${ms}ms`,
-      status: '●'
-    }
-  } else if (ms <= LATENCY_COLORS$1.GOOD.threshold) {
-    return { color: LATENCY_COLORS$1.GOOD.color, text: `${ms}ms`, status: '●' }
-  } else {
-    return { color: LATENCY_COLORS$1.POOR.color, text: `${ms}ms`, status: '●' }
-  }
-}
-
-/**
- * 显示加载动画的简单实现
- */
-function showSpinner$1() {
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-  let i = 0;
-  return setInterval(() => {
-    process.stdout.write(`\r${frames[i]} `);
-    i = (i + 1) % frames.length;
-  }, 100)
-}
-
-/**
- * 使用cross-spawn执行进程并处理超时
- */
-function spawnWithTimeout(command, args, options, timeout, input = null) {
-  return new Promise((resolve, reject) => {
-    const child = spawn$1(command, args, options);
-    let stdout = '';
-    let stderr = '';
-    let timedOut = false;
-
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill('SIGTERM');
-      reject({ signal: 'SIGTERM', message: 'timeout', code: 'ETIMEDOUT' });
-    }, timeout);
-
-    if (input && child.stdin) {
-      child.stdin.write(input);
-      child.stdin.end();
-    } else if (child.stdin) {
-      child.stdin.end();
-    }
-
-    if (child.stdout) {
-      child.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-    }
-
-    if (child.stderr) {
-      child.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-    }
-
-    child.on('close', (code) => {
-      clearTimeout(timer);
-      if (timedOut) return
-      resolve({ stdout, stderr, code });
-    });
-
-    child.on('error', (error) => {
-      clearTimeout(timer);
-      if (!timedOut) {
-        reject(error);
-      }
-    });
-  })
-}
-
-/**
- * 使用curl命令流式请求测试单个API配置的有效性
- */
-async function testApiLatencyWithCurl(url, key, token, model = 'claude-3-5-haiku-20241022') {
-  let latency;
-  let startTime = Date.now();
-
-  const testMessage =
-    'Please reply with only one word "Success", no thinking is allowed, and no use of any mcp services, tools or hooks is allowed.';
-
-  const timeout = configData$1.testTimeout || 30000;
-
-  const isClaudeModel = model && model.toLowerCase().includes('claude');
-  const firstTestModel = isClaudeModel ? 'claude-3-5-haiku-20241022' : model;
-  const shouldRetry = isClaudeModel && model !== 'claude-3-5-haiku-20241022';
-
-  // 执行单次测试的内部函数
-  async function performSingleTest(testModel, attempt = 1) {
-    try {
-      const requestBody = {
-        model: testModel,
-        max_tokens: 521,
-        messages: [{ role: 'user', content: testMessage }],
-        temperature: 0,
-        stream: true
-      };
-
-      const requestBodyString = JSON.stringify(requestBody);
-
-      const curlArgs = [
-        '-k',
-        '-i',
-        '--raw',
-        '-s',
-        '-X',
-        'POST',
-        '-H',
-        `host: ${new URL(url).host}`,
-        '-H',
-        'Accept: application/json',
-        '-H',
-        'X-Stainless-Retry-Count: 0',
-        '-H',
-        'X-Stainless-Lang: js',
-        '-H',
-        'X-Stainless-Package-Version: 0.60.0',
-        '-H',
-        'X-Stainless-Runtime: node',
-        '-H',
-        'X-Stainless-Runtime-Version: v22.17.0',
-        '-H',
-        'anthropic-dangerous-direct-browser-access: true',
-        '-H',
-        'anthropic-version: 2023-06-01',
-        '-H',
-        `x-api-key: ${key || token}`,
-        '-H',
-        `Authorization: Bearer ${key || token}`,
-        '-H',
-        'x-app: cli',
-        '-H',
-        'User-Agent: claude-cli/1.0.113 (external, cli)',
-        '-H',
-        'content-type: application/json',
-        '-H',
-        'anthropic-beta: claude-code-20250219,fine-grained-tool-streaming-2025-05-14',
-        '-H',
-        'x-stainless-helper-method: stream',
-        '-H',
-        'accept-language: *',
-        '-H',
-        'sec-fetch-mode: cors',
-        '-H',
-        `content-length: ${Buffer.byteLength(requestBodyString, 'utf8')}`,
-        '-d',
-        requestBodyString,
-        `${url}/v1/messages?beta=true`
-      ];
-
-      const testStartTime = Date.now();
-
-      const result = await spawnWithTimeout(
-        'curl',
-        curlArgs,
-        {
-          stdio: ['pipe', 'pipe', 'pipe']
-        },
-        timeout
-      );
-
-      const testLatency = Date.now() - testStartTime;
-
-      // 处理curl原始响应（包含HTTP头部）
-      let responseText = '';
-      const fullResponse = result.stdout;
-
-      // 分离HTTP头部和响应体
-      const headerBodySplit = fullResponse.split('\r\n\r\n');
-      let httpHeaders = '';
-      let responseBody = '';
-
-      if (headerBodySplit.length < 2) {
-        const lineSplit = fullResponse.split('\n\n');
-        if (lineSplit.length < 2) {
-          throw new Error('Invalid HTTP response format')
-        }
-        httpHeaders = lineSplit[0];
-        responseBody = lineSplit.slice(1).join('\n\n');
-      } else {
-        httpHeaders = headerBodySplit[0];
-        responseBody = headerBodySplit.slice(1).join('\r\n\r\n');
-      }
-
-      // console.log('httpHeaders', httpHeaders)
-      // console.log('responseBody', responseBody)
-
-      // 检查HTTP状态码
-      const statusMatch = httpHeaders.match(/HTTP\/[12](?:\.\d)?\s+(\d{3})\s*(.*)/);
-      const statusCode = statusMatch ? parseInt(statusMatch[1]) : 0;
-      const statusText = statusMatch ? statusMatch[2].trim() : 'Unknown';
-
-      if (statusCode < 200 || statusCode >= 300) {
-        let errorMessage = `HTTP ${statusCode} ${statusText}`;
-
-        // 尝试从响应体中提取更详细的错误信息
-        try {
-          const errorJson = JSON.parse(responseBody.trim());
-          if (errorJson.error && errorJson.error.message) {
-            errorMessage = errorJson.error.message;
-          }
-        } catch (e) {
-          const cleanBody = responseBody.replace(/<[^>]*>/g, '').trim();
-          if (cleanBody && cleanBody.length < 200) {
-            errorMessage = cleanBody;
-          }
-        }
-
-        throw new Error(errorMessage)
-      }
-
-      // 检查响应是否为text/event-stream
-      const isEventStream = httpHeaders.toLowerCase().includes('content-type: text/event-stream');
-
-      if (!isEventStream) {
-        // 非SSE响应，尝试解析为JSON
-        try {
-          const jsonResponse = JSON.parse(responseBody.trim());
-
-          if (jsonResponse.error) {
-            throw new Error(jsonResponse.error.message || 'API Error')
-          }
-          // 如果是成功的JSON响应，提取内容
-          if (jsonResponse.content && Array.isArray(jsonResponse.content)) {
-            responseText = jsonResponse.content.map((c) => c.text).join('');
-          }
-        } catch (parseError) {
-          const errorIndex = responseBody.indexOf('error');
-          if (errorIndex !== -1) {
-            const errorPart = responseBody.substring(errorIndex).replace(/\n/g, '').trim();
-            throw new Error(errorPart)
-          } else {
-            throw new Error(responseBody.replace(/\n/g, '').trim() || 'Invalid response format')
-          }
-        }
-      } else {
-        // SSE响应处理
-        const lines = responseBody.split('\n');
-
-        for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (!trimmedLine) continue
-
-          // 跳过事件行，只处理数据行
-          if (trimmedLine.startsWith('event:')) continue
-
-          // 处理SSE数据行
-          if (trimmedLine.startsWith('data: ')) {
-            try {
-              const jsonData = trimmedLine.slice(6);
-              if (jsonData === '[DONE]') break
-
-              const eventData = JSON.parse(jsonData);
-
-              // 处理文本增量事件
-              if (eventData.type === 'content_block_delta' && eventData.delta?.type === 'text_delta') {
-                responseText += eventData.delta.text;
-              }
-
-              // 处理错误事件
-              if (eventData.type === 'error') {
-                throw new Error(eventData.error?.message || 'API Error')
-              }
-            } catch (jsonError) {
-              if (jsonError.message.includes('API Error')) {
-                throw jsonError
-              }
-              // 忽略JSON解析错误，继续处理
-              continue
-            }
-          }
-        }
-      }
-
-      // 检查curl命令执行结果
-      if (result.code !== 0) {
-        throw new Error(`Failed with code ${result.code}: ${result.stderr}`)
-      }
-
-      // 返回结果
-      // if (!responseText.trim()) {
-      //   throw new Error('No valid response received')
-      // }
-
-      return {
-        success: true,
-        latency: testLatency,
-        response:
-          responseText.length > maxText$3
-            ? responseText.slice(0, maxText$3) + '...'
-            : responseText.replace(/\n/g, '').trim(),
-        error: null,
-        model: testModel,
-        attempt
-      }
-    } catch (error) {
-      // console.log(`Attempt ${attempt} failed:`, error.message)
-
-      return {
-        success: false,
-        latency: 'error',
-        error: error.message.replace(/\n/g, '').trim(),
-        response: null,
-        model: testModel,
-        attempt
-      }
-    }
-  }
-
-  try {
-    startTime = Date.now();
-
-    // 第一次测试
-    let result = await performSingleTest(firstTestModel, 1);
-
-    // 如果第一次成功，直接返回
-    if (result.success) {
-      return {
-        ...result
-      }
-    }
-
-    // 如果第一次失败且需要重试
-    if (shouldRetry) {
-      result = await performSingleTest(model, 2);
-      return {
-        ...result
-      }
-    }
-    return {
-      ...result
-    }
-  } catch (error) {
-    let message = await t$9('test.REQUEST_FAILED');
-
-    if (error.code === 'ETIMEDOUT' || error.signal === 'SIGTERM') {
-      message = await t$9('test.TIMEOUT');
-      latency = 'error';
-    } else if (error.message) {
-      message = error.message;
-      latency = 'error';
-    } else {
-      message = 'Failed';
-      latency = 'error';
-    }
-
-    return {
-      success: false,
-      latency,
-      error: message,
-      response: null
-    }
-  }
-}
-
-/**
- * 使用claude cli测试单个API配置的有效性
- */
-async function testApiLatency(url, key, token, model = 'claude-3-5-haiku-20241022') {
-  let latency;
-  let startTime = Date.now();
-
-  try {
-    // 创建测试专用的临时settings文件和MCP配置文件
-    const { settingsPath: tempSettingsPath, mcpConfigPath } = createTestSettingsFile(url, key, token, model);
-
-    // 创建临时工作目录用于claude cli执行
-    const tmpDir = os$2.tmpdir();
-    const randomSuffix = Math.random().toString(36).substring(2, 15);
-    const tempWorkDir = path$1.join(tmpDir, `ccapi-test-${randomSuffix}`);
-
-    if (!fs.existsSync(tempWorkDir)) {
-      fs.mkdirSync(tempWorkDir, { recursive: true });
-    }
-    testTempDirs.push(tempWorkDir);
-
-    const testPrompt =
-      'Please reply with only one word "Success", no thinking is allowed, and no use of any mcp services, tools or hooks is allowed.';
-
-    const claudeArgs = [
-      '-p',
-      '--model',
-      model,
-      '--max-turns',
-      '2',
-      '--dangerously-skip-permissions',
-      '--settings',
-      tempSettingsPath,
-      '--mcp-config',
-      mcpConfigPath
-    ];
-
-    const timeout = configData$1.testTimeout || 100000;
-    const spawnOptions = {
-      cwd: tempWorkDir,
-      stdio: ['pipe', 'pipe', 'pipe']
-    };
-
-    startTime = Date.now();
-    const result = await spawnWithTimeout('claude', claudeArgs, spawnOptions, timeout - 1000, testPrompt);
-    // console.log('result', result)
-
-    const endTime = Date.now();
-    latency = endTime - startTime;
-    // console.log('latency', latency)
-
-    // 解析响应
-    let responseText = result.stdout.trim().replace(/\n/g, '');
-    const success = responseText && !responseText.toLowerCase().includes('error');
-
-    return {
-      success,
-      latency,
-      response: responseText.length > maxText$3 ? responseText.slice(0, maxText$3) + '...' : responseText || 'Success',
-      error: null
-    }
-  } catch (error) {
-    // 处理错误
-    // console.log('error', error)
-
-    let success = false;
-    let message = await t$9('test.REQUEST_FAILED');
-
-    // 处理超时错误
-    if (
-      error.signal === 'SIGTERM' ||
-      error.code === 'ETIMEDOUT' ||
-      (error.message && error.message.includes('timeout'))
-    ) {
-      message = await t$9('test.TIMEOUT');
-      latency = 'error';
-    } else if (error.stdout || error.stderr) {
-      message = error.stdout?.trim() || error.stderr?.trim();
-      latency = 'error';
-    } else if (error.message) {
-      message = error.message;
-      latency = 'error';
-    } else {
-      message = 'Failed';
-      latency = 'error';
-    }
-
-    return {
-      success,
-      latency,
-      error: message,
-      response: null
-    }
-  }
-}
-
-/**
- * 格式化URL，确保对齐
- */
-function formatUrl$1(url, maxLength = maxText$3) {
-  if (url.length > maxLength) {
-    return url.slice(0, maxLength - 3) + '...'
-  }
-  // return url.padEnd(maxLength);
-  return url
-}
-
-/**
- * 测试单个URL
- */
-async function testSingleUrl(configName, url, config, keyIndex = 0, tokenIndex = 0, urlIndex = 0, useCli = false) {
-  const keys = Array.isArray(config.key) ? config.key : config.key ? [config.key] : [];
-  const tokens = Array.isArray(config.token) ? config.token : config.token ? [config.token] : [];
-
-  // 获取认证信息，优先使用key
-  const authItems = keys.length > 0 ? keys : tokens;
-
-  if (authItems.length === 0) {
-    return {
-      url,
-      success: false,
-      latency: 'error',
-      error: await t$9('test.MISSING_AUTH'),
-      configName,
-      index: urlIndex
-    }
-  }
-
-  // 选择指定的key或token
-  const selectedAuthIndex = keyIndex || tokenIndex || 0;
-  const selectedAuth = authItems[Math.min(selectedAuthIndex, authItems.length - 1)];
-  const model = Array.isArray(config.model) ? config.model[0] : config.model || 'claude-3-5-haiku-20241022';
-
-  try {
-    let result;
-    if (useCli) {
-      // 使用CLI方式测试
-      result = await testApiLatency(
-        url,
-        keys.length > 0 ? selectedAuth : null,
-        tokens.length > 0 ? selectedAuth : null,
-        model
-      );
-    } else {
-      // 使用API方式测试（默认）
-      result = await testApiLatencyWithCurl(
-        url,
-        keys.length > 0 ? selectedAuth : null,
-        tokens.length > 0 ? selectedAuth : null,
-        model
-      );
-    }
-    return { url, ...result, configName, index: urlIndex }
-  } catch (error) {
-    return {
-      url,
-      success: false,
-      latency: 'error',
-      error: error.message,
-      configName,
-      index: urlIndex
-    }
-  }
-}
-
-/**
- * 对测试结果进行排序和分组 (按配置分组，配置内按原始顺序)
- */
-function sortTestResults$1(allResults) {
-  // 对每个配置的results内部保持原始顺序（按index排序）
-  const sortedResults = allResults.map((configResult) => {
-    const sortedConfigResults = configResult.results.sort((a, b) => {
-      // 按原始配置文件中的顺序排序（使用index字段）
-      if (a.index !== undefined && b.index !== undefined) {
-        return a.index - b.index
-      }
-
-      // 如果没有index字段，保持原顺序（不排序）
-      return 0
-    });
-
-    return {
-      ...configResult,
-      results: sortedConfigResults
-    }
-  });
-
-  // 按配置的最佳延迟排序配置
-  const finalSorted = sortedResults.sort((a, b) => {
-    const bestLatencyA = getBestLatency$1(a.results);
-    const bestLatencyB = getBestLatency$1(b.results);
-
-    // 调试信息
-    // console.log(`比较 ${a.configName}(${bestLatencyA}ms) vs ${b.configName}(${bestLatencyB}ms)`);
-
-    // 如果都有成功的结果，按最佳延迟排序
-    if (bestLatencyA !== Infinity && bestLatencyB !== Infinity) {
-      return bestLatencyA - bestLatencyB
-    }
-
-    // 有成功结果的排在前面
-    if (bestLatencyA !== Infinity && bestLatencyB === Infinity) return -1
-    if (bestLatencyA === Infinity && bestLatencyB !== Infinity) return 1
-
-    return a.configName.localeCompare(b.configName)
-  });
-
-  return finalSorted
-}
-
-/**
- * 获取配置结果中的最佳延迟和对应地址
- */
-function getBestLatencyInfo$1(results) {
-  // 首先尝试从成功的结果中获取
-  // const successResults = results.filter(r => r.success === true);
-
-  // 如果有成功的结果，从中获取最佳延迟
-  // if (successResults.length > 0) {
-  //   const validResults = successResults
-  //     .map(r => ({ ...r, latency: typeof r.latency === 'number' ? r.latency : Infinity }))
-  //     .filter(r => r.latency !== Infinity);
-
-  //   if (validResults.length > 0) {
-  //     const bestResult = validResults.reduce((best, current) =>
-  //       current.latency < best.latency ? current : best
-  //     );
-  //     return { latency: bestResult.latency, url: bestResult.url };
-  //   }
-  // }
-
-  // 如果没有标记为成功的结果，尝试从所有有数字延迟的结果中获取
-  const numericResults = results
-    .filter((r) => typeof r.latency === 'number' && r.latency > 0 && r.latency !== Infinity)
-    .sort((a, b) => a.latency - b.latency);
-
-  if (numericResults.length > 0) {
-    return { latency: numericResults[0].latency, url: numericResults[0].url }
-  }
-
-  return { latency: Infinity, url: null }
-}
-
-/**
- * 获取配置结果中的最佳延迟
- */
-function getBestLatency$1(results) {
-  const info = getBestLatencyInfo$1(results);
-  return info.latency
-}
-
-/**
- * 简化显示测试结果
- */
-async function displaySimpleResults(sortedResults) {
-  console.log();
-  console.log(chalk$8.yellow.bold(await t$9('test.TEST_RESULTS_TITLE')));
-  console.log();
-
-  const translations = {
-    valid: await t$9('test.VALID'),
-    invalid: await t$9('test.INVALID')
-  };
-
-  for (const [configIndex, configResult] of sortedResults.entries()) {
-    // 获取并显示配置的最佳延迟和地址
-    const bestInfo = getBestLatencyInfo$1(configResult.results);
-
-    let bestText;
-    if (bestInfo.latency === Infinity) {
-      bestText = await t$9('common.NONE');
-    } else {
-      const shortUrl = formatUrl$1(bestInfo.url);
-      bestText = `${shortUrl}`;
-    }
-    console.log(
-      chalk$8.cyan.bold(`[${configResult.configName}]`) + chalk$8.cyan.bold(`(${await t$9('test.BEST_ROUTE')}: ${bestText})`)
-    );
-
-    configResult.results.forEach((result, index) => {
-      const status =
-        result.success && result.latency !== 'error'
-          ? `✅ ${chalk$8.green.bold(translations.valid)}`
-          : `❌ ${chalk$8.red.bold(translations.invalid)}`;
-      const { color } = getLatencyColor$1(result.latency);
-      const latencyText = result.latency === 'error' ? 'error' : `${result.latency}ms`;
-      const responseText = result.response
-        ? result.response.length > maxText$3
-          ? result.response.slice(0, maxText$3) + '...'
-          : result.response
-        : result.error || 'Success';
-
-      const show = configData$1.testResponse === void 0 ? true : !!configData$1.testResponse;
-      const responseDisplay = show ? ` [Response: ${responseText}]` : '';
-
-      console.log(`    ${index + 1}.[${result.url}] ${status}(${color.bold(latencyText)})${responseDisplay}`);
-      console.log();
-    });
-  }
-}
-
-/**
- * 并行测试所有API配置的主函数 - 按URL维度并发控制
- */
-async function testCommand$2(configName = null, keyIndex = 0, tokenIndex = 0, useCli = false) {
-  const { cleanupAllTempProjects } = requireCleanup();
-  try {
-    const config = await validateConfig$4();
-
-    // 读取API配置文件
-    const apiConfig = await readConfigFile$4(config.apiConfigPath);
-    if (!validateApiConfig$2(apiConfig)) {
-      console.error(chalk$8.red(await t$9('common.PARAMETER_ERROR')), await t$9('test.CONFIG_FORMAT_ERROR'));
-      return
-    }
-
-    let configsToTest = {};
-
-    if (configName) {
-      // 测试指定配置
-      if (!apiConfig[configName]) {
-        console.error(chalk$8.red(await t$9('common.PARAMETER_ERROR')), await t$9('test.CONFIG_NOT_EXIST', configName));
-        console.log(chalk$8.green(await t$9('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '));
-        return
-      }
-      configsToTest[configName] = apiConfig[configName];
-    } else {
-      configsToTest = apiConfig;
-    }
-
-    const urlTasks = [];
-    let urlIndex = 0;
-
-    Object.entries(configsToTest).forEach(([name, configData]) => {
-      const urls = Array.isArray(configData.url) ? configData.url : [configData.url];
-      urls.forEach((url) => {
-        urlTasks.push({
-          configName: name,
-          url,
-          config: configData,
-          keyIndex,
-          tokenIndex,
-          urlIndex: urlIndex++,
-          useCli
-        });
-      });
-    });
-
-    console.log(chalk$8.green.bold(await t$9('test.TESTING_CONFIGS', urlTasks.length)));
-
-    const globalSpinner = showSpinner$1();
-
-    // 优化并发控制：确保达到最大并发限制
-    const chunkSize = Math.max(1, configData$1.testConcurrency || 3); // 确保至少为1
-    const allResults = [];
-
-    // 如果任务数量少于并发数，直接并发执行所有任务
-    if (!useCli) {
-      // 使用curl方式，支持并发
-      const allPromises = urlTasks.map((task) =>
-        testSingleUrl(
-          task.configName,
-          task.url,
-          task.config,
-          task.keyIndex,
-          task.tokenIndex,
-          task.urlIndex,
-          task.useCli
-        )
-      );
-      const results = await Promise.all(allPromises);
-      allResults.push(...results);
-    } else {
-      // 使用CLI方式，分片处理大量任务
-      for (let i = 0; i < urlTasks.length; i += chunkSize) {
-        const chunk = urlTasks.slice(i, i + chunkSize);
-        const chunkPromises = chunk.map((task) =>
-          testSingleUrl(
-            task.configName,
-            task.url,
-            task.config,
-            task.keyIndex,
-            task.tokenIndex,
-            task.urlIndex,
-            task.useCli
-          )
-        );
-
-        const chunkResults = await Promise.all(chunkPromises);
-        allResults.push(...chunkResults);
-
-        const completed = Math.min(i + chunkSize, urlTasks.length);
-        if (completed < urlTasks.length) {
-          process.stdout.write(`\r\u001b[K${await t$9('test.PROGRESS_COMPLETED', completed, urlTasks.length)} `);
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-      }
-    }
-
-    clearInterval(globalSpinner);
-    process.stdout.write('\r\u001b[K');
-
-    const groupedResults = {};
-    allResults.forEach((result) => {
-      if (!groupedResults[result.configName]) {
-        groupedResults[result.configName] = {
-          configName: result.configName,
-          results: []
-        };
-      }
-      groupedResults[result.configName].results.push(result);
-    });
-
-    const sortedResults = sortTestResults$1(Object.values(groupedResults));
-    await displaySimpleResults(sortedResults);
-
-    console.log(chalk$8.green.bold(await t$9('test.TEST_COMPLETE')));
-
-    await cleanupTestTempFiles();
-    setTimeout(() => {
-      cleanupAllTempProjects();
-    }, 2000);
-
-    return allResults
-  } catch (error) {
-    await cleanupTestTempFiles();
-    cleanupAllTempProjects();
-    console.error(chalk$8.red(await t$9('test.TEST_FAILED')), error.message);
-    process.exit(1);
-  }
-}
-
-var test = testCommand$2;
-
-const { exec } = require$$0$3;
-const https = require$$1$2;
-const http = require$$2$2;
-const { URL: URL$1 } = require$$3;
-const os$1 = require$$0$4;
-const { t: t$8 } = i18n;
-
-/**
- * 跨平台延迟测试工具类
- * 支持 curl 优先策略，不可用时降级到 Node.js HTTP 请求
- */
-let LatencyTester$1 = class LatencyTester {
-  /**
-   * 测试 URL 延迟
-   * @param {string} url - 要测试的URL
-   * @param {string} method - 测试方法 ('auto', 'curl', 'http')
-   * @param {number} timeout - 超时时间（毫秒），默认5000ms
-   * @returns {Promise<number>} 延迟时间（毫秒）
-   */
-  static async testUrl(url, method = 'auto', timeout = 5000) {
-    if (method === 'curl' || (method === 'auto' && (await this.isCurlAvailable()))) {
-      return this.testWithCurl(url, timeout)
-    } else {
-      return this.testWithNodeHttp(url, timeout)
-    }
-  }
-
-  /**
-   * 检查 curl 是否可用
-   * @returns {Promise<boolean>}
-   */
-  static async isCurlAvailable() {
-    return new Promise((resolve) => {
-      exec('curl --version', { timeout: 3000 }, (error) => {
-        resolve(!error);
-      });
-    })
-  }
-
-  /**
-   * 使用 curl 测试延迟
-   * @param {string} url - 要测试的URL
-   * @param {number} timeout - 超时时间（毫秒）
-   * @returns {Promise<number>} 延迟时间（毫秒）
-   */
-  static async testWithCurl(url, timeout = 5000) {
-    // 预先获取所有可能需要的错误信息
-    const errorMessages = {
-      timeout: await t$8('utils.CONNECTION_TIMEOUT'),
-      dns: await t$8('utils.DNS_RESOLUTION_FAILED'),
-      invalid: await t$8('utils.INVALID_LATENCY_DATA', '{0}'),
-      failed: await t$8('utils.TEST_FAILED', '{0}')
-    };
-    
-    const nullDevice = os$1.platform() === 'win32' ? 'nul' : '/dev/null';
-    const timeoutSeconds = Math.ceil(timeout / 1000);
-    const curlCommand = `curl -o ${nullDevice} -s -w "%{time_total}" --connect-timeout ${timeoutSeconds} --max-time ${timeoutSeconds + 2} "${url}"`;
-
-    return new Promise((resolve, reject) => {
-      exec(curlCommand, { timeout: timeout + 2000 }, (error, stdout) => {
-        if (error) {
-          // 如果是超时或网络错误，返回适当的错误信息
-          const errorMsg = error.message.toLowerCase();
-          if (errorMsg.includes('timeout') || errorMsg.includes('timed out')) {
-            reject(new Error(errorMessages.timeout));
-          } else if (errorMsg.includes('could not resolve host')) {
-            reject(new Error(errorMessages.dns));
-          } else {
-            reject(new Error(errorMessages.failed.replace('{0}', error.message)));
-          }
-          return
-        }
-
-        const timeInSeconds = parseFloat(stdout.trim());
-        if (isNaN(timeInSeconds) || timeInSeconds < 0) {
-          reject(new Error(errorMessages.invalid.replace('{0}', stdout)));
-          return
-        }
-
-        resolve(Math.round(timeInSeconds * 1000));
-      });
-    })
-  }
-
-  /**
-   * 使用 Node.js HTTP 请求测试延迟
-   * @param {string} url - 要测试的URL
-   * @param {number} timeout - 超时时间（毫秒）
-   * @returns {Promise<number>} 延迟时间（毫秒）
-   */
-  static async testWithNodeHttp(url, timeout = 5000) {
-    // 预先获取所有可能需要的错误信息
-    const errorMessages = {
-      timeout: await t$8('utils.CONNECTION_TIMEOUT'),
-      dns: await t$8('utils.DNS_RESOLUTION_FAILED'),
-      refused: await t$8('utils.CONNECTION_REFUSED'),
-      reset: await t$8('utils.CONNECTION_RESET'),
-      httpFailed: await t$8('utils.HTTP_TEST_FAILED', '{0}'),
-      requestTimeout: await t$8('utils.REQUEST_TIMEOUT'),
-      urlParsing: await t$8('utils.URL_PARSING_ERROR', '{0}')
-    };
-    
-    return new Promise((resolve, reject) => {
-      const startTime = Date.now();
-
-      try {
-        const urlObj = new URL$1(url);
-        const client = urlObj.protocol === 'https:' ? https : http;
-
-        const req = client.get(
-          url,
-          {
-            timeout: timeout,
-            headers: {
-              'User-Agent': 'ccapi-ping/1.0',
-              Connection: 'close'
-            }
-          },
-          (res) => {
-            const latency = Date.now() - startTime;
-            res.destroy(); // 立即关闭响应流，不需要读取完整内容
-            resolve(latency);
-          }
-        );
-
-        req.on('error', (error) => {
-          const errorMsg = error.message.toLowerCase();
-          if (errorMsg.includes('timeout') || error.code === 'ETIMEDOUT') {
-            reject(new Error(errorMessages.timeout));
-          } else if (errorMsg.includes('getaddrinfo') || error.code === 'ENOTFOUND') {
-            reject(new Error(errorMessages.dns));
-          } else if (error.code === 'ECONNREFUSED') {
-            reject(new Error(errorMessages.refused));
-          } else if (error.code === 'ECONNRESET') {
-            reject(new Error(errorMessages.reset));
-          } else {
-            reject(new Error(errorMessages.httpFailed.replace('{0}', error.message)));
-          }
-        });
-
-        req.on('timeout', () => {
-          req.destroy();
-          reject(new Error(errorMessages.requestTimeout));
-        });
-
-        // 设置额外的超时保护
-        const timeoutId = setTimeout(() => {
-          req.destroy();
-          reject(new Error(errorMessages.requestTimeout));
-        }, timeout);
-
-        req.on('response', () => {
-          clearTimeout(timeoutId);
-        });
-
-        req.on('error', () => {
-          clearTimeout(timeoutId);
-        });
-      } catch (error) {
-        reject(new Error(errorMessages.urlParsing.replace('{0}', error.message)));
-      }
-    })
-  }
-
-  /**
-   * 批量测试多个URL的延迟
-   * @param {Array<string>} urls - URL列表
-   * @param {string} method - 测试方法
-   * @param {number} timeout - 超时时间（毫秒）
-   * @returns {Promise<Array<{url: string, latency: number|string, error: string|null}>>}
-   */
-  static async testMultipleUrls(urls, method = 'auto', timeout = 5000) {
-    const testPromises = urls.map(async (url, index) => {
-      try {
-        const latency = await this.testUrl(url, method, timeout);
-        return {
-          url,
-          latency,
-          error: null,
-          index,
-          success: true
-        }
-      } catch (error) {
-        return {
-          url,
-          latency: 'error',
-          error: error.message,
-          index,
-          success: false
-        }
-      }
-    });
-
-    return Promise.all(testPromises)
-  }
-
-  /**
-   * 获取测试方法信息
-   * @returns {Promise<{method: string, available: boolean}>}
-   */
-  static async getTestMethodInfo() {
-    const curlAvailable = await this.isCurlAvailable();
-    return {
-      curl: curlAvailable,
-      http: true, // Node.js HTTP 总是可用
-      recommended: curlAvailable ? 'curl' : 'http'
-    }
-  }
-};
-
-var latencyTester = LatencyTester$1;
-
-const chalk$7 = source$1;
-const { validateConfig: validateConfig$3 } = config;
-const { readConfigFile: readConfigFile$3 } = file;
-const { validateApiConfig: validateApiConfig$1 } = validator;
-const { readConfig: readConfig$1 } = config;
-const LatencyTester = latencyTester;
-const { t: t$7 } = i18n;
-
-let configData;
-const maxText$2 = 50;
-/**
- * 获取配置数据
- */
-async function getConfigData() {
-  configData = await readConfig$1();
-}
-
-// 初始化配置
-getConfigData();
-
-/**
- * 延迟分级颜色配置
- */
-const LATENCY_COLORS = {
-  EXCELLENT: { color: chalk$7.green, threshold: 300 },
-  GOOD: { color: chalk$7.yellow, threshold: 800 },
-  POOR: { color: chalk$7.red}
-};
-
-/**
- * 获取延迟颜色和状态
- */
-function getLatencyColor(latency) {
-  if (latency === 'error') {
-    return { color: chalk$7.red, text: 'error', status: '●' }
-  }
-
-  const ms = parseInt(latency);
-  if (ms <= LATENCY_COLORS.EXCELLENT.threshold) {
-    return {
-      color: LATENCY_COLORS.EXCELLENT.color,
-      text: `${ms}ms`,
-      status: '●'
-    }
-  } else if (ms <= LATENCY_COLORS.GOOD.threshold) {
-    return { color: LATENCY_COLORS.GOOD.color, text: `${ms}ms`, status: '●' }
-  } else {
-    return { color: LATENCY_COLORS.POOR.color, text: `${ms}ms`, status: '●' }
-  }
-}
-
-/**
- * 显示加载动画
- */
-function showSpinner() {
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-  let i = 0;
-  return setInterval(() => {
-    process.stdout.write(`\r${frames[i]} `);
-    i = (i + 1) % frames.length;
-  }, 100)
-}
-
-/**
- * 格式化URL显示
- */
-function formatUrl(url, maxLength = maxText$2) {
-  if (url.length > maxLength) {
-    return url.slice(0, maxLength - 3) + '...'
-  }
-  return url
-}
-
-/**
- * 测试单个配置的所有URL延迟
- */
-async function testConfigurationPing(configName, config) {
-  const urls = Array.isArray(config.url) ? config.url : [config.url];
-
-  // 获取超时配置，默认5000ms
-  const timeout = configData && configData.pingTimeout ? configData.pingTimeout : 5000;
-
-  // 使用 LatencyTester 并行测试所有URL
-  const results = await LatencyTester.testMultipleUrls(urls, 'auto', timeout);
-
-  return {
-    configName,
-    results: results.map((result) => ({
-      url: result.url,
-      success: result.success,
-      latency: result.latency,
-      error: result.error,
-      response: null, // ping 命令不返回响应内容，只测试延迟
-      index: result.index,
-      configName
-    }))
-  }
-}
-
-/**
- * 获取配置结果中的最佳延迟信息
- */
-function getBestLatencyInfo(results) {
-  // 从所有有数字延迟的结果中获取最佳延迟
-  const numericResults = results
-    .filter((r) => typeof r.latency === 'number' && r.latency > 0 && r.latency !== Infinity)
-    .sort((a, b) => a.latency - b.latency);
-
-  if (numericResults.length > 0) {
-    return { latency: numericResults[0].latency, url: numericResults[0].url }
-  }
-
-  return { latency: Infinity, url: null }
-}
-
-/**
- * 获取配置结果中的最佳延迟（向后兼容）
- */
-function getBestLatency(results) {
-  const info = getBestLatencyInfo(results);
-  return info.latency
-}
-
-/**
- * 对测试结果进行排序和分组（按配置分组，配置内按原始顺序）
- */
-function sortTestResults(allResults) {
-  // 对每个配置的results内部保持原始顺序（按index排序）
-  const sortedResults = allResults.map((configResult) => {
-    const sortedConfigResults = configResult.results.sort((a, b) => {
-      // 按原始配置文件中的顺序排序（使用index字段）
-      if (a.index !== undefined && b.index !== undefined) {
-        return a.index - b.index
-      }
-      return 0
-    });
-
-    return {
-      ...configResult,
-      results: sortedConfigResults
-    }
-  });
-
-  // 按配置的最佳延迟排序配置
-  const finalSorted = sortedResults.sort((a, b) => {
-    const bestLatencyA = getBestLatency(a.results);
-    const bestLatencyB = getBestLatency(b.results);
-
-    // 如果都有成功的结果，按最佳延迟排序
-    if (bestLatencyA !== Infinity && bestLatencyB !== Infinity) {
-      return bestLatencyA - bestLatencyB
-    }
-
-    // 有成功结果的排在前面
-    if (bestLatencyA !== Infinity && bestLatencyB === Infinity) return -1
-    if (bestLatencyA === Infinity && bestLatencyB !== Infinity) return 1
-
-    // 都没有成功结果，按配置名排序
-    return a.configName.localeCompare(b.configName)
-  });
-
-  return finalSorted
-}
-
-/**
- * 显示排序后的测试结果
- */
-async function displayPingResults(sortedResults) {
-  console.log();
-  console.log(chalk$7.yellow.bold(await t$7('ping.LATENCY_TEST_RESULTS')));
-  console.log();
-
-  for (const configResult of sortedResults) {
-    const configIndex = sortedResults.indexOf(configResult);
-    // 获取并显示配置的最佳延迟和地址
-    const bestInfo = getBestLatencyInfo(configResult.results);
-
-    let bestText;
-    if (bestInfo.latency === Infinity) {
-      bestText = await t$7('test.FAILED');
-    } else {
-      const shortUrl = formatUrl(bestInfo.url);
-      bestText = `${shortUrl}`;
-    }
-
-    // 显示配置名和最佳延迟信息
-    console.log(
-      chalk$7.cyan.bold(`[${configResult.configName}]`) + chalk$7.cyan.bold(`(${await t$7('ping.BEST_ROUTE', bestText)})`)
-    );
-
-    configResult.results.forEach((result, index) => {
-      const { color, text, status } = getLatencyColor(result.latency);
-
-      // ping 命令的响应显示逻辑
-      let responseDisplay = '';
-      const show = configData.testResponse === void 0 ? true : !!configData.testResponse;
-      if (show) {
-        const responseText = result.error || 'Success';
-        const finalResponse = responseText.length > maxText$2 ? responseText.slice(0, maxText$2) + '...' : responseText;
-        responseDisplay = ` [Response: ${finalResponse}]`;
-      }
-
-      const urlFormatted = formatUrl(result.url);
-      const resultLine = `    ${index + 1}.[${urlFormatted}] ${color(status)} ${color.bold(text)}${responseDisplay}`;
-
-      console.log(resultLine);
-    });
-
-    // 在每个配置后添加空行
-    if (configIndex < sortedResults.length - 1) {
-      console.log();
-    }
-  }
-
-  console.log();
-}
-
-/**
- * ping 命令的主函数
- */
-async function pingCommand$2(configName = null) {
-  try {
-    // 验证配置
-    const config = await validateConfig$3();
-
-    // 读取API配置文件
-    const apiConfig = await readConfigFile$3(config.apiConfigPath);
-    if (!validateApiConfig$1(apiConfig)) {
-      console.error(chalk$7.red((await t$7('test.ERROR')) + ':'), await t$7('ping.CONFIG_FORMAT_ERROR'));
-      return
-    }
-
-    let configsToTest = {};
-
-    if (configName) {
-      // 测试指定配置
-      if (!apiConfig[configName]) {
-        console.error(chalk$7.red((await t$7('test.ERROR')) + ':'), await t$7('ping.CONFIG_NOT_EXIST', configName));
-        console.log(chalk$7.green(await t$7('ping.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '));
-        return
-      }
-      configsToTest[configName] = apiConfig[configName];
-    } else {
-      // 测试所有配置
-      configsToTest = apiConfig;
-    }
-
-    // 显示测试进度信息
-    const totalConfigs = Object.keys(configsToTest).length;
-    console.log(chalk$7.green.bold(await t$7('ping.TESTING_CONFIGS', totalConfigs)));
-
-    // 显示测试方法信息
-    // const methodInfo = await LatencyTester.getTestMethodInfo()
-
-    // 显示全局加载动画
-    const globalSpinner = showSpinner();
-
-    // 创建所有配置的并行测试任务
-    const testPromises = Object.entries(configsToTest).map(([name, configdata]) =>
-      testConfigurationPing(name, configdata)
-    );
-
-    // 等待所有配置测试完成
-    const allResults = await Promise.all(testPromises);
-
-    // 清除加载动画
-    clearInterval(globalSpinner);
-    process.stdout.write('\r\u001b[K'); // 清除当前行
-
-    // 整理并排序所有测试结果
-    const sortedResults = sortTestResults(allResults);
-
-    // 显示排序后的结果
-    await displayPingResults(sortedResults);
-
-    // 显示测试完成信息
-    const totalUrls = sortedResults.reduce((total, config) => total + config.results.length, 0);
-    const successUrls = sortedResults.reduce(
-      (total, config) => total + config.results.filter((r) => r.success).length,
-      0
-    );
-
-    console.log(chalk$7.green.bold(await t$7('ping.LATENCY_TEST_COMPLETE', successUrls, totalUrls)));
-
-    return sortedResults
-  } catch (error) {
-    console.error(chalk$7.red(await t$7('ping.LATENCY_TEST_FAILED')), error.message);
-    process.exit(1);
-  }
-}
-
-var ping = pingCommand$2;
-
-const chalk$6 = source$1;
-const pingCommand$1 = ping;
-const testCommand$1 = test;
-const useCommand$1 = use;
-const { validateConfig: validateConfig$2 } = config;
-const { readConfigFile: readConfigFile$2 } = file;
-const { t: t$6 } = i18n;
-
-/**
- * 分析测试结果，从已排序的结果中选择最优配置
- * @param {Array} sortedResults - 排序后的测试结果
- * @param {boolean} isTestMode - 是否为test模式（true=test, false=ping）
- */
-function analyzeBestConfig(sortedResults, isTestMode = false) {
-  const allValidResults = [];
-
-  for (const configResult of sortedResults) {
-    const { configName, results } = configResult;
-
-    // 遍历该配置的所有结果
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-
-      let isValidResult = false;
-
-      if (isTestMode) {
-        isValidResult =
-          result.success === true &&
-          typeof result.latency === 'number' &&
-          result.latency > 0 &&
-          result.latency !== Infinity &&
-          !isNaN(result.latency);
-      } else {
-        isValidResult =
-          typeof result.latency === 'number' &&
-          result.latency > 0 &&
-          result.latency !== Infinity &&
-          !isNaN(result.latency);
-      }
-
-      if (isValidResult) {
-        allValidResults.push({
-          configName: configName,
-          latency: result.latency,
-          url: result.url,
-          urlIndex: i,
-          keyIndex: i,
-          tokenIndex: i
-        });
-      }
-    }
-  }
-
-  // 如果没有有效结果，返回默认值
-  if (allValidResults.length === 0) {
-    return {
-      configName: null,
-      latency: Infinity,
-      url: null,
-      urlIndex: -1,
-      keyIndex: -1,
-      tokenIndex: -1
-    }
-  }
-
-  // 按延迟从小到大排序，选择延迟最低的配置
-  allValidResults.sort((a, b) => a.latency - b.latency);
-
-  return allValidResults[0]
-}
-
-/**
- * 构建use命令的选项对象
- */
-async function buildUseOptions(configName, bestResult, apiConfig) {
-  const config = apiConfig[configName];
-  const options = {};
-
-  // 处理URL索引
-  if (Array.isArray(config.url) && bestResult.urlIndex >= 0) {
-    options.url = (bestResult.urlIndex + 1).toString(); // 转换为1开始的索引
-  }
-
-  // 处理Key索引
-  if (Array.isArray(config.key) && bestResult.keyIndex >= 0) {
-    const actualKeyIndex = Math.min(bestResult.keyIndex, config.key.length - 1);
-    options.key = (actualKeyIndex + 1).toString();
-  }
-
-  // 处理Token索引
-  if (Array.isArray(config.token) && bestResult.tokenIndex >= 0) {
-    const actualTokenIndex = Math.min(bestResult.tokenIndex, config.token.length - 1);
-    options.token = (actualTokenIndex + 1).toString();
-  }
-
-  // Model和Fast默认使用第一个（如果是数组的话）
-  if (Array.isArray(config.model)) {
-    options.model = '1';
-  }
-
-  if (Array.isArray(config.fast)) {
-    options.fast = '1';
-  }
-
-  return options
-}
-
-/**
- * 自动选择最优配置命令
- */
-async function autoCommand$1(configName = null, options = {}) {
-  try {
-    let sortedResults;
-    let isTestMode = true;
-
-    if (options.ping) {
-      // console.log(chalk.cyan('使用 ping 测试模式（快速网络延迟测试）...'))
-      sortedResults = await pingCommand$1(configName);
-      isTestMode = false;
-    } else {
-      // console.log(chalk.cyan('使用 test 测试模式（真实API可用性测试）...'))
-      sortedResults = await testCommand$1(configName, 0, 0);
-      isTestMode = true;
-    }
-
-    if (!sortedResults || sortedResults.length === 0) {
-      console.error(chalk$6.red(await t$6('test.ERROR') + ':'), await t$6('auto.NO_CONFIGS_AVAILABLE'));
-      process.exit(1);
-    }
-
-    // 从已排序的结果中选择最优配置
-    const bestResult = analyzeBestConfig(sortedResults, isTestMode);
-
-    if (!bestResult.configName) {
-      const tip = configName ? `${configName}: ${await t$6('test.ERROR')}!` : await t$6('test.NO_AVAILABLE_CONFIG') + '!';
-      console.error(chalk$6.red.bold(tip));
-      process.exit(1);
-    }
-
-    console.log(chalk$6.green.bold(await t$6('auto.FOUND_OPTIMAL_CONFIG')));
-
-    // 读取配置文件以构建use命令参数
-    const config = await validateConfig$2();
-    const apiConfig = await readConfigFile$2(config.apiConfigPath);
-
-    // 构建use命令的选项
-    const useOptions = await buildUseOptions(bestResult.configName, bestResult, apiConfig);
-
-    // 执行切换
-    await useCommand$1(bestResult.configName, useOptions);
-  } catch (error) {
-    console.error(chalk$6.red(await t$6('auto.AUTO_SWITCH_FAILED')), error.message);
-    process.exit(1);
-  }
-}
-
-var auto = autoCommand$1;
-
-const { spawn } = require$$0$3;
+const { spawn } = require$$0$2;
 const chalk$5 = source$1;
 const packageJson$1 = require$$2$1;
 const { t: t$5 } = i18n;
@@ -23908,7 +21508,7 @@ async function setEnvFromConfig(configName, options = {}) {
     const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set');
     if (no) {
       console.error(chalk$4.red(await t$4('common.CONFIG_ERROR')), error.message);
-      console.log(await t$4('use.USE_SET_CMD', chalk$4.cyan('ccapi set')));
+      console.log(await t$4('claude.USE_SET_CMD', chalk$4.cyan('ccapi set')));
     } else {
       console.error(chalk$4.red(await t$4('envManagement.ENV_CMD_FAILED')), error.message);
     }
@@ -24001,7 +21601,7 @@ async function envCommand$1(configName, options = {}) {
 var env = envCommand$1;
 
 const chalk$3 = source$1;
-const readline = require$$1$3;
+const readline = require$$1$2;
 const { validateConfig } = config;
 const { readConfigFile, writeConfigFile, backupFile } = file;
 const { validateSettingsConfig } = validator;
@@ -24248,12 +21848,12 @@ async function langCommand$1(lang) {
 var lang = langCommand$1;
 
 const chalk$1 = source$1;
-const os = require$$0$4;
+const os = require$$0$3;
 const path = require$$1;
 const toml = toml$1;
 const { fileExists, readFileContent, writeFileContent } = file;
 const { t: t$1 } = i18n;
-const { execSync } = require$$0$3;
+const { execSync } = require$$0$2;
 
 /**
  * 读取codex配置文件
@@ -24342,13 +21942,11 @@ async function setAuthJsonApiKey(apiKey) {
 async function codexCommand$1(providerName) {
   try {
     const configPath = path.join(os.homedir(), '.codex', 'config.toml');
-    const authDisplayPath = path.posix ? path.posix.join('~', '.codex', 'auth.json') : '~/.codex/auth.json';
 
     // 如果没有提供provider名称，显示当前配置和可用选项
     if (!providerName) {
       console.log(chalk$1.green('当前codex配置:'));
       console.log(`  配置文件: ${chalk$1.cyan(configPath)}`);
-      console.log(`  认证文件: ${chalk$1.cyan(authDisplayPath)}`);
 
       try {
         const config = await readCodexConfig();
@@ -24403,14 +22001,13 @@ async function codexCommand$1(providerName) {
       await setAuthJsonApiKey(providerConfig.api_key);
       console.log(chalk$1.green('✓ codex配置切换成功'));
       console.log(`  model_provider: ${chalk$1.cyan(providerName)}`);
-      console.log(`  API Key 已写入 ${chalk$1.cyan(authDisplayPath)}`);
+      console.log(`  API Key 已写入 ~/.codex/auth.json`);
       console.log(`  配置文件: ${chalk$1.cyan(configPath)}`);
     } else {
       console.log(chalk$1.green('✓ codex配置切换成功'));
       console.log(`  model_provider: ${chalk$1.cyan(providerName)}`);
       console.log(chalk$1.yellow(`  警告: ${providerName} 配置中未找到 api_key 字段`));
       console.log(`  配置文件: ${chalk$1.cyan(configPath)}`);
-      console.log(`  认证文件: ${chalk$1.cyan(authDisplayPath)}`);
     }
 
   } catch (error) {
@@ -24431,11 +22028,7 @@ const { t } = i18n;
 // 导入命令处理模块
 const versionCommand = version;
 const setCommand = set;
-const listCommand = list;
-const useCommand = use;
-const testCommand = test;
-const autoCommand = auto;
-const pingCommand = ping;
+const claudeCommand = claude;
 const updateCommand = update;
 const envCommand = env;
 const clearCommand = clear;
@@ -24474,82 +22067,27 @@ async function initializeProgram() {
     await checkVersionInBackground();
   });
 
-  // 设置命令
+  // claude 命令
   program
-    .command('set')
-    .description(await t('commands.set.description'))
-    .option('--settings <path>', await t('commands.set.settingsOption'))
-    .option('--api <path>', await t('commands.set.apiOption'))
-    .action(async (options) => {
-      await setCommand(options);
-      await checkVersionInBackground();
-    });
-
-  // 列举命令 (支持 ls 和 list 两个命令)
-  program
-    .command('ls')
-    .alias('list')
-    .description(await t('commands.list.description'))
-    .action(async () => {
-      await listCommand();
-      await checkVersionInBackground();
-    });
-
-  // 使用命令
-  program
-    .command('use <name>')
-    .description(await t('commands.use.description'))
-    .option('-u, --url <index>', await t('commands.use.urlOption'))
-    .option('-k, --key <index>', await t('commands.use.keyOption'))
-    .option('-t, --token <index>', await t('commands.use.tokenOption'))
-    .option('-m, --model <index>', await t('commands.use.modelOption'))
-    .option('-f, --fast <index>', await t('commands.use.fastOption'))
+    .command('claude [name]')
+    .description(await t('commands.claude.description'))
+    .option('-u, --url <index>', await t('commands.claude.urlOption'))
+    .option('-k, --key <index>', await t('commands.claude.keyOption'))
+    .option('-t, --token <index>', await t('commands.claude.tokenOption'))
+    .option('-m, --model <index>', await t('commands.claude.modelOption'))
+    .option('-f, --fast <index>', await t('commands.claude.fastOption'))
     .action(async (name, options) => {
-      await useCommand(name, options);
+      await claudeCommand(name, options);
       await checkVersionInBackground();
     });
 
-  // ping 命令
+  // codex 命令
   program
-    .command('ping [name]')
-    .description(await t('commands.ping.description'))
-    .action(async (name) => {
-      await pingCommand(name);
+    .command('codex [provider]')
+    .description('切换codex配置中的model_provider')
+    .action(async (provider) => {
+      await codexCommand(provider);
       await checkVersionInBackground();
-    });
-
-  // 测试命令
-  program
-    .command('test [name]')
-    .description(await t('commands.test.description'))
-    .option('-t, --token <index>', await t('commands.test.tokenOption'))
-    .option('-k, --key <index>', await t('commands.test.keyOption'))
-    .option('-c, --cli', await t('commands.test.cliOption'))
-    .action(async (name, options) => {
-      const keyIndex = options.key ? parseInt(options.key) - 1 : 0;
-      const tokenIndex = options.token ? parseInt(options.token) - 1 : 0;
-      const useCli = options.cli || false;
-      await testCommand(name, keyIndex, tokenIndex, useCli);
-      await checkVersionInBackground();
-    });
-
-  // 自动选择命令
-  program
-    .command('auto [name]')
-    .description(await t('commands.auto.description'))
-    .option('-p, --ping', await t('commands.auto.pingOption'))
-    .option('-t, --test', await t('commands.auto.testOption'))
-    .action(async (name, options) => {
-      await autoCommand(name, options);
-      await checkVersionInBackground();
-    });
-
-  // update 命令
-  program
-    .command('update')
-    .description(await t('commands.update.description'))
-    .action(() => {
-      updateCommand();
     });
 
   // env 命令
@@ -24565,6 +22103,7 @@ async function initializeProgram() {
       await envCommand(name, options);
       await checkVersionInBackground();
     });
+
 
   // clear 命令
   program
@@ -24583,14 +22122,27 @@ async function initializeProgram() {
       await langCommand(language);
     });
 
-  // codex 命令
+  // update 命令
   program
-    .command('codex [provider]')
-    .description('切换codex配置中的model_provider')
-    .action(async (provider) => {
-      await codexCommand(provider);
+    .command('update')
+    .description(await t('commands.update.description'))
+    .action(() => {
+      updateCommand();
+    });
+
+  // 设置命令
+  program
+    .command('set')
+    .description(await t('commands.set.description'))
+    .option('--settings <path>', await t('commands.set.settingsOption'))
+    .option('--api <path>', await t('commands.set.apiOption'))
+    .action(async (options) => {
+      await setCommand(options);
       await checkVersionInBackground();
     });
+
+
+
 
   return program
 }

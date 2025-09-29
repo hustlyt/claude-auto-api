@@ -104,7 +104,7 @@ async function setEnvFromConfig(configName, options = {}) {
     const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set')
     if (no) {
       console.error(chalk.red(await t('common.CONFIG_ERROR')), error.message)
-      console.log(await t('use.USE_SET_CMD', chalk.cyan('ccapi set')))
+      console.log(await t('claude.USE_SET_CMD', chalk.cyan('ccapi set')))
     } else {
       console.error(chalk.red(await t('envManagement.ENV_CMD_FAILED')), error.message)
     }

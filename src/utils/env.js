@@ -209,7 +209,7 @@ async function setSystemEnvVars(config, configName, tip = true) {
   try {
     const platform = await getPlatformType() // 这里会抛出不支持平台的错误
 
-    // console.log(await t('use.SWITCHING_ENV'))
+    // console.log(await t('claude.SWITCHING_ENV'))
 
     // 构建所有要设置的环境变量
     const envVarsToSet = {}

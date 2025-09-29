@@ -18,27 +18,13 @@ module.exports = {
       description: '显示当前API配置列表',
       alias: '列举'
     },
-    use: {
+    claude: {
       description: '切换到指定的API配置',
       urlOption: '指定要切换的URL索引（从1开始，仅对数组类型url有效）',
       keyOption: '指定要切换的Key索引（从1开始，仅对数组类型key有效）',
       tokenOption: '指定要切换的Token索引（从1开始，仅对数组类型token有效）',
       modelOption: '指定要切换的模型索引（从1开始，仅对数组类型model有效）',
       fastOption: '指定要切换的快速模型索引（从1开始，仅对数组类型fast有效）'
-    },
-    ping: {
-      description: '测试API配置中所有URL的网络延迟'
-    },
-    test: {
-      description: '测试API配置在Claude Code中是否可用',
-      tokenOption: '指定要使用的Token索引（从1开始，仅在测试单个配置时有效）',
-      keyOption: '指定要使用的Key索引（从1开始，仅在测试单个配置时有效）',
-      cliOption: '使用Claude Code CLI方式进行测试，而非默认的接口模拟方式'
-    },
-    auto: {
-      description: '自动测试API配置并切换到最优配置',
-      pingOption: '使用ping测试延迟结果选择最优配置切换（快速且只验证网站URL延迟）',
-      testOption: '使用test测试结果选择最优配置切换（稍慢但验证真实API可用性）'
     },
     update: {
       description: '更新ccapi到最新版本'
@@ -123,35 +109,6 @@ module.exports = {
     Token: 'Token'
   },
 
-  // 测试相关
-  test: {
-    TESTING: '正在测试',
-    TESTING_CONFIG: '正在测试配置',
-    TEST_RESULTS: '测试结果',
-    LATENCY_TEST: '延迟测试',
-    API_TEST: 'API测试',
-    SUCCESS: '成功',
-    FAILED: '失败',
-    ERROR: '错误',
-    TIMEOUT: '超时',
-    BEST_CONFIG: '最佳配置',
-    AUTO_SWITCH_SUCCESS: '自动切换成功',
-    NO_AVAILABLE_CONFIG: '没有可用的配置',
-    GET_CLAUDE_PATH_FAILED: 'Claude Code路径获取失败:',
-    CLAUDE_NOT_FOUND: 'Claude Code可执行文件未找到，请确保已安装 Claude Code',
-    REQUEST_FAILED: '请求失败',
-    MISSING_AUTH: '缺少认证信息 (key 或 token)',
-    TEST_RESULTS_TITLE: '测试结果(按响应延迟从低到高): ',
-    BEST_ROUTE: '最优路线',
-    CONFIG_FORMAT_ERROR: 'api配置文件格式不正确',
-    CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    TESTING_CONFIGS: '正在测试配置URL在Claude Code中的有效性(时间可能稍长,请耐心等待)...',
-    TEST_COMPLETE: '有效性测试完成, 此结果代表能否在Claude Code中使用!',
-    TEST_FAILED: '有效性测试失败:',
-    VALID: '有效',
-    INVALID: '无效',
-    PROGRESS_COMPLETED: '✓ 已完成{0}/{1}个URL测试，下一批次测试中...'
-  },
 
   // 环境变量相关
   env: {
@@ -195,27 +152,10 @@ module.exports = {
     ENV_CMD_FAILED: '环境变量命令执行失败:'
   },
 
-  // Ping 相关
-  ping: {
-    LATENCY_TEST_RESULTS: '延迟测试结果(按厂商URL延迟从低到高):',
-    BEST_ROUTE: '最优路线: {0}',
-    CONFIG_NOT_EXIST: '配置 "{0}" 不存在',
-    AVAILABLE_CONFIGS: '可用配置:',
-    TESTING_CONFIGS: '正在测试配置URL延迟...',
-    LATENCY_TEST_COMPLETE: 'URL延迟测试完成! 成功: {0}/{1}',
-    LATENCY_TEST_FAILED: 'URL延迟测试失败:',
-    CONFIG_FORMAT_ERROR: 'api配置文件格式不正确'
-  },
 
-  // 自动选择相关
-  auto: {
-    NO_CONFIGS_AVAILABLE: '暂无可用的配置进行测试',
-    FOUND_OPTIMAL_CONFIG: '已找到最优配置,开始切换中...',
-    AUTO_SWITCH_FAILED: '自动切换配置失败:'
-  },
 
-  // 使用配置相关
-  use: {
+  // Claude 配置相关
+  claude: {
     API_FORMAT_ERROR: 'api.json文件格式不正确',
     SETTINGS_FORMAT_ERROR: 'settings.json文件格式不正确',
     SWITCHING_CONFIG: '正在切换配置: {0}',

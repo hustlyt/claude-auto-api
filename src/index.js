@@ -8,11 +8,7 @@ const { t } = require('./utils/i18n')
 // 导入命令处理模块
 const versionCommand = require('./commands/version')
 const setCommand = require('./commands/set')
-const listCommand = require('./commands/list')
-const useCommand = require('./commands/use')
-const testCommand = require('./commands/test')
-const autoCommand = require('./commands/auto')
-const pingCommand = require('./commands/ping')
+const claudeCommand = require('./commands/claude')
 const updateCommand = require('./commands/update')
 const envCommand = require('./commands/env')
 const clearCommand = require('./commands/clear')
@@ -51,82 +47,27 @@ async function initializeProgram() {
     await checkVersionInBackground()
   })
 
-  // 设置命令
+  // claude 命令
   program
-    .command('set')
-    .description(await t('commands.set.description'))
-    .option('--settings <path>', await t('commands.set.settingsOption'))
-    .option('--api <path>', await t('commands.set.apiOption'))
-    .action(async (options) => {
-      await setCommand(options)
-      await checkVersionInBackground()
-    })
-
-  // 列举命令 (支持 ls 和 list 两个命令)
-  program
-    .command('ls')
-    .alias('list')
-    .description(await t('commands.list.description'))
-    .action(async () => {
-      await listCommand()
-      await checkVersionInBackground()
-    })
-
-  // 使用命令
-  program
-    .command('use <name>')
-    .description(await t('commands.use.description'))
-    .option('-u, --url <index>', await t('commands.use.urlOption'))
-    .option('-k, --key <index>', await t('commands.use.keyOption'))
-    .option('-t, --token <index>', await t('commands.use.tokenOption'))
-    .option('-m, --model <index>', await t('commands.use.modelOption'))
-    .option('-f, --fast <index>', await t('commands.use.fastOption'))
+    .command('claude [name]')
+    .description(await t('commands.claude.description'))
+    .option('-u, --url <index>', await t('commands.claude.urlOption'))
+    .option('-k, --key <index>', await t('commands.claude.keyOption'))
+    .option('-t, --token <index>', await t('commands.claude.tokenOption'))
+    .option('-m, --model <index>', await t('commands.claude.modelOption'))
+    .option('-f, --fast <index>', await t('commands.claude.fastOption'))
     .action(async (name, options) => {
-      await useCommand(name, options)
+      await claudeCommand(name, options)
       await checkVersionInBackground()
     })
 
-  // ping 命令
+  // codex 命令
   program
-    .command('ping [name]')
-    .description(await t('commands.ping.description'))
-    .action(async (name) => {
-      await pingCommand(name)
+    .command('codex [provider]')
+    .description('切换codex配置中的model_provider')
+    .action(async (provider) => {
+      await codexCommand(provider)
       await checkVersionInBackground()
-    })
-
-  // 测试命令
-  program
-    .command('test [name]')
-    .description(await t('commands.test.description'))
-    .option('-t, --token <index>', await t('commands.test.tokenOption'))
-    .option('-k, --key <index>', await t('commands.test.keyOption'))
-    .option('-c, --cli', await t('commands.test.cliOption'))
-    .action(async (name, options) => {
-      const keyIndex = options.key ? parseInt(options.key) - 1 : 0
-      const tokenIndex = options.token ? parseInt(options.token) - 1 : 0
-      const useCli = options.cli || false
-      await testCommand(name, keyIndex, tokenIndex, useCli)
-      await checkVersionInBackground()
-    })
-
-  // 自动选择命令
-  program
-    .command('auto [name]')
-    .description(await t('commands.auto.description'))
-    .option('-p, --ping', await t('commands.auto.pingOption'))
-    .option('-t, --test', await t('commands.auto.testOption'))
-    .action(async (name, options) => {
-      await autoCommand(name, options)
-      await checkVersionInBackground()
-    })
-
-  // update 命令
-  program
-    .command('update')
-    .description(await t('commands.update.description'))
-    .action(() => {
-      updateCommand()
     })
 
   // env 命令
@@ -142,6 +83,7 @@ async function initializeProgram() {
       await envCommand(name, options)
       await checkVersionInBackground()
     })
+
 
   // clear 命令
   program
@@ -160,14 +102,27 @@ async function initializeProgram() {
       await langCommand(language)
     })
 
-  // codex 命令
+  // update 命令
   program
-    .command('codex [provider]')
-    .description('切换codex配置中的model_provider')
-    .action(async (provider) => {
-      await codexCommand(provider)
+    .command('update')
+    .description(await t('commands.update.description'))
+    .action(() => {
+      updateCommand()
+    })
+
+  // 设置命令
+  program
+    .command('set')
+    .description(await t('commands.set.description'))
+    .option('--settings <path>', await t('commands.set.settingsOption'))
+    .option('--api <path>', await t('commands.set.apiOption'))
+    .action(async (options) => {
+      await setCommand(options)
       await checkVersionInBackground()
     })
+
+
+
 
   return program
 }

@@ -18,28 +18,13 @@ module.exports = {
       description: 'Display current API configuration list',
       alias: 'list'
     },
-    use: {
+    claude: {
       description: 'Switch to specified API configuration',
       urlOption: 'Specify URL index to switch to (starting from 1, only valid for array type url)',
       keyOption: 'Specify Key index to switch to (starting from 1, only valid for array type key)',
       tokenOption: 'Specify Token index to switch to (starting from 1, only valid for array type token)',
       modelOption: 'Specify model index to switch to (starting from 1, only valid for array type model)',
       fastOption: 'Specify fast model index to switch to (starting from 1, only valid for array type fast)'
-    },
-    ping: {
-      description: 'Test network latency of all URLs in API configuration'
-    },
-    test: {
-      description: 'Test if API configuration is available in Claude Code',
-      tokenOption: 'Specify Token index to use (starting from 1, only valid when testing single configuration)',
-      keyOption: 'Specify Key index to use (starting from 1, only valid when testing single configuration)',
-      cliOption: 'Use Claude Code CLI method for testing instead of default API mock method'
-    },
-    auto: {
-      description: 'Automatically test API configurations and switch to the optimal one',
-      pingOption:
-        'Use ping test latency results to select optimal configuration (fast and only verifies website URL latency)',
-      testOption: 'Use test results to select optimal configuration (slower but verifies real API availability)'
     },
     update: {
       description: 'Update ccapi to latest version'
@@ -127,36 +112,6 @@ module.exports = {
     Token: 'Token'
   },
 
-  // Test related
-  test: {
-    TESTING: 'Testing',
-    TESTING_CONFIG: 'Testing configuration',
-    TEST_RESULTS: 'Test results',
-    LATENCY_TEST: 'Latency test',
-    API_TEST: 'API test',
-    SUCCESS: 'Success',
-    FAILED: 'Failed',
-    ERROR: 'Error',
-    TIMEOUT: 'Timeout',
-    BEST_CONFIG: 'Best configuration',
-    AUTO_SWITCH_SUCCESS: 'Auto switch successful',
-    NO_AVAILABLE_CONFIG: 'No available configuration',
-    GET_CLAUDE_PATH_FAILED: 'Failed to get Claude path:',
-    CLAUDE_NOT_FOUND: 'Claude executable not found, please ensure Claude Code is installed',
-    REQUEST_FAILED: 'Request failed',
-    MISSING_AUTH: 'Missing authentication (key or token)',
-    TEST_RESULTS_TITLE: 'Test results (by response latency from low to high): ',
-    BEST_ROUTE: 'Best route',
-    CONFIG_FORMAT_ERROR: 'api configuration file format error',
-    CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
-    TESTING_CONFIGS:
-      'Testing URL for availability in Claude Code (may take a while, please be patient)...',
-    TEST_COMPLETE: 'Validity test completed, this result shows whether it can be used in Claude Code!',
-    TEST_FAILED: 'Validity test failed:',
-    VALID: 'Valid',
-    INVALID: 'Invalid',
-    PROGRESS_COMPLETED: '✓ Completed {0}/{1} URL tests, continuing with next batch...'
-  },
 
   // Environment variable related
   env: {
@@ -200,27 +155,10 @@ module.exports = {
     ENV_CMD_FAILED: 'Environment variable command execution failed:'
   },
 
-  // Ping related
-  ping: {
-    LATENCY_TEST_RESULTS: 'Latency test results (by vendor URL latency from low to high):',
-    BEST_ROUTE: 'Best route: {0}',
-    CONFIG_NOT_EXIST: 'Configuration "{0}" does not exist',
-    AVAILABLE_CONFIGS: 'Available configurations:',
-    TESTING_CONFIGS: 'Testing URL latency...',
-    LATENCY_TEST_COMPLETE: 'URL latency test complete! Success: {0}/{1}',
-    LATENCY_TEST_FAILED: 'URL latency test failed:',
-    CONFIG_FORMAT_ERROR: 'api configuration file format error'
-  },
 
-  // Auto selection related
-  auto: {
-    NO_CONFIGS_AVAILABLE: 'No configurations available for testing',
-    FOUND_OPTIMAL_CONFIG: 'Found optimal configuration, switching...',
-    AUTO_SWITCH_FAILED: 'Auto switch configuration failed:'
-  },
 
-  // Use configuration related
-  use: {
+  // Claude configuration related
+  claude: {
     API_FORMAT_ERROR: 'api.json file format error',
     SETTINGS_FORMAT_ERROR: 'settings.json file format error',
     SWITCHING_CONFIG: 'Switching configuration: {0}',
