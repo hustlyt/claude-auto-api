@@ -38,6 +38,30 @@ async function fileExists(filePath) {
 }
 
 /**
+ * 读取文件内容（纯文本）
+ */
+async function readFileContent(filePath) {
+  try {
+    return await fs.readFile(filePath, 'utf8')
+  } catch (error) {
+    throw new Error(`Failed to read file: ${error.message}`)
+  }
+}
+
+/**
+ * 写入文件内容（纯文本）
+ */
+async function writeFileContent(filePath, content) {
+  try {
+    // 确保目录存在
+    await fs.ensureDir(path.dirname(filePath))
+    await fs.writeFile(filePath, content, 'utf8')
+  } catch (error) {
+    throw new Error(`Failed to write file: ${error.message}`)
+  }
+}
+
+/**
  * 验证路径格式
  */
 function validatePath(filePath) {
@@ -58,6 +82,8 @@ function validatePath(filePath) {
 module.exports = {
   readConfigFile,
   writeConfigFile,
+  readFileContent,
+  writeFileContent,
   backupFile,
   fileExists,
   validatePath

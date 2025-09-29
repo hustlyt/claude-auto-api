@@ -1,4 +1,6 @@
 const chalk = require('chalk')
+const os = require('os')
+const path = require('path')
 const { validateSetCommand } = require('../utils/validator')
 const { setSettingsPath, setApiConfigPath, getSettingsPath, getApiConfigPath } = require('../utils/config')
 const { fileExists } = require('../utils/file')
@@ -42,6 +44,17 @@ async function setCommand(options) {
           }
         } else {
           console.log(`  api: ${chalk.yellow(await t('prompts.NOT_SET'))}`)
+        }
+
+        // 显示codex配置路径
+        const codexConfigPath = path.join(os.homedir(), '.codex', 'config.toml')
+        const codexExists = await fileExists(codexConfigPath)
+        const codexStatusIcon = codexExists ? chalk.green('✓') : chalk.red('✗')
+        console.log(`  codex: ${codexStatusIcon} ${chalk.cyan(codexConfigPath)}`)
+        if (!codexExists) {
+          console.log(
+            `    ${chalk.yellow((await t('prompts.WARNING')) + ': ' + (await t('prompts.FILE_NOT_EXISTS')))}`
+          )
         }
 
         console.log()

@@ -17,6 +17,7 @@ const updateCommand = require('./commands/update')
 const envCommand = require('./commands/env')
 const clearCommand = require('./commands/clear')
 const langCommand = require('./commands/lang')
+const codexCommand = require('./commands/codex')
 
 const program = new Command()
 
@@ -157,6 +158,15 @@ async function initializeProgram() {
     .description(await t('commands.lang.description'))
     .action(async (language) => {
       await langCommand(language)
+    })
+
+  // codex 命令
+  program
+    .command('codex [provider]')
+    .description('切换codex配置中的model_provider')
+    .action(async (provider) => {
+      await codexCommand(provider)
+      await checkVersionInBackground()
     })
 
   return program
