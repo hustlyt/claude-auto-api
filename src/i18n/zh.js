@@ -3,7 +3,7 @@ module.exports = {
   // CLI 基础信息
   cli: {
     description:
-      '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
+      '一个快速切换Claude Code/Codex配置的工具，支持provider快速切换',
     version: '显示版本信息'
   },
 
@@ -19,7 +19,7 @@ module.exports = {
       alias: '列举'
     },
     claude: {
-      description: '切换到指定的API配置',
+      description: '切换Claude Code配置中的model_provider',
       urlOption: '指定要切换的URL索引（从1开始，仅对数组类型url有效）',
       keyOption: '指定要切换的Key索引（从1开始，仅对数组类型key有效）',
       tokenOption: '指定要切换的Token索引（从1开始，仅对数组类型token有效）',

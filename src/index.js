@@ -49,22 +49,17 @@ async function initializeProgram() {
 
   // claude 命令
   program
-    .command('claude [name]')
+    .command('claude [provider]')
     .description(await t('commands.claude.description'))
-    .option('-u, --url <index>', await t('commands.claude.urlOption'))
-    .option('-k, --key <index>', await t('commands.claude.keyOption'))
-    .option('-t, --token <index>', await t('commands.claude.tokenOption'))
-    .option('-m, --model <index>', await t('commands.claude.modelOption'))
-    .option('-f, --fast <index>', await t('commands.claude.fastOption'))
-    .action(async (name, options) => {
-      await claudeCommand(name, options)
+    .action(async (provider) => {
+      await claudeCommand(provider)
       await checkVersionInBackground()
     })
 
   // codex 命令
   program
     .command('codex [provider]')
-    .description('切换codex配置中的model_provider')
+    .description('切换Codex配置中的model_provider')
     .action(async (provider) => {
       await codexCommand(provider)
       await checkVersionInBackground()

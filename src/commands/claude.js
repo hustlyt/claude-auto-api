@@ -384,11 +384,52 @@ async function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
 /**
  * 使用指定配置命令
  */
-async function claudeCommand(configName, options = {}) {
+async function claudeCommand(provider) {
   try {
-    // 如果没有提供配置名，显示配置列表
-    if (!configName) {
-      await listConfigs()
+    // 如果没有提供provider名称，显示当前配置和可用选项
+    if (!provider) {
+      console.log(chalk.green('当前claude配置:'))
+
+      try {
+        // 验证配置
+        const config = await validateConfig()
+
+        // 读取API配置文件
+        const apiConfig = await readConfigFile(config.apiConfigPath)
+        if (!validateApiConfig(apiConfig)) {
+          console.error(chalk.red(await t('common.PARAMETER_ERROR')), await t('claude.API_FORMAT_ERROR'))
+          return
+        }
+
+        // 显示当前配置
+        console.log(`  配置文件: ${chalk.cyan(config.apiConfigPath)}`)
+
+        // 读取settings.json文件获取当前激活的配置
+        const settingsData = await readConfigFile(config.settingsPath)
+        if (validateSettingsConfig(settingsData)) {
+          const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig)
+          const currentProvider = currentConfigInfo.name || '未设置'
+          console.log(`  当前provider: ${chalk.yellow(currentProvider)}`)
+        } else {
+          console.log(`  当前provider: ${chalk.yellow('未设置')}`)
+        }
+
+        // 获取可用的配置列表
+        const availableProviders = Object.keys(apiConfig)
+        if (availableProviders.length > 0) {
+          console.log(`  可用的providers: ${chalk.cyan(availableProviders.join(', '))}`)
+        } else {
+          console.log(`  ${chalk.yellow('未找到可用的provider配置')}`)
+        }
+
+        console.log()
+        console.log('使用方法:')
+        console.log(`  ${chalk.cyan('ccapi claude <provider_name>')} - 切换到指定的provider`)
+        console.log(`  例如: ${chalk.cyan('ccapi claude default')}`)
+
+      } catch (error) {
+        console.error(chalk.red('读取claude配置失败:'), error.message)
+      }
       return
     }
 
@@ -403,8 +444,8 @@ async function claudeCommand(configName, options = {}) {
     }
 
     // 验证配置名称是否存在
-    if (!validateConfigName(apiConfig, configName)) {
-      console.error(chalk.red(await t('common.CONFIG_ERROR')), `${await t(ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND)}: ${configName}`)
+    if (!validateConfigName(apiConfig, provider)) {
+      console.error(chalk.red(await t('common.CONFIG_ERROR')), `${await t(ERROR_MESSAGES.CONFIG_NAME_NOT_FOUND)}: ${provider}`)
       console.log(chalk.green(await t('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '))
       return
     }
@@ -416,67 +457,20 @@ async function claudeCommand(configName, options = {}) {
       return
     }
 
-    const originalConfig = apiConfig[configName]
+    const originalConfig = apiConfig[provider]
 
     // 创建配置副本用于修改
     const targetConfig = { ...originalConfig }
 
     // 设置默认值
     targetConfig.model = targetConfig.model || 'claude-sonnet-4-20250514'
-    // targetConfig.fast = targetConfig.fast || 'claude-3-5-haiku-20241022';
-    // targetConfig.timeout = targetConfig.timeout || "600000";
-
-    try {
-      // 根据参数选择各字段值
-      const selectedUrl = await selectFieldValue(
-        targetConfig.url,
-        options.url ? parseInt(options.url) : 0,
-        targetConfig.url // URL 没有默认值，使用原值
-      )
-
-      const selectedKey = await selectFieldValue(
-        targetConfig.key,
-        options.key ? parseInt(options.key) : 0,
-        targetConfig.key // Key 没有默认值，使用原值
-      )
-
-      const selectedToken = await selectFieldValue(
-        targetConfig.token,
-        options.token ? parseInt(options.token) : 0,
-        targetConfig.token // Token 没有默认值，使用原值
-      )
-
-      const selectedModel = await selectFieldValue(
-        targetConfig.model,
-        options.model ? parseInt(options.model) : 0,
-        'claude-sonnet-4-20250514'
-      )
-
-      const selectedFast = await selectFieldValue(targetConfig.fast, options.fast ? parseInt(options.fast) : 0, '')
-
-      // 更新目标配置为选中的具体值
-      targetConfig.url = selectedUrl
-      targetConfig.key = selectedKey
-      targetConfig.token = selectedToken
-      targetConfig.model = selectedModel
-      targetConfig.fast = selectedFast
-    } catch (error) {
-      console.error(chalk.red(await t('common.PARAMETER_ERROR')), error.message)
-      return
-    }
-
-    // 检查是否已经是当前配置
-    // if (isCurrentConfig(settingsData, targetConfig)) {
-    //   console.log(chalk.yellow(ERROR_MESSAGES.SAME_CONFIG));
-    //   return;
-    // }
 
     // 备份settings.json
     const backupPath = await backupFile(config.settingsPath)
     console.log(await t(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`)
 
     // 更新配置
-    console.log(await t('claude.SWITCHING_CONFIG', configName))
+    console.log(await t('claude.SWITCHING_CONFIG', provider))
     const updatedSettings = updateSettingsEnv(settingsData, targetConfig)
 
     // 保存更新后的settings.json
@@ -488,7 +482,7 @@ async function claudeCommand(configName, options = {}) {
     const updateEnv = configData.useNoEnv !== void 0 ? configData.useNoEnv : true
     if (updateEnv) {
       try {
-        success = await setSystemEnvVars(targetConfig, configName, false)
+        success = await setSystemEnvVars(targetConfig, provider, false)
       } catch (error) {
         console.log(chalk.red(await t('claude.SETTINGS_SUCCESS_ENV_FAILED')))
       }
@@ -504,7 +498,7 @@ async function claudeCommand(configName, options = {}) {
     }
     console.log()
     console.log(chalk.green.bold(await t('claude.CURRENT_CONFIG_DETAILS')))
-    console.log(await t('claude.NAME_LABEL', chalk.cyan(configName)))
+    console.log(await t('claude.NAME_LABEL', chalk.cyan(provider)))
     console.log(await t('claude.URL_LABEL', chalk.cyan(targetConfig.url)))
 
     // 显示选中的模型信息

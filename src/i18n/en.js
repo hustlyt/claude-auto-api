@@ -3,7 +3,7 @@ module.exports = {
   // CLI basic information
   cli: {
     description:
-      'A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support',
+      'A tool for quickly switching Claude Code/Codex configurations, supporting provider quick switching',
     version: 'Show version information'
   },
 
@@ -19,7 +19,7 @@ module.exports = {
       alias: 'list'
     },
     claude: {
-      description: 'Switch to specified API configuration',
+      description: 'Switch model_provider in Claude Code configuration',
       urlOption: 'Specify URL index to switch to (starting from 1, only valid for array type url)',
       keyOption: 'Specify Key index to switch to (starting from 1, only valid for array type key)',
       tokenOption: 'Specify Token index to switch to (starting from 1, only valid for array type token)',

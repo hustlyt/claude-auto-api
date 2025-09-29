@@ -5276,7 +5276,7 @@ chalk$a.stderr.supportsColor = stderrColor;
 var source$1 = chalk$a;
 
 var name = "@silencetao/ccapi";
-var version$1 = "1.0.11";
+var version$1 = "1.0.12";
 var author = "4xian (https://github.com/4xian)";
 var description = "A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support";
 var repository = {
@@ -19537,7 +19537,7 @@ var zh = {
   // CLI 基础信息
   cli: {
     description:
-      '一个快速切换Claude Code配置的工具，支持URL、API_KEY、AUTH_TOKEN、MODEL快速切换、系统环境变量一键管理、延迟测速、自动择优线路、国际化支持',
+      '一个快速切换Claude Code/Codex配置的工具，支持provider快速切换',
     version: '显示版本信息'
   },
 
@@ -19553,7 +19553,7 @@ var zh = {
       alias: '列举'
     },
     claude: {
-      description: '切换到指定的API配置',
+      description: '切换Claude Code配置中的model_provider',
       urlOption: '指定要切换的URL索引（从1开始，仅对数组类型url有效）',
       keyOption: '指定要切换的Key索引（从1开始，仅对数组类型key有效）',
       tokenOption: '指定要切换的Token索引（从1开始，仅对数组类型token有效）',
@@ -19802,7 +19802,7 @@ var en = {
   // CLI basic information
   cli: {
     description:
-      'A tool for quickly switching Claude Code configurations, supporting URL, API_KEY, AUTH_TOKEN, MODEL quick switching, one-click management of system environment variables, delay speed measurement, automatic optimal line selection, and internationalization support',
+      'A tool for quickly switching Claude Code/Codex configurations, supporting provider quick switching',
     version: 'Show version information'
   },
 
@@ -19818,7 +19818,7 @@ var en = {
       alias: 'list'
     },
     claude: {
-      description: 'Switch to specified API configuration',
+      description: 'Switch model_provider in Claude Code configuration',
       urlOption: 'Specify URL index to switch to (starting from 1, only valid for array type url)',
       keyOption: 'Specify Key index to switch to (starting from 1, only valid for array type key)',
       tokenOption: 'Specify Token index to switch to (starting from 1, only valid for array type token)',
@@ -20448,7 +20448,7 @@ const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$3 } = constants;
 const { t: t$7 } = i18n;
 
 const execAsync = promisify(exec);
-const maxText$3 = 30;
+const maxText$2 = 30;
 
 // 配置标识环境变量名
 const CONFIG_IDENTIFIER$1 = 'CCAPI_CURRENT_CONFIG';
@@ -20697,7 +20697,7 @@ async function setSystemEnvVars$2(config, configName, tip = true) {
 
           // 对敏感信息进行脱敏处理
           if (configKey === 'key' || configKey === 'token') {
-            displayValue = displayValue.length > maxText$3 ? displayValue.slice(0, maxText$3) + '...' : displayValue;
+            displayValue = displayValue.length > maxText$2 ? displayValue.slice(0, maxText$2) + '...' : displayValue;
           }
 
           console.log(`  ${chalk$7.cyan(envKey)}: ${chalk$7.green(displayValue)}`);
@@ -20785,8 +20785,6 @@ const { validateApiConfig: validateApiConfig$1, validateSettingsConfig: validate
 const { CLAUDE_ENV_KEYS: CLAUDE_ENV_KEYS$2, ERROR_MESSAGES: ERROR_MESSAGES$1, SUCCESS_MESSAGES } = constants;
 const { setSystemEnvVars: setSystemEnvVars$1 } = env$1;
 const { t: t$6 } = i18n;
-
-const maxText$2 = 30;
 
 /**
  * 获取当前使用的配置名称和各字段索引信息
@@ -20909,172 +20907,6 @@ function getCurrentConfigInfo(settingsData, apiConfig) {
 }
 
 /**
- * 格式化字段显示（支持 URL、Key、Token、Model、Fast）
- */
-async function formatFieldDisplay(fieldValue, currentIndex, label, isMasked = false) {
-  // 获取本地化标签
-  const localizedLabel = await t$6(`list.${label}`) || label;
-
-  if (Array.isArray(fieldValue)) {
-    const lines = [`${localizedLabel}:`];
-    fieldValue.forEach((value, index) => {
-      const isCurrentValue = index === currentIndex;
-      const prefix = isCurrentValue ? '    * - ' : '      - ';
-
-      // 处理敏感信息脱敏
-      let displayValue = value;
-      if (isMasked && value && value.length > maxText$2) {
-        displayValue = value.slice(0, maxText$2) + '...';
-      }
-
-      const valueDisplay = isCurrentValue ? chalk$6.green.bold(displayValue) : chalk$6.cyan(displayValue);
-      const text = `${prefix}${index + 1}: ${valueDisplay}`;
-      lines.push(isCurrentValue ? chalk$6.green.bold(text) : text);
-    });
-    return lines
-  } else {
-    // 字符串情况，保持原样
-    let displayValue = fieldValue;
-    if (isMasked && fieldValue && fieldValue.length > maxText$2) {
-      displayValue = fieldValue.slice(0, maxText$2) + '...';
-    }
-
-    const valueDisplay = currentIndex === 0 ? chalk$6.green.bold(displayValue) : chalk$6.cyan(displayValue);
-    return [`${localizedLabel}: ${valueDisplay}`]
-  }
-}
-
-/**
- * 格式化配置显示
- */
-async function formatConfigDisplay(name, config, currentInfo) {
-  const isCurrent = name === currentInfo.name;
-  const prefix = isCurrent ? chalk$6.green.bold('*') : '  ';
-  const nameDisplay = isCurrent ? chalk$6.green.bold(`[${name}]`) : chalk$6.cyan(`[${name}]`);
-
-  // 设置默认值
-  config.model = config.model || 'claude-sonnet-4-20250514';
-  // config.fast = config.fast || 'claude-3-5-haiku-20241022';
-
-  let details = [];
-
-  // 格式化 URL 显示
-  const urlLines = await formatFieldDisplay(config.url, isCurrent ? currentInfo.urlIndex : -1, 'URL');
-  details.push(...urlLines);
-
-  // 格式化模型显示
-  const modelLines = await formatFieldDisplay(config.model, isCurrent ? currentInfo.modelIndex : -1, 'Model');
-  details.push(...modelLines);
-
-  // 格式化快速模型显示
-  if (config.fast) {
-    const fastLines = await formatFieldDisplay(config.fast, isCurrent ? currentInfo.fastIndex : -1, 'Fast');
-    details.push(...fastLines);
-  }
-
-  // 格式化 Key 显示
-  if (config.key) {
-    const keyLines = await formatFieldDisplay(
-      config.key,
-      isCurrent ? currentInfo.keyIndex : -1,
-      'Key',
-      true // 需要脱敏
-    );
-    details.push(...keyLines);
-  }
-
-  // 格式化 Token 显示
-  if (config.token) {
-    const tokenLines = await formatFieldDisplay(
-      config.token,
-      isCurrent ? currentInfo.tokenIndex : -1,
-      'Token',
-      true // 需要脱敏
-    );
-    details.push(...tokenLines);
-  }
-
-  if (config.http) {
-    details.push(`HTTP: ${chalk$6.cyan(config.http)}`);
-  }
-
-  if (config.https) {
-    details.push(`HTTPS: ${chalk$6.cyan(config.https)}`);
-  }
-
-  console.log(`${prefix}${nameDisplay}`);
-  details.forEach((detail) => {
-    console.log(`    ${detail}`);
-  });
-}
-
-/**
- * 列举配置命令
- */
-async function listConfigs() {
-  try {
-    // 验证配置
-    const config = await validateConfig$2();
-
-    // 读取API配置文件
-    const apiConfig = await readConfigFile$2(config.apiConfigPath);
-    if (!validateApiConfig$1(apiConfig)) {
-      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('listDisplay.API_FORMAT_ERROR'));
-      return
-    }
-
-    // 读取settings.json文件
-    const settingsData = await readConfigFile$2(config.settingsPath);
-    if (!validateSettingsConfig$1(settingsData)) {
-      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('listDisplay.SETTINGS_FORMAT_ERROR'));
-      return
-    }
-
-    // 获取当前使用的配置信息
-    const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig);
-
-    // 显示配置列表
-    console.log(chalk$6.green.bold(await t$6('listDisplay.AVAILABLE_API_CONFIGS')));
-
-    const configNames = Object.keys(apiConfig);
-    if (configNames.length === 0) {
-      console.log(chalk$6.yellow(await t$6('listDisplay.NO_CONFIGS_AVAILABLE')));
-      return
-    }
-
-    // 按名称排序显示
-    for (const name of configNames.sort()) {
-      await formatConfigDisplay(name, apiConfig[name], currentConfigInfo);
-      console.log(); // 空行分隔
-    }
-
-    // 显示当前状态
-    if (currentConfigInfo.name) {
-      console.log(chalk$6.green.bold(await t$6('listDisplay.CURRENT_CONFIG', currentConfigInfo.name)));
-    } else {
-      console.log(chalk$6.yellow(await t$6('listDisplay.NO_CURRENT_CONFIG')));
-    }
-
-    // 显示使用方法
-    console.log();
-    console.log('使用方法:');
-    console.log(`  ${chalk$6.cyan('ccapi claude <config_name>')} - 切换到指定的配置`);
-    console.log(`  例如: ${chalk$6.cyan('ccapi claude openai')}`);
-    console.log(`  ${chalk$6.cyan('ccapi claude <config_name> -u <index>')} - 使用指定配置和URL索引`);
-    console.log(`  ${chalk$6.cyan('ccapi claude <config_name> -k <index>')} - 使用指定配置和Key索引`);
-  } catch (error) {
-    const no = error.message.includes('未设置') || error.message.includes('不存在') || error.message.includes('Not set');
-    if (no) {
-      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), error.message);
-      console.log(await t$6('listDisplay.USE_SET_CMD', chalk$6.cyan('ccapi set')));
-    } else {
-      console.error(chalk$6.red(await t$6('listDisplay.LIST_FAILED')), error.message);
-    }
-    process.exit(1);
-  }
-}
-
-/**
  * 更新settings.json中的环境变量
  */
 function updateSettingsEnv(settingsData, targetConfig) {
@@ -21144,30 +20976,54 @@ function updateSettingsEnv(settingsData, targetConfig) {
 }
 
 /**
- * 解析和选择字段值（支持 URL、Key、Token、Model、Fast）
- */
-async function selectFieldValue(fieldValue, selectedIndex, defaultValue) {
-  if (Array.isArray(fieldValue)) {
-    // 数组情况：选择指定索引的值，默认为第一个
-    const index = selectedIndex > 0 ? selectedIndex - 1 : 0;
-    if (index >= fieldValue.length) {
-      throw new Error(await t$6('common.INDEX_OUT_OF_RANGE', selectedIndex, `1-${fieldValue.length}`))
-    }
-    return fieldValue[index]
-  } else {
-    // 字符串情况：直接返回，忽略索引参数
-    return fieldValue || defaultValue
-  }
-}
-
-/**
  * 使用指定配置命令
  */
-async function claudeCommand$1(configName, options = {}) {
+async function claudeCommand$1(provider) {
   try {
-    // 如果没有提供配置名，显示配置列表
-    if (!configName) {
-      await listConfigs();
+    // 如果没有提供provider名称，显示当前配置和可用选项
+    if (!provider) {
+      console.log(chalk$6.green('当前claude配置:'));
+
+      try {
+        // 验证配置
+        const config = await validateConfig$2();
+
+        // 读取API配置文件
+        const apiConfig = await readConfigFile$2(config.apiConfigPath);
+        if (!validateApiConfig$1(apiConfig)) {
+          console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), await t$6('claude.API_FORMAT_ERROR'));
+          return
+        }
+
+        // 显示当前配置
+        console.log(`  配置文件: ${chalk$6.cyan(config.apiConfigPath)}`);
+
+        // 读取settings.json文件获取当前激活的配置
+        const settingsData = await readConfigFile$2(config.settingsPath);
+        if (validateSettingsConfig$1(settingsData)) {
+          const currentConfigInfo = getCurrentConfigInfo(settingsData, apiConfig);
+          const currentProvider = currentConfigInfo.name || '未设置';
+          console.log(`  当前provider: ${chalk$6.yellow(currentProvider)}`);
+        } else {
+          console.log(`  当前provider: ${chalk$6.yellow('未设置')}`);
+        }
+
+        // 获取可用的配置列表
+        const availableProviders = Object.keys(apiConfig);
+        if (availableProviders.length > 0) {
+          console.log(`  可用的providers: ${chalk$6.cyan(availableProviders.join(', '))}`);
+        } else {
+          console.log(`  ${chalk$6.yellow('未找到可用的provider配置')}`);
+        }
+
+        console.log();
+        console.log('使用方法:');
+        console.log(`  ${chalk$6.cyan('ccapi claude <provider_name>')} - 切换到指定的provider`);
+        console.log(`  例如: ${chalk$6.cyan('ccapi claude default')}`);
+
+      } catch (error) {
+        console.error(chalk$6.red('读取claude配置失败:'), error.message);
+      }
       return
     }
 
@@ -21182,8 +21038,8 @@ async function claudeCommand$1(configName, options = {}) {
     }
 
     // 验证配置名称是否存在
-    if (!validateConfigName$1(apiConfig, configName)) {
-      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), `${await t$6(ERROR_MESSAGES$1.CONFIG_NAME_NOT_FOUND)}: ${configName}`);
+    if (!validateConfigName$1(apiConfig, provider)) {
+      console.error(chalk$6.red(await t$6('common.CONFIG_ERROR')), `${await t$6(ERROR_MESSAGES$1.CONFIG_NAME_NOT_FOUND)}: ${provider}`);
       console.log(chalk$6.green(await t$6('common.AVAILABLE_CONFIGS')), Object.keys(apiConfig).join(', '));
       return
     }
@@ -21195,67 +21051,20 @@ async function claudeCommand$1(configName, options = {}) {
       return
     }
 
-    const originalConfig = apiConfig[configName];
+    const originalConfig = apiConfig[provider];
 
     // 创建配置副本用于修改
     const targetConfig = { ...originalConfig };
 
     // 设置默认值
     targetConfig.model = targetConfig.model || 'claude-sonnet-4-20250514';
-    // targetConfig.fast = targetConfig.fast || 'claude-3-5-haiku-20241022';
-    // targetConfig.timeout = targetConfig.timeout || "600000";
-
-    try {
-      // 根据参数选择各字段值
-      const selectedUrl = await selectFieldValue(
-        targetConfig.url,
-        options.url ? parseInt(options.url) : 0,
-        targetConfig.url // URL 没有默认值，使用原值
-      );
-
-      const selectedKey = await selectFieldValue(
-        targetConfig.key,
-        options.key ? parseInt(options.key) : 0,
-        targetConfig.key // Key 没有默认值，使用原值
-      );
-
-      const selectedToken = await selectFieldValue(
-        targetConfig.token,
-        options.token ? parseInt(options.token) : 0,
-        targetConfig.token // Token 没有默认值，使用原值
-      );
-
-      const selectedModel = await selectFieldValue(
-        targetConfig.model,
-        options.model ? parseInt(options.model) : 0,
-        'claude-sonnet-4-20250514'
-      );
-
-      const selectedFast = await selectFieldValue(targetConfig.fast, options.fast ? parseInt(options.fast) : 0, '');
-
-      // 更新目标配置为选中的具体值
-      targetConfig.url = selectedUrl;
-      targetConfig.key = selectedKey;
-      targetConfig.token = selectedToken;
-      targetConfig.model = selectedModel;
-      targetConfig.fast = selectedFast;
-    } catch (error) {
-      console.error(chalk$6.red(await t$6('common.PARAMETER_ERROR')), error.message);
-      return
-    }
-
-    // 检查是否已经是当前配置
-    // if (isCurrentConfig(settingsData, targetConfig)) {
-    //   console.log(chalk.yellow(ERROR_MESSAGES.SAME_CONFIG));
-    //   return;
-    // }
 
     // 备份settings.json
     const backupPath = await backupFile$1(config.settingsPath);
     console.log(await t$6(SUCCESS_MESSAGES.BACKUP_CREATED), `(${backupPath})`);
 
     // 更新配置
-    console.log(await t$6('claude.SWITCHING_CONFIG', configName));
+    console.log(await t$6('claude.SWITCHING_CONFIG', provider));
     const updatedSettings = updateSettingsEnv(settingsData, targetConfig);
 
     // 保存更新后的settings.json
@@ -21267,7 +21076,7 @@ async function claudeCommand$1(configName, options = {}) {
     const updateEnv = configData.useNoEnv !== void 0 ? configData.useNoEnv : true;
     if (updateEnv) {
       try {
-        success = await setSystemEnvVars$1(targetConfig, configName, false);
+        success = await setSystemEnvVars$1(targetConfig, provider, false);
       } catch (error) {
         console.log(chalk$6.red(await t$6('claude.SETTINGS_SUCCESS_ENV_FAILED')));
       }
@@ -21283,7 +21092,7 @@ async function claudeCommand$1(configName, options = {}) {
     }
     console.log();
     console.log(chalk$6.green.bold(await t$6('claude.CURRENT_CONFIG_DETAILS')));
-    console.log(await t$6('claude.NAME_LABEL', chalk$6.cyan(configName)));
+    console.log(await t$6('claude.NAME_LABEL', chalk$6.cyan(provider)));
     console.log(await t$6('claude.URL_LABEL', chalk$6.cyan(targetConfig.url)));
 
     // 显示选中的模型信息
@@ -22069,22 +21878,17 @@ async function initializeProgram() {
 
   // claude 命令
   program
-    .command('claude [name]')
+    .command('claude [provider]')
     .description(await t('commands.claude.description'))
-    .option('-u, --url <index>', await t('commands.claude.urlOption'))
-    .option('-k, --key <index>', await t('commands.claude.keyOption'))
-    .option('-t, --token <index>', await t('commands.claude.tokenOption'))
-    .option('-m, --model <index>', await t('commands.claude.modelOption'))
-    .option('-f, --fast <index>', await t('commands.claude.fastOption'))
-    .action(async (name, options) => {
-      await claudeCommand(name, options);
+    .action(async (provider) => {
+      await claudeCommand(provider);
       await checkVersionInBackground();
     });
 
   // codex 命令
   program
     .command('codex [provider]')
-    .description('切换codex配置中的model_provider')
+    .description('切换Codex配置中的model_provider')
     .action(async (provider) => {
       await codexCommand(provider);
       await checkVersionInBackground();
